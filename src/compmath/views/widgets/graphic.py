@@ -11,8 +11,8 @@ from compmath.views.widgets.input_label import InputLabel
 
 class Canvas(FigureCanvasQTAgg):
 
-    def __init__(self, parent=None, width=5, height=4, dpi=100):
-        fig = Figure(figsize=(width, height), dpi=dpi)
+    def __init__(self, parent=None):
+        fig = Figure()
         self.ax = fig.add_subplot(111)
         # установка положения осей координат
         self.ax.spines['left'].set_position('zero')
@@ -23,22 +23,26 @@ class Canvas(FigureCanvasQTAgg):
         self.ax.set_xlabel(r'x', fontsize=15, loc='right')
         self.ax.set_ylabel(r'y', fontsize=15, loc='top')
 
+        self.ax.autoscale_view()
+
         # Настройка сетки
         self.ax.minorticks_on()
 
         self.ax.grid(which='major')
         self.ax.grid(which='minor', linestyle=':')
 
-        # self.ax.xaxis.set_major_locator(ticker.MultipleLocator(1))
-        # self.ax.xaxis.set_minor_locator(ticker.MultipleLocator(0.5))
-        # self.ax.yaxis.set_major_locator(ticker.MultipleLocator(1))
-        # self.ax.yaxis.set_minor_locator(ticker.MultipleLocator(0.5))
-        # self.ax.minorticks_on()
-
         # self.ax.set_xlim(-10, 10)
         # self.ax.set_ylim(-10, 10)
 
+        fig.subplots_adjust(left=0, right=1, bottom=0, top=1)
+
         super(Canvas, self).__init__(fig)
+
+
+    def resize_figure(self, width, height, dpi):
+        self.figure.set_size_inches(width, height)
+        self.figure.set_dpi(dpi)
+        self.draw()
 
 
 class Graphic(QWidget):
@@ -82,9 +86,7 @@ class Graphic(QWidget):
         x_min.setFixedHeight(30)
         self._x_min = x_min
 
-        graphic = Canvas(width=5, height=4, dpi=100)
-        graphic.setFixedWidth(250)
-        graphic.setFixedHeight(250)
+        graphic = Canvas()
         graphic.setStyleSheet("""
             QWidget {
                 border: 1px solid $HOVER;
@@ -104,6 +106,7 @@ class Graphic(QWidget):
         self._graphic = graphic
 
         toolbar = NavigationToolbar(graphic, self)
+        self._toolbar = toolbar
 
         layout.addWidget(y_max, 0, 1, 1, 1, Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(x_min, 1, 0, 1, 1, Qt.AlignmentFlag.AlignCenter)
