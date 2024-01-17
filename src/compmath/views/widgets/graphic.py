@@ -39,12 +39,6 @@ class Canvas(FigureCanvasQTAgg):
         super(Canvas, self).__init__(fig)
 
 
-    def resize_figure(self, width, height, dpi):
-        self.figure.set_size_inches(width, height)
-        self.figure.set_dpi(dpi)
-        self.draw()
-
-
 class Graphic(QWidget):
     limitInvalid = pyqtSignal()
     limitChanged = pyqtSignal()
