@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=AudioLibrary
+Comment=Официальный клиент для AudioLibrary
+TryExec=audiolibrary
+Exec=audiolibrary -- %u
+Icon=audiolibrary
+Terminal=false
+Type=Application
+MimeType=x-scheme-handler/audiolibrary;
+Categories=Network;Qt;
+Keywords=al;audio;alib;alibrary;

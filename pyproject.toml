@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "CompMath"
+version = "0.1.0"
+description = ""
+authors = ["JKearnsl <boyarshinovn@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+PyQt6 = "^6.6.1"
+psutil = "^5.9.7"
+apscheduler = "^3.10.4"
+scipy = "^1.11.4"
+matplotlib = "^3.8.2"
+mpld3 = "^0.5.10"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[[tool.poetry.packages]]
+include = "src/compmath"
