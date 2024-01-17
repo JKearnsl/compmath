@@ -126,8 +126,7 @@ class MainView(QWidget, DObserver, metaclass=TSMeta):
             "Разработчик: "
             f"<a href='{self.model.contact.URL}'>{self.model.contact.NAME}</a> 2023"
             "\n\nОгромная благодарность за иконки: \n\n"
-            '<a href="https://www.flaticon.com/ru/authors/kerismaker">kerismaker</a>\n\n'
-            '<a href="https://www.flaticon.com/ru/authors/those-icons">those-icons</a>\n\n'
+            '<a href="https://www.flaticon.com/authors/freepik">freepik</a>\n\n'
             '<a href="https://www.svgrepo.com">svgrepo.com</a>\n\n'
         )
         central_layout.addWidget(text_widget)
