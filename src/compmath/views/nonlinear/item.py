@@ -133,8 +133,8 @@ class NoNLinearItemView(QWidget):
         bottom.addLayout(right)
 
         graphic = widgets_factory.graphic()
-        graphic.setFixedWidth(320)
-        graphic.setFixedHeight(320)
+        graphic.setFixedWidth(350)
+        graphic.setFixedHeight(350)
         self.graphic = graphic
         right.addWidget(graphic)
 
