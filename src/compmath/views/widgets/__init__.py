@@ -150,7 +150,7 @@ class WidgetsFactory:
             text_color_close_btn=self.theme.text_header,
             parent=parent
         )
-        _.set_title(title)
+        _.setWindowTitle(title)
         return _
 
     def button(self, text: str = None, *, parent: QWidgetLike = None) -> Button:
@@ -219,7 +219,7 @@ class WidgetsFactory:
             selection_color=self.theme.primary,
             primary_text_color=self.theme.text_primary,
             hover_color=self.theme.hover,
-            third_background_color=self.theme.third_background,
+            background_color=self.theme.first_background,
             parent=parent
         )
 

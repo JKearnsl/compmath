@@ -23,7 +23,6 @@ class Dialog(QDialog):
     ):
         super().__init__(parent)
         self.setModal(True)
-        self.setWindowTitle("Dialog")
         self.setContentsMargins(0, 0, 0, 0)
         self.setWindowFlag(QtCore.Qt.WindowType.FramelessWindowHint, True)
         self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground, True)
@@ -168,10 +167,10 @@ class Dialog(QDialog):
     def layout(self) -> QLayout | None:
         return self._layout
 
-    def set_title(self, title: str = None):
+    def setWindowTitle(self, title: str):
+        super().setWindowTitle(title)
         if title:
             self._title_label.setText(title)
             self._title_widget.show()
         else:
             self._title_widget.hide()
-        self.setWindowTitle(title)

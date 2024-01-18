@@ -8,7 +8,7 @@ class Table(QTableWidget):
             selection_color,
             primary_text_color,
             hover_color,
-            third_background_color,
+            background_color,
             parent=None
     ):
         super().__init__(parent)
@@ -19,7 +19,7 @@ class Table(QTableWidget):
             QTableWidget {
                 border: 2px solid $HOVER;
                 border-radius: 5px;
-                background: $BG3;
+                background: $BG1;
                 color: $PRIMARY_TEXT_COLOR;
             }
             QTableWidget::item {
@@ -35,7 +35,7 @@ class Table(QTableWidget):
             }
             
             QHeaderView::section {
-                background: $BG3;
+                background: $BG1;
                 color: $PRIMARY_TEXT_COLOR;
                 padding: 5px;
                 border-bottom: 2px solid $HOVER;
@@ -46,7 +46,7 @@ class Table(QTableWidget):
             
             QScrollBar:vertical {
                 border: none;
-                background: $BG3;
+                background: $BG1;
                 width: 10px;
                 margin: 0px 0px 0px 0px;
             }
@@ -71,7 +71,7 @@ class Table(QTableWidget):
         ).replace(
             "$HOVER", hover_color
         ).replace(
-            "$BG3", third_background_color
+            "$BG1", background_color
         ))
 
     def add_style(self, style: str):
