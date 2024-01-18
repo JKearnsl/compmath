@@ -67,7 +67,7 @@ class Dialog(QDialog):
 
         general_layout = QVBoxLayout(sheet)
         general_layout.setContentsMargins(0, 0, 0, 0)
-        general_layout.setSpacing(0)
+        general_layout.setSpacing(5)
 
         header_layout = QHBoxLayout()
         header_layout.setContentsMargins(0, 0, 0, 0)
