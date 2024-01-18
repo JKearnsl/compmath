@@ -1,42 +1,44 @@
 from PyQt6.QtCore import QPointF, Qt, pyqtSignal
 from PyQt6.QtGui import QColor
-from PyQt6.QtWidgets import QWidget, QGridLayout, QGraphicsDropShadowEffect
-from matplotlib import ticker
-from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg, NavigationToolbar2QT as NavigationToolbar
-from matplotlib.figure import Figure
-from matplotlib.ticker import MultipleLocator
+from PyQt6.QtWidgets import QWidget, QGridLayout, QGraphicsDropShadowEffect, QHBoxLayout, QToolButton, QSizePolicy, \
+    QVBoxLayout, QSlider
+from pyqtgraph import PlotDataItem, AxisItem
+from pyqtgraph import PlotWidget, InfiniteLine
 
+from compmath.utils.icon import svg_ico
+from compmath.views.widgets import Dialog
 from compmath.views.widgets.input_label import InputLabel
 
 
-class Canvas(FigureCanvasQTAgg):
-
+class GraphicCanvas(PlotWidget):
     def __init__(self, parent=None):
-        fig = Figure()
-        self.ax = fig.add_subplot(111)
-        # установка положения осей координат
-        self.ax.spines['left'].set_position('zero')
-        self.ax.spines['bottom'].set_position('zero')
-        self.ax.spines['right'].set_color('none')
-        self.ax.spines['top'].set_color('none')
+        self.axis_x = AxisItem(orientation='bottom')
+        self.axis_y = AxisItem(orientation='left')
+        super().__init__(parent, axisItems={'bottom': self.axis_x, 'left': self.axis_y})
+        self._temp_items = []
 
-        self.ax.set_xlabel(r'x', fontsize=15, loc='right')
-        self.ax.set_ylabel(r'y', fontsize=15, loc='top')
+        # Создание линий, которые будут служить осями
+        x_axis_line = InfiniteLine(pos=0, angle=0, movable=False)
+        y_axis_line = InfiniteLine(pos=0, angle=90, movable=False)
 
-        self.ax.autoscale_view()
+        self.addItem(x_axis_line)
+        self.addItem(y_axis_line)
 
-        # Настройка сетки
-        self.ax.minorticks_on()
+        self.showGrid(x=True, y=True)
 
-        self.ax.grid(which='major')
-        self.ax.grid(which='minor', linestyle=':')
+        self.setBackground('w')
 
-        # self.ax.set_xlim(-10, 10)
-        # self.ax.set_ylim(-10, 10)
+    def add_temp_item(self, item: PlotDataItem):
+        self._temp_items.append(item)
+        self.addItem(item)
 
-        fig.subplots_adjust(left=0, right=1, bottom=0, top=1)
+    def clear_temp_items(self):
+        for item in self._temp_items:
+            self.removeItem(item)
+        self._temp_items.clear()
 
-        super(Canvas, self).__init__(fig)
+    def temp_items(self) -> list[PlotDataItem]:
+        return self._temp_items
 
 
 class Graphic(QWidget):
@@ -47,28 +49,50 @@ class Graphic(QWidget):
             self,
             text_primary_color: str,
             hover_color: str,
+            first_background_color: str,
             second_background_color: str,
+            text_header_color: str,
             parent: QWidget = None
     ):
         super().__init__(parent)
 
-        self.fig_width = self.width() / self.physicalDpiX() * 1.5,
-        self.fig_height = self.height() / self.physicalDpiY() * 1.5,
+        self._plots: list[list[PlotDataItem]] = []
+        self._current_plot = None
+
+        self._text_header_color = text_header_color
+        self._hover_color = hover_color
+        self._second_background_color = second_background_color
+        self._first_background_color = first_background_color
+
+        widget_layout = QVBoxLayout()
+        widget_layout.setContentsMargins(0, 0, 0, 0)
+        widget_layout.setSpacing(0)
+        self.setLayout(widget_layout)
+
+        sheet = QWidget()
+        sheet.setObjectName("sheet")
+        widget_layout.addWidget(sheet)
+        sheet.setStyleSheet("""
+            QWidget#sheet {
+                border: none;
+                border-radius: 5px;
+                background-color: $BG1;
+            }
+        """.replace(
+            "$HOVER", hover_color,
+        ).replace(
+            "$BG1", first_background_color,
+        ))
+        sheet.setGraphicsEffect(QGraphicsDropShadowEffect(
+            blurRadius=10,
+            color=QColor(0, 0, 0, 50),
+            offset=QPointF(0, 0)
+        ))
 
         layout = QGridLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setContentsMargins(0, 5, 0, 5)
         layout.setSpacing(0)
-        self.setLayout(layout)
-
-        y_max = InputLabel(text_primary_color)
-        y_max.setFixedWidth(30)
-        y_max.setFixedHeight(30)
-        self._y_max = y_max
-
-        y_min = InputLabel(text_primary_color)
-        y_min.setFixedWidth(30)
-        y_min.setFixedHeight(30)
-        self._y_min = y_min
+        sheet.setLayout(layout)
 
         x_max = InputLabel(text_primary_color)
         x_max.setFixedWidth(30)
@@ -80,59 +104,73 @@ class Graphic(QWidget):
         x_min.setFixedHeight(30)
         self._x_min = x_min
 
-        graphic = Canvas()
-        graphic.setStyleSheet("""
-            QWidget {
-                border: 1px solid $HOVER;
-                border-radius: 5px;
-                background-color: $BG2;
-            }
-        """.replace(
-            "$HOVER", hover_color,
-        ).replace(
-            "$BG2", second_background_color,
-        ))
-        graphic.setGraphicsEffect(QGraphicsDropShadowEffect(
-            blurRadius=10,
-            color=QColor(0, 0, 0, 50),
-            offset=QPointF(0, 0)
-        ))
+        graphic = GraphicCanvas()
         self._graphic = graphic
 
-        toolbar = NavigationToolbar(graphic, self)
-        self._toolbar = toolbar
+        toolbar = QWidget()
+        toolbar.setFixedHeight(30)
+        toolbar_layout = QHBoxLayout()
+        toolbar.setLayout(toolbar_layout)
+        toolbar_layout.setContentsMargins(0, 0, 0, 0)
+        toolbar_layout.setSpacing(10)
 
-        layout.addWidget(y_max, 0, 1, 1, 1, Qt.AlignmentFlag.AlignCenter)
-        layout.addWidget(x_min, 1, 0, 1, 1, Qt.AlignmentFlag.AlignCenter)
-        layout.addWidget(graphic, 1, 1, 1, 1, Qt.AlignmentFlag.AlignCenter)
-        layout.addWidget(x_max, 1, 2, 1, 1, Qt.AlignmentFlag.AlignCenter)
-        layout.addWidget(y_min, 2, 1, 1, 1, Qt.AlignmentFlag.AlignCenter)
-        layout.addWidget(toolbar, 3, 1, 1, 1, Qt.AlignmentFlag.AlignCenter)
+        # Fullscreen button
+        fullscreen_btn = QToolButton()
+        fullscreen_btn.setFixedSize(24, 24)
+        fullscreen_btn.setStyleSheet("""
+            QToolButton {
+                border: none;
+                border-radius: 5px;
+                background-color: transparent;
+            }
+            
+            QToolButton:hover {
+                background-color: $HOVER;
+            }
+            
+            QToolButton:pressed {
+                background-color: transparent;
+            }
+            
+        """.replace(
+            "$HOVER", hover_color,
+        ))
 
-        y_max.finishEditing.connect(self.limit_changed)
-        y_min.finishEditing.connect(self.limit_changed)
+        fullscreen_btn.setIconSize(fullscreen_btn.size())
+        fullscreen_btn.setIcon(svg_ico("icons:fullscreen.svg"))
+        toolbar_layout.addWidget(fullscreen_btn)
+
+        graphic_slider = QSlider(Qt.Orientation.Horizontal)
+        graphic_slider.setFixedHeight(20)
+        graphic_slider.setFixedWidth(200)
+        graphic_slider.setRange(0, 0)
+        graphic_slider.setDisabled(True)
+        graphic_slider.setTickPosition(QSlider.TickPosition.TicksBelow)
+        self._graphic_slider = graphic_slider
+
+        layout.addWidget(x_min, 0, 0, 1, 1, Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(graphic, 0, 1, 1, 1, Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(x_max, 0, 2, 1, 1, Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(toolbar, 1, 1, 1, 1, Qt.AlignmentFlag.AlignRight)
+        layout.addWidget(graphic_slider, 2, 0, 1, 3, Qt.AlignmentFlag.AlignCenter)
+
         x_max.finishEditing.connect(self.limit_changed)
         x_min.finishEditing.connect(self.limit_changed)
-
-    def y_limits(self) -> tuple[float, float]:
-        return float(self._y_min.text()), float(self._y_max.text())
+        fullscreen_btn.clicked.connect(self.show_full_screen)
+        graphic_slider.valueChanged.connect(self.set_plot)
 
     def x_limits(self) -> tuple[float, float]:
         return float(self._x_min.text()), float(self._x_max.text())
 
     def limit_changed(self):
-        y_max = self._y_max.text()
-        y_min = self._y_min.text()
         x_max = self._x_max.text()
         x_min = self._x_min.text()
 
-        if not y_max or not y_min or not x_max or not x_min:
+        if not x_max or not x_min:
             self.limitInvalid.emit()
             return
 
         try:
-            float(y_max)
-            float(y_min)
             float(x_max)
             float(x_min)
         except ValueError:
@@ -141,18 +179,42 @@ class Graphic(QWidget):
 
         self.limitChanged.emit()
 
-    def set_y_limits(self, y_limits: tuple[float, float]):
-        self._graphic.ax.set_ylim(y_limits)
-        self._y_max.setText(str(y_limits[1]))
-        self._y_min.setText(str(y_limits[0]))
-
     def set_x_limits(self, x_limits: tuple[float, float]):
-        self._graphic.ax.set_xlim(x_limits)
         self._x_max.setText(str(x_limits[1]))
         self._x_min.setText(str(x_limits[0]))
 
-    def set_graphic(self, figure: Figure):
-        if self._graphic.figure:
-            self._graphic.figure.clear()
-        self._graphic.figure = figure
-        self._graphic.draw()
+    def add_plot(self, plot_items: list[PlotDataItem]):
+        self._plots.append(plot_items)
+        self._graphic_slider.setMaximum(len(self._plots) - 1)
+        self._graphic_slider.setEnabled(True)
+        self._graphic_slider.setValue(len(self._plots) - 1)
+
+    def set_plot(self, index: int):
+        self._current_plot = index
+        self._graphic.clear_temp_items()
+        for item in self._plots[index]:
+            self._graphic.add_temp_item(item)
+
+    def clear_plots(self):
+        self._plots.clear()
+        self._current_plot = None
+        self._graphic.clear_temp_items()
+        self._graphic_slider.setDisabled(True)
+
+    def show_full_screen(self):
+        dialog = Dialog(
+            background_window=self._first_background_color,
+            background_close_btn=self._second_background_color,
+            hover_close_btn=self._hover_color,
+            text_color_close_btn=self._text_header_color,
+            parent=self
+        )
+        dialog.setModal(True)
+        dialog.setFixedSize(800, 450)
+
+        graphic = GraphicCanvas()
+        for item in self._graphic.temp_items():
+            graphic.addItem(item)
+        dialog.layout().addWidget(graphic)
+
+        dialog.show()

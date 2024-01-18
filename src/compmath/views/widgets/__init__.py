@@ -233,6 +233,8 @@ class WidgetsFactory:
         return Graphic(
             self.theme.text_primary,
             self.theme.hover,
+            self.theme.first_background,
             self.theme.second_background,
+            self.theme.text_header,
             parent
         )
