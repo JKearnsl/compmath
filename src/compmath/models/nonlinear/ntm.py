@@ -25,6 +25,7 @@ class NTModel(BaseNoNLinearModel):
         :return:
         """
         self.graphics.clear()
+        self.table.clear()
 
         function = make_callable(self.fx)
         a, b = self.interval

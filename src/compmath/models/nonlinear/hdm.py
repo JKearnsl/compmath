@@ -1,4 +1,4 @@
-from compmath.models.nonlinear.base import BaseNoNLinearModel
+from compmath.models.nonlinear.base import BaseNoNLinearModel, TableRow
 from compmath.models.nonlinear.graphic import Graphic
 from compmath.utils.func import make_callable
 
@@ -31,6 +31,7 @@ class HDModel(BaseNoNLinearModel):
         :return:
         """
         self.graphics.clear()
+        self.table.clear()
 
         function = make_callable(self.fx)
         a, b = self.interval
@@ -49,7 +50,19 @@ class HDModel(BaseNoNLinearModel):
             graphic.add_point(a, function(a), color='yellow')
             graphic.add_point(b, function(b), color='yellow')
             graphic.add_point(x, function(x), color='red')
+
+            table_row = TableRow(
+                iter_num=n,
+                a=a,
+                b=b,
+                x=x,
+                fx=function(x),
+                fa=function(a),
+                fb=function(b),
+                distance=abs(a - b)
+            )
             self.graphics.append(graphic)
+            self.table.append(table_row)
 
             if function(a) * function(x) < 0:
                 b = x

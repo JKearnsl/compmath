@@ -4,7 +4,7 @@ from PyQt6.QtWidgets import (
     QWidget,
     QVBoxLayout,
     QFormLayout,
-    QHBoxLayout
+    QHBoxLayout, QTableWidgetItem, QSizePolicy
 )
 
 from compmath.models.nonlinear.base import BaseNoNLinearModel
@@ -19,6 +19,7 @@ class NoNLinearItemView(QWidget):
             parent=None
     ):
         super().__init__(parent)
+        self.widgets_factory = widgets_factory
         self.parent = parent
         self.model = model
         model.add_observer(self)
@@ -119,10 +120,23 @@ class NoNLinearItemView(QWidget):
         self.result_input = result_input
         form.addRow(result_label, result_input)
 
+        buttons_layout = QHBoxLayout()
+        buttons_layout.setContentsMargins(0, 0, 0, 0)
+        buttons_layout.setAlignment(Qt.AlignmentFlag.AlignRight)
+        buttons_layout.setSpacing(10)
+        left.addLayout(buttons_layout)
+
+        table_button = widgets_factory.button("Таблица")
+        table_button.setMaximumWidth(150)
+        table_button.setMinimumWidth(100)
+        table_button.setDisabled(True)
+        buttons_layout.addWidget(table_button)
+        self.table_button = table_button
+
         calc_button = widgets_factory.button("Рассчитать")
-        calc_button.setMaximumWidth(200)
+        calc_button.setMaximumWidth(150)
         calc_button.setMinimumWidth(100)
-        left.addWidget(calc_button, alignment=Qt.AlignmentFlag.AlignRight)
+        buttons_layout.addWidget(calc_button)
         self.calc_button = calc_button
 
         graphic = widgets_factory.graphic()
@@ -137,6 +151,7 @@ class NoNLinearItemView(QWidget):
         interval_a_input.textChanged.connect(self.interval_input_changed)
         interval_b_input.textChanged.connect(self.interval_input_changed)
         graphic.limitChanged.connect(self.limit_changed)
+        table_button.clicked.connect(self.show_table)
         calc_button.clicked.connect(self.model.calc)
 
     def model_changed(self):
@@ -145,6 +160,9 @@ class NoNLinearItemView(QWidget):
             self.count_iters_input.setText(str(self.model.iters))
         if self.model.result is not None:
             self.result_input.setText(str(self.model.result))
+
+        if self.model.table:
+            self.table_button.setDisabled(False)
 
         if self.model.graphics:
             self.graphic.clear_plots()
@@ -214,3 +232,39 @@ class NoNLinearItemView(QWidget):
     def limit_changed(self):
         if self.graphic.x_limits() != self.model.x_limits:
             self.model.set_x_limits(self.graphic.x_limits())
+
+    def show_table(self):
+        modal = self.widgets_factory.modal(self.parent)
+        modal.setFixedWidth(800)
+        modal.setFixedHeight(450)
+        modal.layout().setContentsMargins(5, 0, 5, 5)
+        table = self.widgets_factory.table()
+        table.setFixedHeight(400)
+        table.setRowCount(len(self.model.table))
+        table.setColumnCount(8)
+        table.add_style("""
+            QTableWidget {
+                border: none;
+            }
+            """)
+        table.setHorizontalHeaderLabels([
+            "№",
+            "a",
+            "b",
+            "x",
+            "f(x)",
+            "f(a)",
+            "f(b)",
+            "|a - b|"
+        ])
+        for i, row in enumerate(self.model.table):
+            table.setItem(i, 0, QTableWidgetItem(str(row.iter_num)))
+            table.setItem(i, 1, QTableWidgetItem(str(row.a)))
+            table.setItem(i, 2, QTableWidgetItem(str(row.b)))
+            table.setItem(i, 3, QTableWidgetItem(str(row.x)))
+            table.setItem(i, 4, QTableWidgetItem(str(row.fx)))
+            table.setItem(i, 5, QTableWidgetItem(str(row.fa)))
+            table.setItem(i, 6, QTableWidgetItem(str(row.fb)))
+            table.setItem(i, 7, QTableWidgetItem(str(row.distance)))
+        modal.layout().addWidget(table)
+        modal.exec()

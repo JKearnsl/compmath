@@ -1,8 +1,21 @@
 from abc import abstractmethod
+from dataclasses import dataclass
 
 from compmath.models.base import BaseModel
 from compmath.models.nonlinear.graphic import Graphic
 from compmath.utils.func import make_callable, FunctionValidateError
+
+
+@dataclass
+class TableRow:
+    iter_num: int
+    x: float
+    fx: float
+    a: float
+    fa: float
+    b: float
+    fb: float
+    distance: float
 
 
 class BaseNoNLinearModel(BaseModel):
@@ -18,6 +31,7 @@ class BaseNoNLinearModel(BaseModel):
         self.iters = None
         self._x_limits = (-10, 10)
         self.graphics: list[Graphic] = []
+        self.table: list[TableRow] = []
 
     @property
     def title(self) -> str:
