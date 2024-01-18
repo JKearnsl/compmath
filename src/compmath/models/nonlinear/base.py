@@ -16,7 +16,6 @@ class BaseNoNLinearModel(BaseModel):
         self._eps = 0
         self.result = None
         self.iters = None
-        self._y_limits = (-10, 10)
         self._x_limits = (-10, 10)
         self.graphics: list[Graphic] = []
 
@@ -43,7 +42,7 @@ class BaseNoNLinearModel(BaseModel):
     def set_fx(self, fx: str):
         try:
             make_callable(fx)
-        except FunctionValidateError as error:
+        except FunctionValidateError:
             self.validation_error("Инвалидная функция")
             return
 
@@ -87,30 +86,8 @@ class BaseNoNLinearModel(BaseModel):
         self.notify_observers()
 
     @property
-    def y_limits(self) -> tuple[float | int, float | int]:
-        return self._y_limits
-
-    @property
     def x_limits(self) -> tuple[float | int, float | int]:
         return self._x_limits
-
-    def set_y_limits(self, y_limits: tuple[float | int, float | int]):
-        if not isinstance(y_limits, tuple):
-            raise ValueError("Неверно задан предел по Y")
-
-        if len(y_limits) != 2:
-            raise ValueError("Неверно задан предел по Y")
-
-        if not isinstance(y_limits[0], (int, float)) or not isinstance(y_limits[1], (int, float)):
-            raise ValueError("Неверно задан предел по Y")
-
-        if y_limits[0] >= y_limits[1]:
-            self.validation_error("Неверно задан предел по Y")
-            return
-
-        self._y_limits = y_limits
-        self.notify_observers()
-        # self.calc()
 
     def set_x_limits(self, x_limits: tuple[float | int, float | int]):
         if not isinstance(x_limits, tuple):
@@ -127,7 +104,7 @@ class BaseNoNLinearModel(BaseModel):
             return
 
         self._x_limits = x_limits
-        self.notify_observers()
+        self.calc()
 
     @abstractmethod
     def calc(self) -> None:

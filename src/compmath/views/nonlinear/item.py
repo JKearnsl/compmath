@@ -2,7 +2,6 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QDoubleValidator
 from PyQt6.QtWidgets import (
     QWidget,
-    QSlider,
     QVBoxLayout,
     QFormLayout,
     QHBoxLayout
@@ -126,22 +125,11 @@ class NoNLinearItemView(QWidget):
         left.addWidget(calc_button, alignment=Qt.AlignmentFlag.AlignRight)
         self.calc_button = calc_button
 
-        right = QVBoxLayout()
-        right.setContentsMargins(0, 0, 0, 0)
-        right.setSpacing(20)
-        right.setAlignment(Qt.AlignmentFlag.AlignTop)
-        bottom.addLayout(right)
-
         graphic = widgets_factory.graphic()
         graphic.setFixedWidth(350)
         graphic.setFixedHeight(350)
         self.graphic = graphic
-        right.addWidget(graphic)
-
-        graphic_slider = QSlider(Qt.Orientation.Horizontal)
-        graphic_slider.setFixedHeight(20)
-        self.graphic_slider = graphic_slider
-        right.addWidget(graphic_slider)
+        bottom.addWidget(graphic)
 
         # События
         fx_input.textChanged.connect(lambda text: self.model.set_fx(text))
@@ -159,7 +147,11 @@ class NoNLinearItemView(QWidget):
             self.result_input.setText(str(self.model.result))
 
         if self.model.graphics:
-            self.graphic.set_graphic(self.model.graphics[0].canvas())
+            self.graphic.clear_plots()
+            for plot in self.model.graphics:
+                self.graphic.add_plot(plot.plot_items())
+        else:
+            self.graphic.clear_plots()
 
     def model_loaded(self):
         self.header.blockSignals(True)
@@ -176,7 +168,6 @@ class NoNLinearItemView(QWidget):
         self.eps_input.setText(str(self.model.eps))
         self.interval_a_input.setText(str(self.model.interval[0]))
         self.interval_b_input.setText(str(self.model.interval[1]))
-        self.graphic.set_y_limits(self.model.y_limits)
         self.graphic.set_x_limits(self.model.x_limits)
 
         self.header.blockSignals(False)
@@ -221,7 +212,5 @@ class NoNLinearItemView(QWidget):
         self.model.set_eps(value)
 
     def limit_changed(self):
-        if self.graphic.y_limits() != self.model.y_limits:
-            self.model.set_y_limits(self.graphic.y_limits())
-        else:
+        if self.graphic.x_limits() != self.model.x_limits:
             self.model.set_x_limits(self.graphic.x_limits())
