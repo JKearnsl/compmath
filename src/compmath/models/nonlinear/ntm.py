@@ -18,17 +18,16 @@ class NTModel(BaseNoNLinearModel):
         self._interval = (2, 3)
         self._eps = 0.001
 
-    def calc(self, fx: str, interval: tuple[float, float], eps: float) -> tuple[float, int] | None:
+    def calc(self) -> None:
         """
         Метод Ньютона (касательных)
 
-        :param fx:
-        :param interval:
-        :param eps:
         :return:
         """
-        function = make_callable(fx)
-        a, b = interval
+        self.graphics.clear()
+
+        function = make_callable(self.fx)
+        a, b = self.interval
 
         if function(a) * function(b) > 0:
             self.raise_error("На данном интервале нет корней")
@@ -36,8 +35,6 @@ class NTModel(BaseNoNLinearModel):
 
         n = 0
         x = a
-        while abs(function(x)) > eps:
+        while abs(function(x)) > self.eps:
             n += 1
-            x = x - function(x) / self.derivative(fx, x)
-
-        return x, n
+            x = x - function(x) / self.derivative(self.fx, x)

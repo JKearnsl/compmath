@@ -30,6 +30,8 @@ class HDModel(BaseNoNLinearModel):
 
         :return:
         """
+        self.graphics.clear()
+
         function = make_callable(self.fx)
         a, b = self.interval
 
@@ -42,10 +44,7 @@ class HDModel(BaseNoNLinearModel):
             n += 1
             x = (a + b) / 2
 
-            graphic = Graphic(
-                y_limits=self.y_limits,
-                x_limits=self.x_limits
-            )
+            graphic = Graphic(x_limits=self.x_limits)
             graphic.add_graph(function)
             graphic.add_point(a, function(a), color='yellow')
             graphic.add_point(b, function(b), color='yellow')

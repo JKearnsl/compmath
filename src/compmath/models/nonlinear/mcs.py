@@ -23,11 +23,10 @@ class MCSModel(BaseNoNLinearModel):
         """
         Метод хорд и секущих
 
-        :param fx:
-        :param interval:
-        :param eps:
         :return:
         """
+        self.graphics.clear()
+
         function = make_callable(self.fx)
         a, b = self.interval
 
