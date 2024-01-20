@@ -34,3 +34,18 @@ def derivative(fx: Callable[[float | int], float], h: float = 0.0001) -> Callabl
     """
 
     return lambda x: (fx(x + h) - fx(x)) / h
+
+
+def tangent(fx: Callable[[float | int], float], x0: float | int) -> Callable[[float | int], float]:
+    """
+    Уравнение касательной
+
+    y = f(x0) + f'(x0)(x-x0)
+
+
+    :param fx: функция графика
+    :param x0: точка касания
+    :return: уравнение касательной
+    """
+
+    return lambda x: fx(x0) + derivative(fx)(x0) * (x - x0)
