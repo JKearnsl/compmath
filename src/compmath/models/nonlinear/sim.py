@@ -1,5 +1,5 @@
 from compmath.models.nonlinear.base import BaseNoNLinearModel
-from compmath.utils.func import make_callable
+from compmath.utils.func import make_callable, derivative
 
 
 class SIModel(BaseNoNLinearModel):
@@ -37,6 +37,6 @@ class SIModel(BaseNoNLinearModel):
 
         n = 0
         x = a
-        while abs(function(x)) > self.eps:
+        while abs(function(x)) > self.eps or n < self.iters_limit:
             n += 1
-            x = x - function(x) / self.derivative(self.fx, x)
+            x = x - function(x) / derivative(function)(x)

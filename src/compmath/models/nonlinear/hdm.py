@@ -41,7 +41,7 @@ class HDModel(BaseNoNLinearModel):
             return
 
         n = 0
-        while abs(a - b) > self.eps:
+        while abs(a - b) > self.eps and n < self.iters_limit:
             n += 1
             x = (a + b) / 2
 
@@ -71,4 +71,4 @@ class HDModel(BaseNoNLinearModel):
 
         self.result = (a + b) / 2
         self.iters = n
-        self.notify_observers()
+        self.was_calculated()

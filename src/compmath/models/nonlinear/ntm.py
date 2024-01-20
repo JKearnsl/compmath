@@ -1,5 +1,6 @@
-from compmath.models.nonlinear.base import BaseNoNLinearModel
-from compmath.utils.func import make_callable
+from compmath.models.nonlinear.base import BaseNoNLinearModel, TableRow
+from compmath.models.nonlinear.graphic import Graphic
+from compmath.utils.func import make_callable, derivative, tangent
 
 
 class NTModel(BaseNoNLinearModel):
@@ -34,8 +35,41 @@ class NTModel(BaseNoNLinearModel):
             self.raise_error("На данном интервале нет корней")
             return
 
+        if function(a) * derivative(derivative(function))(a) > 0:
+            x = a
+        else:
+            x = b
+
         n = 0
-        x = a
-        while abs(function(x)) > self.eps:
+        while True:
+            h = - function(x) / derivative(function)(x)
+            x += h
             n += 1
-            x = x - function(x) / self.derivative(self.fx, x)
+
+            graphic = Graphic(x_limits=self.x_limits)
+            graphic.add_graph(function)
+            graphic.add_graph(tangent(function, x))
+            graphic.add_point(x, function(x))
+            graphic.add_point(a, function(a), color="yellow")
+            graphic.add_point(b, function(b), color="yellow")
+            self.graphics.append(graphic)
+
+            self.table.append(
+                TableRow(
+                    iter_num=n,
+                    x=x,
+                    fx=function(x),
+                    a=a,
+                    fa=function(a),
+                    b=b,
+                    fb=function(b),
+                    distance=abs(a - b)
+                )
+            )
+
+            if abs(h) <= self.eps or n >= self.iters_limit:
+                break
+
+        self.result = x
+        self.iters = n
+        self.was_calculated()

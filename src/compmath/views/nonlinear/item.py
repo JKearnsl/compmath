@@ -1,5 +1,5 @@
 from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QDoubleValidator
+from PyQt6.QtGui import QDoubleValidator, QIntValidator
 from PyQt6.QtWidgets import (
     QWidget,
     QVBoxLayout,
@@ -108,6 +108,12 @@ class NoNLinearItemView(QWidget):
         self.interval_b_input = interval_b_input
         form.addRow(interval_b_label, interval_b_input)
 
+        iters_limit_label = widgets_factory.label("Лимит итераций: ")
+        iters_limit_input = widgets_factory.line_edit()
+        iters_limit_input.setValidator(QIntValidator())
+        self.iters_limit_input = iters_limit_input
+        form.addRow(iters_limit_label, iters_limit_input)
+
         count_iters_label = widgets_factory.label("Кол-во итераций: ")
         count_iters_input = widgets_factory.line_edit()
         count_iters_input.setReadOnly(True)
@@ -150,26 +156,27 @@ class NoNLinearItemView(QWidget):
         eps_input.textChanged.connect(self.eps_changed)
         interval_a_input.textChanged.connect(self.interval_input_changed)
         interval_b_input.textChanged.connect(self.interval_input_changed)
+        iters_limit_input.textChanged.connect(self.iters_limit_changed)
         graphic.limitChanged.connect(self.limit_changed)
         table_button.clicked.connect(self.show_table)
         calc_button.clicked.connect(self.model.calc)
 
     def model_changed(self):
         self.error_label.setText("")
+
+    def was_calculated(self):
         if self.model.iters is not None:
             self.count_iters_input.setText(str(self.model.iters))
+
         if self.model.result is not None:
             self.result_input.setText(str(self.model.result))
 
         if self.model.table:
             self.table_button.setDisabled(False)
 
-        if self.model.graphics:
-            self.graphic.clear_plots()
-            for plot in self.model.graphics:
-                self.graphic.add_plot(plot.plot_items())
-        else:
-            self.graphic.clear_plots()
+        self.graphic.clear_plots()
+        for plot in self.model.graphics:
+            self.graphic.add_plot(plot.plot_items())
 
     def model_loaded(self):
         self.header.blockSignals(True)
@@ -179,6 +186,7 @@ class NoNLinearItemView(QWidget):
         self.interval_a_input.blockSignals(True)
         self.interval_b_input.blockSignals(True)
         self.graphic.blockSignals(True)
+        self.iters_limit_input.blockSignals(True)
 
         self.header.setText(self.model.title)
         self.description.setText(self.model.description)
@@ -187,6 +195,7 @@ class NoNLinearItemView(QWidget):
         self.interval_a_input.setText(str(self.model.interval[0]))
         self.interval_b_input.setText(str(self.model.interval[1]))
         self.graphic.set_x_limits(self.model.x_limits)
+        self.iters_limit_input.setText(str(self.model.iters_limit))
 
         self.header.blockSignals(False)
         self.description.blockSignals(False)
@@ -195,6 +204,7 @@ class NoNLinearItemView(QWidget):
         self.interval_a_input.blockSignals(False)
         self.interval_b_input.blockSignals(False)
         self.graphic.blockSignals(False)
+        self.iters_limit_input.blockSignals(False)
 
     def validation_error(self, message: str):
         self.error_label.setText(message)
@@ -232,6 +242,18 @@ class NoNLinearItemView(QWidget):
     def limit_changed(self):
         if self.graphic.x_limits() != self.model.x_limits:
             self.model.set_x_limits(self.graphic.x_limits())
+
+    def iters_limit_changed(self):
+        value = self.iters_limit_input.text()
+        if not value:
+            return
+
+        try:
+            value = int(value)
+        except ValueError:
+            return
+
+        self.model.set_iters_limit(value)
 
     def show_table(self):
         modal = self.widgets_factory.modal(self.parent)

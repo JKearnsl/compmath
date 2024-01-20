@@ -28,6 +28,7 @@ class BaseNoNLinearModel(BaseModel):
         self._fx = "None"
         self._interval = (0, 1)
         self._eps = 0
+        self._iters_limit = 100
         self.result = None
         self.iters = None
         self._x_limits = (-10, 10)
@@ -104,6 +105,21 @@ class BaseNoNLinearModel(BaseModel):
     def x_limits(self) -> tuple[float | int, float | int]:
         return self._x_limits
 
+    @property
+    def iters_limit(self) -> int:
+        return self._iters_limit
+
+    def set_iters_limit(self, value: int) -> None:
+        if not isinstance(value, int):
+            raise ValueError(f"Неверный параметр max_iters {value!r} type {type(value)!r}")
+
+        if value <= 0:
+            self.validation_error("Неверный параметр ограничения итераций")
+            return
+
+        self._iters_limit = value
+        self.notify_observers()
+
     def set_x_limits(self, x_limits: tuple[float | int, float | int]):
         if not isinstance(x_limits, tuple):
             raise ValueError("Неверно задан предел по X")
@@ -124,6 +140,10 @@ class BaseNoNLinearModel(BaseModel):
     @abstractmethod
     def calc(self) -> None:
         ...
+
+    def was_calculated(self):
+        for observer in self._mObservers:
+            observer.was_calculated()
 
     def validation_error(self, error):
         for observer in self._mObservers:
