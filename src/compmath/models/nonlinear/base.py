@@ -1,5 +1,6 @@
 from abc import abstractmethod
 from dataclasses import dataclass
+from typing import Callable
 
 from compmath.models.base import BaseModel
 from compmath.models.nonlinear.graphic import Graphic
@@ -123,16 +124,6 @@ class BaseNoNLinearModel(BaseModel):
     @abstractmethod
     def calc(self) -> None:
         ...
-
-    def derivative(self, fx: str, x: float) -> float:
-        """
-        Производная функции
-
-        :param fx:
-        :param x:
-        :return:
-        """
-        raise NotImplementedError
 
     def validation_error(self, error):
         for observer in self._mObservers:
