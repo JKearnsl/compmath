@@ -3,18 +3,12 @@ from compmath.models.nonlinear.graphic import Graphic
 from compmath.utils.func import make_callable, line_between_points
 
 
-class MCSModel(BaseNoNLinearModel):
+class MCSTwoModel(BaseNoNLinearModel):
 
     def __init__(self):
         super().__init__()
-        self._title = "Метод хорд"
+        self._title = "Метод секущих (Двух шаговый)"
         self._description = """
-            <p>
-            Метод хорд — это простейший итерационный метод решения нелинейных уравнений.
-            Предполагается, что функция <i>f(x)</i> непрерывна на отрезке <i>[a, b]</i> и на концах отрезка принимает 
-            значения разных знаков. Тогда на этом отрезке гарантированно существует хотя бы один корень уравнения 
-            <i>f(x) = 0</i>.
-            </p>
         """
         self._fx = "x**3 - 2*x - 5"
         self._interval = (2, 3)
@@ -22,7 +16,7 @@ class MCSModel(BaseNoNLinearModel):
 
     def calc(self) -> None:
         """
-        Метод хорд и секущих
+        Метод секущих двух шаговый
 
         :return:
         """
@@ -32,15 +26,13 @@ class MCSModel(BaseNoNLinearModel):
         function = make_callable(self.fx)
         a, b = self.interval
 
-        if function(a) * function(b) > 0:
-            self.raise_error("На данном интервале нет корней")
-            return
-
         n = 0
-        x = None
-        while abs(a - b) > self.eps and n < self.iters_limit:
+        while True:
+            x = b - (function(b) * (b - a)) / (function(b) - function(a))
             n += 1
-            x = a - (function(a) * (b - a)) / (function(b) - function(a))
+
+            a = b
+            b = x
 
             graphic = Graphic(x_limits=self.x_limits)
             graphic.add_graph(function)
@@ -63,15 +55,7 @@ class MCSModel(BaseNoNLinearModel):
                 )
             )
 
-            if function(x) == 0:
-                break
-
-            if function(a) * function(x) < 0:
-                b = x
-            else:
-                a = x
-
-            if abs(function(x)) < self.eps:
+            if abs(b - a) <= self.eps or n > self.iters_limit:
                 break
 
         self.result = x

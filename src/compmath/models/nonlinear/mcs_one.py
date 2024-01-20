@@ -1,20 +1,14 @@
 from compmath.models.nonlinear.base import BaseNoNLinearModel, TableRow
 from compmath.models.nonlinear.graphic import Graphic
-from compmath.utils.func import make_callable, line_between_points
+from compmath.utils.func import make_callable, line_between_points, derivative
 
 
-class MCSModel(BaseNoNLinearModel):
+class MCSOneModel(BaseNoNLinearModel):
 
     def __init__(self):
         super().__init__()
-        self._title = "Метод хорд"
+        self._title = "Метод секущих (Одно шаговый)"
         self._description = """
-            <p>
-            Метод хорд — это простейший итерационный метод решения нелинейных уравнений.
-            Предполагается, что функция <i>f(x)</i> непрерывна на отрезке <i>[a, b]</i> и на концах отрезка принимает 
-            значения разных знаков. Тогда на этом отрезке гарантированно существует хотя бы один корень уравнения 
-            <i>f(x) = 0</i>.
-            </p>
         """
         self._fx = "x**3 - 2*x - 5"
         self._interval = (2, 3)
@@ -22,7 +16,7 @@ class MCSModel(BaseNoNLinearModel):
 
     def calc(self) -> None:
         """
-        Метод хорд и секущих
+        Метод секущих одно шаговый
 
         :return:
         """
@@ -36,11 +30,17 @@ class MCSModel(BaseNoNLinearModel):
             self.raise_error("На данном интервале нет корней")
             return
 
+        if derivative(derivative(function))(x) * function(a) > 0:
+            c = a
+            x = b
+        else:
+            c = b
+            x = a
+
         n = 0
-        x = None
-        while abs(a - b) > self.eps and n < self.iters_limit:
+        while True:
+            x -= (function(x) * (x - c)) / (function(c) - function(c))
             n += 1
-            x = a - (function(a) * (b - a)) / (function(b) - function(a))
 
             graphic = Graphic(x_limits=self.x_limits)
             graphic.add_graph(function)
@@ -63,15 +63,7 @@ class MCSModel(BaseNoNLinearModel):
                 )
             )
 
-            if function(x) == 0:
-                break
-
-            if function(a) * function(x) < 0:
-                b = x
-            else:
-                a = x
-
-            if abs(function(x)) < self.eps:
+            if abs(function(x)) <= self.eps or n >= self.iters_limit:
                 break
 
         self.result = x
