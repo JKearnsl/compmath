@@ -30,16 +30,16 @@ class MCSOneModel(BaseNoNLinearModel):
             self.raise_error("На данном интервале нет корней")
             return
 
-        if derivative(derivative(function))(x) * function(a) > 0:
-            c = a
-            x = b
-        else:
+        if derivative(derivative(function))(a) * function(a) > 0:
             c = b
             x = a
+        else:
+            c = a
+            x = b
 
         n = 0
         while True:
-            x -= (function(x) * (x - c)) / (function(c) - function(c))
+            x -= (function(x) * (x - c)) / (function(x) - function(c))
             n += 1
 
             graphic = Graphic(x_limits=self.x_limits)
