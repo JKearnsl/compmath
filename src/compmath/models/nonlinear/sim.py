@@ -1,5 +1,6 @@
-from compmath.models.nonlinear.base import BaseNoNLinearModel
-from compmath.utils.func import make_callable, derivative
+from compmath.models.nonlinear.base import BaseNoNLinearModel, TableRow
+from compmath.models.nonlinear.graphic import Graphic
+from compmath.utils.func import make_callable
 
 
 class SIModel(BaseNoNLinearModel):
@@ -21,7 +22,6 @@ class SIModel(BaseNoNLinearModel):
     def calc(self) -> None:
         """
         Метод простых итераций
-        # TODO одинаковы с ньютоном
 
         :return:
         """
@@ -31,12 +31,34 @@ class SIModel(BaseNoNLinearModel):
         function = make_callable(self.fx)
         a, b = self.interval
 
-        if function(a) * function(b) > 0:
-            self.raise_error("На данном интервале нет корней")
-            return
-
         n = 0
         x = a
-        while abs(function(x)) > self.eps or n < self.iters_limit:
+        while True:
+            x0 = x + 2 * self.eps
+            x = function(x0)
             n += 1
-            x = x - function(x) / derivative(function)(x)
+
+            graphic = Graphic(x_limits=self.x_limits)
+            graphic.add_graph(function)
+            graphic.add_point(x, function(x), color="red")
+            self.graphics.append(graphic)
+
+            self.table.append(
+                TableRow(
+                    iter_num=n,
+                    x=x,
+                    fx=function(x),
+                    distance=abs(x - x0),
+                    a=x0,
+                    b=None,
+                    fa=function(a),
+                    fb=None,
+                )
+            )
+
+            if abs(x - x0) <= self.eps or n >= self.iters_limit:
+                break
+
+        self.result = x
+        self.iters = n
+        self.was_calculated()
