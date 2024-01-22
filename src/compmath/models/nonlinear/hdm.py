@@ -1,5 +1,5 @@
 from compmath.models.nonlinear.base import BaseNoNLinearModel, TableRow
-from compmath.models.nonlinear.graphic import Graphic
+from compmath.models.graphic import Graphic
 from compmath.utils.func import make_callable
 
 

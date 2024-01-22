@@ -1,9 +1,8 @@
 from abc import abstractmethod
 from dataclasses import dataclass
-from typing import Callable
 
 from compmath.models.base import BaseModel
-from compmath.models.nonlinear.graphic import Graphic
+from compmath.models.graphic import Graphic
 from compmath.utils.func import make_callable, FunctionValidateError
 
 
