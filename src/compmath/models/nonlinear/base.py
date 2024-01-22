@@ -12,11 +12,11 @@ class TableRow:
     iter_num: int
     x: float
     fx: float
-    a: float
-    fa: float
-    b: float
-    fb: float
-    distance: float
+    a: float | None
+    fa: float | None
+    b: float | None
+    fb: float | None
+    distance: float | None
 
 
 class BaseNoNLinearModel(BaseModel):
