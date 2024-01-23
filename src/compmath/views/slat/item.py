@@ -125,7 +125,7 @@ class SLATItemView(QWidget):
         # События
         size_input.valueChanged.connect(self.size_changed)
         eps_input.textChanged.connect(self.eps_changed)
-        result_button.clicked.connect(self.show_matrix)
+        result_button.clicked.connect(self.show_table)
         calc_button.clicked.connect(self.model.calc)
         matrix.itemChanged.connect(self.item_changed)
 
@@ -135,7 +135,6 @@ class SLATItemView(QWidget):
         self.matrix.blockSignals(True)
         self.matrix.set_a(self.model.a())
         self.matrix.set_b(self.model.b())
-        print(self.model.matrix)
         self.matrix.blockSignals(False)
 
     def was_calculated(self):
@@ -194,8 +193,7 @@ class SLATItemView(QWidget):
             value = float(value)
         self.model.set_item_value(row_index, column_index, value)
 
-
-    def show_matrix(self):
+    def show_table(self):
         modal = self.widgets_factory.modal(self.parent)
         modal.setFixedWidth(800)
         modal.setFixedHeight(450)

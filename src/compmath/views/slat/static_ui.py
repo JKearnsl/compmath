@@ -13,10 +13,10 @@ class UiSLATPage:
         sheet = QtWidgets.QWidget(page)
         sheet.setObjectName("sheet")
         sheet.setStyleSheet("""
-                    QWidget#sheet {
-                        background-color: $BG1;
-                    }
-                """.replace(
+            QWidget#sheet {
+                background-color: $BG1;
+            }
+        """.replace(
             "$BG1", widgets_factory.theme.first_background
         ))
         page_layout.addWidget(sheet)
@@ -31,15 +31,14 @@ class UiSLATPage:
         scroll_area = QtWidgets.QScrollArea(page)
         scroll_area.setObjectName("scroll_area")
         scroll_area.setStyleSheet("""
-                    QWidget#scroll_area {
-                        border: none;
-                        outline: none;
-                    }
-                """)
+            QWidget#scroll_area {
+                border: none;
+                outline: none;
+            }
+        """)
         scroll_area.setWidgetResizable(True)
         scroll_area.setWidget(sheet)
         page_layout.addWidget(scroll_area)
-
 
         central_layout.addStretch(1)
         self.translate_ui(page)
