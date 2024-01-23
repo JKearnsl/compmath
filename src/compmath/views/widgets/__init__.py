@@ -21,6 +21,7 @@ from compmath.views.widgets.input_label import InputLabel
 from compmath.views.widgets.label import Label
 from compmath.views.widgets.line_edit import LineEdit
 from compmath.views.widgets.list import List
+from compmath.views.widgets.matrix import Matrix
 from compmath.views.widgets.message_box import MessageBox
 from compmath.views.widgets.spin_box import SpinBox
 from compmath.views.widgets.table import Table
@@ -237,4 +238,13 @@ class WidgetsFactory:
             self.theme.second_background,
             self.theme.text_header,
             parent
+        )
+
+    def matrix(self, *, parent: QWidgetLike = None) -> Matrix:
+        return Matrix(
+            selection_color=self.theme.primary,
+            primary_text_color=self.theme.text_primary,
+            hover_color=self.theme.hover,
+            background_color=self.theme.first_background,
+            parent=parent
         )
