@@ -3,6 +3,7 @@ from typing import TypeVar
 from PyQt6.QtWidgets import QWidget
 
 from compmath.models import MenuItem
+from compmath.models.slat.sim import SIModel
 from compmath.models.slat.zm import ZModel
 from compmath.utils.observer import DObserver
 from compmath.utils.ts_meta import TSMeta
@@ -37,9 +38,13 @@ class SLATView(QWidget, DObserver, metaclass=TSMeta):
         ...
 
     def model_loaded(self):
+        sim = SLATItemView(SIModel(), self.widgets_factory, self)
+        self.ui.central_layout.addWidget(sim)
+
         zm = SLATItemView(ZModel(), self.widgets_factory, self)
         self.ui.central_layout.addWidget(zm)
 
+        sim.model_loaded()
         zm.model_loaded()
 
         self.model_changed()
