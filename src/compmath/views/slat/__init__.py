@@ -3,9 +3,11 @@ from typing import TypeVar
 from PyQt6.QtWidgets import QWidget
 
 from compmath.models import MenuItem
+from compmath.models.slat.zm import ZModel
 from compmath.utils.observer import DObserver
 from compmath.utils.ts_meta import TSMeta
-from compmath.views.ni.static_ui import UiNIPage
+from compmath.views.slat.static_ui import UiSLATPage
+from compmath.views.slat.item import SLATItemView
 
 ViewWidget = TypeVar('ViewWidget', bound=QWidget)
 
@@ -23,7 +25,7 @@ class SLATView(QWidget, DObserver, metaclass=TSMeta):
         parent.ui.content_layout.addWidget(self)
         parent.ui.content_layout.setCurrentWidget(self)
 
-        self.ui = UiNIPage()
+        self.ui = UiSLATPage()
         self.ui.setup_ui(self, widgets_factory)
 
         # Регистрация представлений
@@ -35,4 +37,9 @@ class SLATView(QWidget, DObserver, metaclass=TSMeta):
         ...
 
     def model_loaded(self):
+        zm = SLATItemView(ZModel(), self.widgets_factory, self)
+        self.ui.central_layout.addWidget(zm)
+
+        zm.model_loaded()
+
         self.model_changed()

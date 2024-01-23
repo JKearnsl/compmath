@@ -3,7 +3,7 @@ from PyQt6 import QtCore, QtWidgets
 from compmath.views.widgets import WidgetsFactory
 
 
-class UISLATPage:
+class UiSLATPage:
     def setup_ui(self, page: QtWidgets.QWidget, widgets_factory: WidgetsFactory):
         page.setObjectName("page")
         page_layout = QtWidgets.QHBoxLayout(page)
