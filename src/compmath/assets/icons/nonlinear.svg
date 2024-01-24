@@ -1,16 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
-<svg width="400" height="400" xmlns="http://www.w3.org/2000/svg" xmlns:bx="https://boxy-svg.com">
-  <defs>
-    <bx:guide x="-40.18214039174538" y="193.07777095286878" angle="0"/>
-    <bx:guide x="-55.76375753246708" y="191.51961280514536" angle="0"/>
-  </defs>
-  <g style="" transform="matrix(1.428688, 0, 0, 9.460771, -22.140185, -2085.931215)">
-    <line x1="50" y1="250" x2="250" y2="250" stroke="black" stroke-width="5"/>
-    <polygon points="245 245 285.693 250 245 255" fill="black" style=""/>
-  </g>
-  <line x1="140.095" y1="206.305" x2="308.562" y2="62.312" stroke="blue" stroke-width="25" style=""/>
-  <g style="" transform="matrix(10.341026, 0.208909, 0, 1.273528, -446.154066, -30.194236)">
-    <polyline stroke="black" stroke-width="5" points="50.173 252.504 50.173 130.629 50.173 52.504"/>
-    <polygon points="45.079 58.062 50.21 19.117 54.712 55.692" fill="black" style=""/>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+  <g fill="none" fill-rule="evenodd">
+    <path fill="#389FD6" d="M6.37342712,5.08045635 L6.55388348,4.9 L9.04842697,7.3945435 L12.9429705,3.5 L14.0036306,4.56066017 L9.05388317,9.51040764 L9.03421341,9.49073788 L9.02875721,9.49619408 L6.55020382,7.01764069 L3.18776695,10.3800776 L2.12710678,9.31941738 L6.36974747,5.0767767 L6.37342712,5.08045635 Z"/>
+    <path fill="#6E6E6E" d="M4,12 L14,12 L14,14 L2,14 L2,12 L2,2 L4,2 L4,12 Z"/>
   </g>
 </svg>
