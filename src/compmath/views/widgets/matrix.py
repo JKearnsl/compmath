@@ -16,6 +16,7 @@ class Matrix(QTableView):
     ):
         super().__init__(parent)
 
+        self.is_hidden_b = False
         self.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         self.verticalHeader().setVisible(False)
         self.horizontalHeader().setVisible(False)
@@ -98,8 +99,9 @@ class Matrix(QTableView):
 
     def b(self) -> list[float | int]:
         values = []
-        for i in range(self.model().rowCount()):
-            values.append(self.model().data(self.model().index(i, self.model().columnCount())))
+        if not self.is_hidden_b:
+            for i in range(self.model().rowCount()):
+                values.append(self.model().data(self.model().index(i, self.model().columnCount())))
         return values
 
     def matrix(self) -> list[list[float | int]]:
