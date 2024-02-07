@@ -11,6 +11,7 @@ class BaseSLATModel(BaseModel):
         self._description = "None"
         self._eps = 0.0001
         self.matrix: list[list[int | float]] = []
+        self.x0: list[int | float] = []
         self.result: list[tuple[int, ...]] = []
         self.iters = None
 
@@ -75,6 +76,12 @@ class BaseSLATModel(BaseModel):
                 for _ in range(delta):
                     row.pop(-2)
 
+        if len(self.x0) < value:
+            for _ in range(len(self.x0), value):
+                self.x0.append(0)
+        elif len(self.x0) > value:
+            self.x0 = self.x0[:value]
+
         self.notify_observers()
 
     def size(self) -> int:
@@ -82,6 +89,10 @@ class BaseSLATModel(BaseModel):
 
     def set_item_value(self, row: int, column: int, value: int | float):
         self.matrix[row][column] = value
+        self.notify_observers()
+
+    def set_item_x0_value(self, index: int, value: int | float):
+        self.x0[index] = value
         self.notify_observers()
 
     @abstractmethod

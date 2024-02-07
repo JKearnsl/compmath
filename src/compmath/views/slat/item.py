@@ -80,6 +80,12 @@ class SLATItemView(QWidget):
         self.matrix = matrix
         left.addWidget(matrix)
 
+        x0 = widgets_factory.matrix()
+        x0.setFixedHeight(30)
+
+        self.x0 = x0
+        left.addWidget(x0)
+
         right = QVBoxLayout()
         right.setContentsMargins(0, 0, 0, 0)
         right.setAlignment(Qt.AlignmentFlag.AlignTop)
@@ -128,6 +134,7 @@ class SLATItemView(QWidget):
         result_button.clicked.connect(self.show_table)
         calc_button.clicked.connect(self.model.calc)
         matrix.itemChanged.connect(self.item_changed)
+        x0.itemChanged.connect(self.item_x0_changed)
 
     def model_changed(self):
         self.error_label.setText("")
@@ -136,6 +143,10 @@ class SLATItemView(QWidget):
         self.matrix.set_a(self.model.a())
         self.matrix.set_b(self.model.b())
         self.matrix.blockSignals(False)
+
+        self.x0.blockSignals(True)
+        self.x0.set_a([self.model.x0])
+        self.x0.blockSignals(False)
 
     def was_calculated(self):
         if self.model.matrix:
@@ -146,17 +157,20 @@ class SLATItemView(QWidget):
         self.description.blockSignals(True)
         self.eps_input.blockSignals(True)
         self.matrix.blockSignals(True)
+        self.x0.blockSignals(True)
 
         self.header.setText(self.model.title)
         self.description.setText(self.model.description)
         self.eps_input.setText(str(self.model.eps))
         self.matrix.set_a(self.model.a())
         self.matrix.set_b(self.model.b())
+        self.x0.set_a([self.model.x0])
 
         self.header.blockSignals(False)
         self.description.blockSignals(False)
         self.eps_input.blockSignals(False)
         self.matrix.blockSignals(False)
+        self.x0.blockSignals(False)
 
     def validation_error(self, message: str):
         self.error_label.setText(message)
@@ -192,6 +206,16 @@ class SLATItemView(QWidget):
         else:
             value = float(value)
         self.model.set_item_value(row_index, column_index, value)
+
+    def item_x0_changed(self, event: QStandardItem):
+        item = event.index()
+        index = item.column()
+        value = event.text()
+        if not value.replace("-", "").isdigit():
+            value = 0
+        else:
+            value = float(value)
+        self.model.set_item_x0_value(index, value)
 
     def show_table(self):
         modal = self.widgets_factory.modal(self.parent)
