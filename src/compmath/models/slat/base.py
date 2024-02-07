@@ -57,6 +57,12 @@ class BaseSLATModel(BaseModel):
         if self.size() == value or value < 3 or value > 8:
             return
 
+        if len(self.x0) < value:
+            for _ in range(len(self.x0), value):
+                self.x0.append(0)
+        elif len(self.x0) > value:
+            self.x0 = self.x0[:value]
+
         if not self.matrix:
             for i in range(value):
                 self.matrix.append([0 for _ in range(value + 1)])
@@ -76,12 +82,6 @@ class BaseSLATModel(BaseModel):
             for row in self.matrix:
                 for _ in range(delta):
                     row.pop(-2)
-
-        if len(self.x0) < value:
-            for _ in range(len(self.x0), value):
-                self.x0.append(0)
-        elif len(self.x0) > value:
-            self.x0 = self.x0[:value]
 
         self.notify_observers()
 

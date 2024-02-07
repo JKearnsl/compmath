@@ -81,6 +81,7 @@ class SLATItemView(QWidget):
         left.addWidget(matrix)
 
         x0 = widgets_factory.matrix()
+        x0.is_hidden_b = True
         x0.setFixedHeight(30)
 
         self.x0 = x0
@@ -97,8 +98,6 @@ class SLATItemView(QWidget):
         size_label = widgets_factory.label("Размер: ")
         size_input = widgets_factory.spin_box()
         size_input.setMaximumWidth(100)
-        size_input.setValue(0)
-        size_input.setRange(0, 100)
         size_layout.addWidget(size_label)
         size_layout.addWidget(size_input, alignment=Qt.AlignmentFlag.AlignLeft)
         self.size_input = size_input
@@ -189,7 +188,7 @@ class SLATItemView(QWidget):
         self.size_input.blockSignals(False)
 
         self.size_input.setRange(3, 8)
-        self.size_input.setValue(len(self.model.matrix))
+        self.size_input.setValue(4)  # TODO: bug with value 3: bad spawn matrix
 
     def validation_error(self, message: str):
         self.error_label.setText(message)
