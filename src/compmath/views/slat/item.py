@@ -1,5 +1,5 @@
 from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QDoubleValidator, QStandardItem
+from PyQt6.QtGui import QDoubleValidator, QStandardItem, QIntValidator
 from PyQt6.QtWidgets import (
     QWidget,
     QVBoxLayout,
@@ -104,6 +104,17 @@ class SLATItemView(QWidget):
         self.size_input = size_input
         right.addLayout(size_layout)
 
+        iters_limit_label = widgets_factory.label("Max итераций: ")
+        iters_limit_input = widgets_factory.line_edit()
+        iters_limit_input.setValidator(QIntValidator())
+        self.iters_limit_input = iters_limit_input
+        iters_limit_input.setMaximumWidth(100)
+        iters_limit_layout = QHBoxLayout()
+        iters_limit_layout.setContentsMargins(0, 0, 0, 0)
+        iters_limit_layout.addWidget(iters_limit_label)
+        iters_limit_layout.addWidget(iters_limit_input, alignment=Qt.AlignmentFlag.AlignLeft)
+        right.addLayout(iters_limit_layout)
+
         eps_layout = QHBoxLayout()
         eps_layout.setContentsMargins(0, 0, 0, 0)
         eps_label = widgets_factory.label("Точность: ")
@@ -135,6 +146,7 @@ class SLATItemView(QWidget):
         calc_button.clicked.connect(self.model.calc)
         matrix.itemChanged.connect(self.item_changed)
         x0.itemChanged.connect(self.item_x0_changed)
+        iters_limit_input.textChanged.connect(self.iters_limit_changed)
 
     def model_changed(self):
         self.error_label.setText("")
@@ -158,6 +170,7 @@ class SLATItemView(QWidget):
         self.eps_input.blockSignals(True)
         self.matrix.blockSignals(True)
         self.x0.blockSignals(True)
+        self.iters_limit_input.blockSignals(True)
 
         self.header.setText(self.model.title)
         self.description.setText(self.model.description)
@@ -165,12 +178,18 @@ class SLATItemView(QWidget):
         self.matrix.set_a(self.model.a())
         self.matrix.set_b(self.model.b())
         self.x0.set_a([self.model.x0])
+        self.iters_limit_input.setText(str(self.model.iters_limit))
 
         self.header.blockSignals(False)
         self.description.blockSignals(False)
         self.eps_input.blockSignals(False)
         self.matrix.blockSignals(False)
         self.x0.blockSignals(False)
+        self.iters_limit_input.blockSignals(False)
+        self.size_input.blockSignals(False)
+
+        self.size_input.setRange(3, 8)
+        self.size_input.setValue(len(self.model.matrix))
 
     def validation_error(self, message: str):
         self.error_label.setText(message)
@@ -252,3 +271,15 @@ class SLATItemView(QWidget):
             table.setItem(i, 7, QTableWidgetItem(str(row.distance)))
         modal.layout().addWidget(table)
         modal.exec()
+
+    def iters_limit_changed(self):
+        value = self.iters_limit_input.text()
+        if not value:
+            return
+
+        try:
+            value = int(value)
+        except ValueError:
+            return
+
+        self.model.set_iters_limit(value)

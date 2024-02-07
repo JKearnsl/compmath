@@ -13,6 +13,7 @@ class BaseSLATModel(BaseModel):
         self.matrix: list[list[int | float]] = []
         self.x0: list[int | float] = []
         self.result: list[tuple[int, ...]] = []
+        self._iters_limit = 100
         self.iters = None
 
     @property
@@ -53,7 +54,7 @@ class BaseSLATModel(BaseModel):
         self.notify_observers()
 
     def resize(self, value: int) -> None:
-        if self.size() == value:
+        if self.size() == value or value < 3 or value > 8:
             return
 
         if not self.matrix:
@@ -106,3 +107,18 @@ class BaseSLATModel(BaseModel):
     def validation_error(self, error):
         for observer in self._mObservers:
             observer.validation_error(error)
+
+    @property
+    def iters_limit(self) -> int:
+        return self._iters_limit
+
+    def set_iters_limit(self, value: int) -> None:
+        if not isinstance(value, int):
+            raise ValueError(f"Неверный параметр max_iters {value!r} type {type(value)!r}")
+
+        if value <= 0:
+            self.validation_error("Неверный параметр ограничения итераций")
+            return
+
+        self._iters_limit = value
+        self.notify_observers()
