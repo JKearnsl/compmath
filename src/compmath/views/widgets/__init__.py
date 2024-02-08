@@ -105,6 +105,7 @@ class WidgetsFactory:
             primary_text_color=self.theme.text_primary,
             first_background_color=self.theme.first_background,
             second_background_color=self.theme.second_background,
+            hover_color=self.theme.hover,
             parent=parent
         )
 

@@ -8,13 +8,14 @@ class SpinBox(QSpinBox):
             primary_text_color: str,
             first_background_color: str,
             second_background_color: str,
+            hover_color: str,
             parent=None
     ):
         super().__init__(parent)
 
         self.setStyleSheet("""
             QSpinBox {
-                border: 2px solid $SELECTION;
+                border: 2px solid $HOVER;
                 border-radius: 5px;
                 padding: 1px 10px 1px 3px;
                 background: transparent;
@@ -27,10 +28,10 @@ class SpinBox(QSpinBox):
                 width: 15px;
                 height: 12.5px;
                 border-left-width: 1px;
-                border-left-color: $SELECTION;
+                border-left-color: $HOVER;
                 border-left-style: solid;
                 border-top-right-radius: 5px;
-                background: $SELECTION;
+                background: $HOVER;
             }
             
             QSpinBox::up-arrow {
@@ -45,11 +46,23 @@ class SpinBox(QSpinBox):
                 width: 15px;
                 height: 12.5px;
                 border-left-width: 1px;
-                border-left-color: $SELECTION;
+                border-left-color: $HOVER;
                 border-left-style: solid;
                 border-bottom-right-radius: 5px;
-                background: $SELECTION;
+                background: $HOVER;
             }
+            
+            QSpinBox::focus {
+                border: 2px solid $SELECTION;
+            }
+            
+            QSpinBox::up-button:focus {
+                background: $SELECTION;
+            } 
+            
+            QSpinBox::down-button:focus {
+                background: $SELECTION;
+            } 
 
             QSpinBox::down-arrow {
                 image: url(icons:drop-down-arrow.png);
@@ -84,4 +97,6 @@ class SpinBox(QSpinBox):
             "$BG1", first_background_color,
         ).replace(
             "$BG2", second_background_color,
+        ).replace(
+            "$HOVER", hover_color
         ))
