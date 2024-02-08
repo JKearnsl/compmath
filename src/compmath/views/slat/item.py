@@ -4,7 +4,8 @@ from PyQt6.QtWidgets import (
     QWidget,
     QVBoxLayout,
     QHBoxLayout,
-    QTableWidgetItem
+    QTableWidgetItem,
+    QHeaderView
 )
 
 from compmath.models.slat.base import BaseSLATModel
@@ -141,7 +142,7 @@ class SLATItemView(QWidget):
         # События
         size_input.valueChanged.connect(self.size_changed)
         eps_input.textChanged.connect(self.eps_changed)
-        result_button.clicked.connect(self.show_table)
+        result_button.clicked.connect(self.show_result)
         calc_button.clicked.connect(self.model.calc)
         matrix.itemChanged.connect(self.item_changed)
         x0.itemChanged.connect(self.item_x0_changed)
@@ -160,7 +161,7 @@ class SLATItemView(QWidget):
         self.x0.blockSignals(False)
 
     def was_calculated(self):
-        if self.model.matrix:
+        if self.model.table:
             self.result_button.setDisabled(False)
 
     def model_loaded(self):
@@ -219,23 +220,23 @@ class SLATItemView(QWidget):
         row_index = item.row()
         column_index = item.column()
         value = event.text()
-        if not value.replace("-", "").isdigit():
-            value = 0
-        else:
+        try:
             value = float(value)
+        except ValueError:
+            value = 0
         self.model.set_item_value(row_index, column_index, value)
 
     def item_x0_changed(self, event: QStandardItem):
         item = event.index()
         index = item.column()
         value = event.text()
-        if not value.replace("-", "").isdigit():
-            value = 0
-        else:
+        try:
             value = float(value)
+        except ValueError:
+            value = 0
         self.model.set_item_x0_value(index, value)
 
-    def show_table(self):
+    def show_result(self):
         modal = self.widgets_factory.modal(self.parent)
         modal.setFixedWidth(800)
         modal.setFixedHeight(450)
@@ -243,31 +244,23 @@ class SLATItemView(QWidget):
         table = self.widgets_factory.table()
         table.setFixedHeight(400)
         table.setRowCount(len(self.model.table))
-        table.setColumnCount(8)
         table.add_style("""
             QTableWidget {
                 border: none;
             }
             """)
+        table.setColumnCount(len(self.model.x0) + 2)
         table.setHorizontalHeaderLabels([
             "№",
-            "a",
-            "b",
-            "x",
-            "f(x)",
-            "f(a)",
-            "f(b)",
-            "|a - b|"
+            "delta",
+            *[f"x{i}" for i in range(len(self.model.x0))]
         ])
+        table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeMode.ResizeToContents)
         for i, row in enumerate(self.model.table):
             table.setItem(i, 0, QTableWidgetItem(str(row.iter_num)))
-            table.setItem(i, 1, QTableWidgetItem(str(row.a)))
-            table.setItem(i, 2, QTableWidgetItem(str(row.b)))
-            table.setItem(i, 3, QTableWidgetItem(str(row.x)))
-            table.setItem(i, 4, QTableWidgetItem(str(row.fx)))
-            table.setItem(i, 5, QTableWidgetItem(str(row.fa)))
-            table.setItem(i, 6, QTableWidgetItem(str(row.fb)))
-            table.setItem(i, 7, QTableWidgetItem(str(row.distance)))
+            table.setItem(i, 1, QTableWidgetItem(str(row.delta)))
+            for j, x in enumerate(row.vector):
+                table.setItem(i, j + 2, QTableWidgetItem(str(x)))
         modal.layout().addWidget(table)
         modal.exec()
 
