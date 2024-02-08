@@ -1,6 +1,14 @@
 from abc import abstractmethod
+from dataclasses import dataclass
 
 from compmath.models.base import BaseModel
+
+
+@dataclass
+class TableRow:
+    iter_num: int
+    vector: list[int | float]
+    delta: float
 
 
 class BaseSLATModel(BaseModel):
@@ -12,9 +20,9 @@ class BaseSLATModel(BaseModel):
         self._eps = 0.0001
         self.matrix: list[list[int | float]] = []
         self.x0: list[int | float] = []
-        self.result: list[tuple[int, ...]] = []
         self._iters_limit = 100
         self.iters = None
+        self.table: list[TableRow] = []
 
     @property
     def title(self) -> str:
