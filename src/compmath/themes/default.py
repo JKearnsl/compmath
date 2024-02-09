@@ -14,6 +14,6 @@ class DefaultTheme(BaseTheme):
     primary: str = "#2675BF"
     hover: str = "#E0E0E0"
     text_header: str = "#010000"
-    text_primary: str = "#010000"
+    text_primary: str = "#ffffff"
     text_secondary: str = "#909fa6"
-    text_tertiary: str = "#ffffff"
+    text_tertiary: str = "#010000"
