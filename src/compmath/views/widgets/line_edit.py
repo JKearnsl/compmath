@@ -9,9 +9,9 @@ class LineEdit(QLineEdit):
     def __init__(
             self,
             selection_color,
-            primary_text_color,
+            text_color,
             hover_color,
-            first_background_color,
+            background_color,
             parent=None
     ):
         super().__init__(parent)
@@ -22,23 +22,23 @@ class LineEdit(QLineEdit):
                 border: 2px solid $HOVER;
                 border-radius: 5px;
                 padding: 1px 10px 1px 3px;
-                background: $BG1;
-                color: $PRIMARY_TEXT_COLOR;
+                background: $BG;
+                color: $TEXT_COLOR;
             }
             QLineEdit:focus {
                 border: 2px solid $SELECTION;
             }
             QLineEdit::placeholder {
-                color: $PRIMARY_TEXT_COLOR;
+                color: $TEXT_COLOR;
             }
         """.replace(
             "$SELECTION", selection_color
         ).replace(
-            "$PRIMARY_TEXT_COLOR", primary_text_color
+            "$TEXT_COLOR", text_color
         ).replace(
             "$HOVER", hover_color
         ).replace(
-            "$BG1", first_background_color
+            "$BG", background_color
         ))
         self.__hover_color = hover_color
         self.__selection_color = selection_color

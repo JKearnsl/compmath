@@ -193,7 +193,7 @@ class UiMainWindow:
             }
 
             QMenuBar::item {
-                color : $TEXT_PRIMARY_COLOR;
+                color : $TEXT_COLOR;
                 margin-top:4px;
                 spacing: 3px;
                 padding: 1px 10px;
@@ -219,14 +219,14 @@ class UiMainWindow:
                 border-bottom-right-radius: 5px;
             }
             QMenu::item {
-                color: $TEXT_PRIMARY_COLOR;
+                color: $TEXT_COLOR;
                 padding: 5px 20px;
             }
             QMenu::item:selected {
                 background-color: $HOVER_COLOR;
             } 
                 """.replace(
-            "$TEXT_PRIMARY_COLOR", widgets_factory.theme.text_primary
+            "$TEXT_COLOR", widgets_factory.theme.text_tertiary
         ).replace(
             "$BG2", widgets_factory.theme.second_background
         ).replace(

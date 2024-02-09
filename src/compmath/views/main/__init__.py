@@ -54,12 +54,12 @@ class MainView(QWidget, DObserver, metaclass=TSMeta):
     def model_loaded(self):
         for i in range(self.ui.menu_list_widget.model().rowCount()):
             item = self.ui.menu_list_widget.model().item(i)
-            item.set_icon_color(self.widgets_factory.theme.text_primary)
+            item.set_icon_color(self.widgets_factory.theme.text_tertiary)
         self.ui.menu_list_widget.setCurrentIndex(self.ui.menu_list_widget.model().index(0, 0))
 
     def menu_select_changed(self, current: QModelIndex, prev: QModelIndex):
         item = self.ui.menu_list_widget.model().item(current.row())
-        item.set_icon_color(self.widgets_factory.theme.text_tertiary)
+        item.set_icon_color(self.widgets_factory.theme.text_primary)
 
         if self.ui.content_layout.count() > 0:
             current_widget = self.ui.content_layout.currentWidget()
@@ -67,7 +67,7 @@ class MainView(QWidget, DObserver, metaclass=TSMeta):
                 return
 
             prev_item = self.ui.menu_list_widget.model().item(prev.row())
-            prev_item.set_icon_color(self.widgets_factory.theme.text_primary)
+            prev_item.set_icon_color(self.widgets_factory.theme.text_tertiary)
 
             # Кэш
             for i in range(self.ui.content_layout.count()):

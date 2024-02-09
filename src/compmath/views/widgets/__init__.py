@@ -36,7 +36,7 @@ class WidgetsFactory:
 
     def label(self, text: str = None, color: str = None, *, parent: QWidgetLike = None) -> Label:
         lb = Label(
-            color if color else self.theme.text_primary,
+            color if color else self.theme.text_tertiary,
             parent
         )
         if text:
@@ -91,7 +91,7 @@ class WidgetsFactory:
     def combo_box(self, parent: QWidgetLike = None) -> ComboBox:
         return ComboBox(
             selection_color=self.theme.primary,
-            primary_text_color=self.theme.text_primary,
+            text_color=self.theme.text_tertiary,
             first_background_color=self.theme.first_background,
             second_background_color=self.theme.second_background,
             third_background_color=self.theme.third_background,
@@ -102,9 +102,9 @@ class WidgetsFactory:
     def spin_box(self, parent: QWidgetLike = None) -> SpinBox:
         return SpinBox(
             selection_color=self.theme.primary,
-            primary_text_color=self.theme.text_primary,
-            first_background_color=self.theme.first_background,
-            second_background_color=self.theme.second_background,
+            text_color=self.theme.text_tertiary,
+            disabled_text_color=self.theme.text_secondary,
+            background_color=self.theme.second_background,
             hover_color=self.theme.hover,
             parent=parent
         )
@@ -112,7 +112,7 @@ class WidgetsFactory:
     def double_spin_box(self, parent: QWidgetLike = None) -> DoubleSpinBox:
         return DoubleSpinBox(
             selection_color=self.theme.primary,
-            primary_text_color=self.theme.text_primary,
+            text_color=self.theme.text_tertiary,
             first_background_color=self.theme.first_background,
             second_background_color=self.theme.second_background,
             parent=parent
@@ -158,9 +158,10 @@ class WidgetsFactory:
     def button(self, text: str = None, *, parent: QWidgetLike = None) -> Button:
         btn = Button(
             self.theme.hover,
-            self.theme.first_background,
+            self.theme.primary,
             self.theme.text_tertiary,
             self.theme.text_primary,
+            self.theme.text_secondary,
             parent
         )
         if text:
@@ -173,6 +174,7 @@ class WidgetsFactory:
             self.theme.primary,
             self.theme.text_primary,
             self.theme.text_tertiary,
+            self.theme.text_secondary,
             parent
         )
         if text:
@@ -191,52 +193,52 @@ class WidgetsFactory:
 
     def list(self, parent: QWidgetLike = None) -> List:
         return List(
-            text_primary_color=self.theme.text_primary,
             hover_color=self.theme.hover,
-            selection_color=self.theme.primary,
-            text_tertiary_color=self.theme.text_tertiary,
+            selected_color=self.theme.primary,
+            selected_text_color=self.theme.text_primary,
+            text_color=self.theme.text_tertiary,
             parent=parent
         )
 
     def line_edit(self, parent: QWidgetLike = None) -> LineEdit:
         return LineEdit(
             selection_color=self.theme.primary,
-            primary_text_color=self.theme.text_primary,
+            text_color=self.theme.text_tertiary,
             hover_color=self.theme.hover,
-            first_background_color=self.theme.first_background,
+            background_color=self.theme.second_background,
             parent=parent
         )
 
     def textarea(self, parent: QWidgetLike = None) -> TextArea:
         return TextArea(
             selection_color=self.theme.primary,
-            primary_text_color=self.theme.text_primary,
+            text_color=self.theme.text_tertiary,
             hover_color=self.theme.hover,
-            background_color=self.theme.first_background,
+            background_color=self.theme.second_background,
             parent=parent
         )
 
     def table(self, parent: QWidgetLike = None) -> Table:
         return Table(
             selection_color=self.theme.primary,
-            primary_text_color=self.theme.text_primary,
+            text_color=self.theme.text_tertiary,
             hover_color=self.theme.hover,
-            background_color=self.theme.first_background,
+            background_color=self.theme.second_background,
             parent=parent
         )
 
     def input_label(self, *, parent: QWidgetLike = None) -> InputLabel:
         return InputLabel(
-            self.theme.text_primary,
+            self.theme.text_tertiary,
             parent
         )
 
     def graphic(self, *, parent: QWidgetLike = None) -> Graphic:
         return Graphic(
-            self.theme.text_primary,
+            self.theme.text_tertiary,
             self.theme.hover,
-            self.theme.first_background,
             self.theme.second_background,
+            self.theme.first_background,
             self.theme.text_header,
             parent
         )
@@ -244,8 +246,8 @@ class WidgetsFactory:
     def matrix(self, *, parent: QWidgetLike = None) -> Matrix:
         return Matrix(
             selection_color=self.theme.primary,
-            primary_text_color=self.theme.text_primary,
+            text_color=self.theme.text_tertiary,
             hover_color=self.theme.hover,
-            background_color=self.theme.first_background,
+            background_color=self.theme.second_background,
             parent=parent
         )

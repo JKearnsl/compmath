@@ -5,7 +5,7 @@ class ComboBox(QComboBox):
     def __init__(
             self,
             selection_color: str,
-            primary_text_color: str,
+            text_color: str,
             first_background_color: str,
             second_background_color: str,
             third_background_color: str,
@@ -20,7 +20,7 @@ class ComboBox(QComboBox):
                 border-radius: 5px;
                 padding: 1px 10px 1px 3px;
                 background: transparent;
-                color: $PRIMARY_TEXT_COLOR;
+                color: $TEXT_COLOR;
             }
             
             QComboBox::drop-down {
@@ -55,12 +55,12 @@ class ComboBox(QComboBox):
                 border: 1px solid $SELECTION;
                 border-radius: 5px;
                 background: $BG2;
-                color: $PRIMARY_TEXT_COLOR;
+                color: $TEXT_COLOR;
                 outline: none;
             }
             
             QComboBox::item {
-                color: $PRIMARY_TEXT_COLOR;
+                color: $TEXT_COLOR;
                 height: 25px;
                 margin: 4px;
                 spacing: 3px;
@@ -78,7 +78,7 @@ class ComboBox(QComboBox):
         """.replace(
             "$SELECTION", selection_color,
         ).replace(
-            "$PRIMARY_TEXT_COLOR", primary_text_color,
+            "$TEXT_COLOR", text_color,
         ).replace(
             "$BG1", first_background_color,
         ).replace(

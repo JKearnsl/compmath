@@ -1,7 +1,15 @@
 from PyQt6.QtCore import QPointF, Qt, pyqtSignal
 from PyQt6.QtGui import QColor
-from PyQt6.QtWidgets import QWidget, QGridLayout, QGraphicsDropShadowEffect, QHBoxLayout, QToolButton, QSizePolicy, \
-    QVBoxLayout, QSlider
+from PyQt6.QtWidgets import (
+    QWidget,
+    QGridLayout,
+    QGraphicsDropShadowEffect,
+    QHBoxLayout,
+    QToolButton,
+    QVBoxLayout,
+    QSlider
+)
+
 from pyqtgraph import PlotDataItem, AxisItem
 from pyqtgraph import PlotWidget, InfiniteLine
 
@@ -11,10 +19,14 @@ from compmath.views.widgets.input_label import InputLabel
 
 
 class GraphicCanvas(PlotWidget):
-    def __init__(self, parent=None):
+    def __init__(self, background_color: str = "white", parent=None):
         self.axis_x = AxisItem(orientation='bottom')
         self.axis_y = AxisItem(orientation='left')
-        super().__init__(parent, axisItems={'bottom': self.axis_x, 'left': self.axis_y})
+        super().__init__(
+            parent,
+            background=background_color,
+            axisItems={'bottom': self.axis_x, 'left': self.axis_y}
+        )
         self._temp_items = []
 
         # Создание линий, которые будут служить осями
@@ -47,10 +59,10 @@ class Graphic(QWidget):
 
     def __init__(
             self,
-            text_primary_color: str,
+            text_color: str,
             hover_color: str,
-            first_background_color: str,
-            second_background_color: str,
+            background_color: str,
+            dialog_background_color: str,
             text_header_color: str,
             parent: QWidget = None
     ):
@@ -61,8 +73,8 @@ class Graphic(QWidget):
 
         self._text_header_color = text_header_color
         self._hover_color = hover_color
-        self._second_background_color = second_background_color
-        self._first_background_color = first_background_color
+        self._dialog_background_color = dialog_background_color
+        self._background_color = background_color
 
         widget_layout = QVBoxLayout()
         widget_layout.setContentsMargins(0, 0, 0, 0)
@@ -76,12 +88,9 @@ class Graphic(QWidget):
             QWidget#sheet {
                 border: none;
                 border-radius: 5px;
-                background-color: $BG1;
             }
         """.replace(
             "$HOVER", hover_color,
-        ).replace(
-            "$BG1", first_background_color,
         ))
         sheet.setGraphicsEffect(QGraphicsDropShadowEffect(
             blurRadius=10,
@@ -94,17 +103,17 @@ class Graphic(QWidget):
         layout.setSpacing(0)
         sheet.setLayout(layout)
 
-        x_max = InputLabel(text_primary_color)
+        x_max = InputLabel(text_color)
         x_max.setFixedWidth(30)
         x_max.setFixedHeight(30)
         self._x_max = x_max
 
-        x_min = InputLabel(text_primary_color)
+        x_min = InputLabel(text_color)
         x_min.setFixedWidth(30)
         x_min.setFixedHeight(30)
         self._x_min = x_min
 
-        graphic = GraphicCanvas()
+        graphic = GraphicCanvas("y")
         self._graphic = graphic
 
         toolbar = QWidget()
@@ -203,8 +212,8 @@ class Graphic(QWidget):
 
     def show_full_screen(self):
         dialog = Dialog(
-            background_window=self._first_background_color,
-            background_close_btn=self._second_background_color,
+            background_window=self._dialog_background_color,
+            background_close_btn=self._background_color,
             hover_close_btn=self._hover_color,
             text_color_close_btn=self._text_header_color,
             parent=self

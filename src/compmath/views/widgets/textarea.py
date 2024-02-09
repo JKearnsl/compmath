@@ -5,7 +5,7 @@ class TextArea(QPlainTextEdit):
     def __init__(
             self,
             selection_color,
-            primary_text_color,
+            text_color,
             hover_color,
             background_color,
             parent=None
@@ -20,18 +20,18 @@ class TextArea(QPlainTextEdit):
                 border-radius: 5px;
                 padding: 1px 10px 1px 3px;
                 background: $BG;
-                color: $PRIMARY_TEXT_COLOR;
+                color: $TEXT_COLOR;
             }
             QPlainTextEdit:focus {
                 border: 2px solid $SELECTION;
             }
             QPlainTextEdit::placeholder {
-                color: $PRIMARY_TEXT_COLOR;
+                color: $TEXT_COLOR;
             }
         """.replace(
             "$SELECTION", selection_color
         ).replace(
-            "$PRIMARY_TEXT_COLOR", primary_text_color
+            "$TEXT_COLOR", text_color
         ).replace(
             "$HOVER", hover_color
         ).replace(

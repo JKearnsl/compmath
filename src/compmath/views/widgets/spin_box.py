@@ -5,9 +5,9 @@ class SpinBox(QSpinBox):
     def __init__(
             self,
             selection_color: str,
-            primary_text_color: str,
-            first_background_color: str,
-            second_background_color: str,
+            text_color: str,
+            background_color: str,
+            disabled_text_color: str,
             hover_color: str,
             parent=None
     ):
@@ -18,8 +18,8 @@ class SpinBox(QSpinBox):
                 border: 2px solid $HOVER;
                 border-radius: 5px;
                 padding: 1px 10px 1px 3px;
-                background: transparent;
-                color: $PRIMARY_TEXT_COLOR;
+                background: $BG;
+                color: $TEXT_COLOR;
             }
             
             QSpinBox::up-button {
@@ -71,8 +71,8 @@ class SpinBox(QSpinBox):
             }
             
             QSpinBox::disabled {
-                background: $BG2;
-                color: $BG1;
+                background: $BG;
+                color: $DISABLED_TEXT;
                 font-weight: bold;
             }
             
@@ -92,11 +92,11 @@ class SpinBox(QSpinBox):
         """.replace(
             "$SELECTION", selection_color,
         ).replace(
-            "$PRIMARY_TEXT_COLOR", primary_text_color,
+            "$TEXT_COLOR", text_color,
         ).replace(
-            "$BG1", first_background_color,
+            "$DISABLED_TEXT", disabled_text_color,
         ).replace(
-            "$BG2", second_background_color,
+            "$BG", background_color,
         ).replace(
             "$HOVER", hover_color
         ))

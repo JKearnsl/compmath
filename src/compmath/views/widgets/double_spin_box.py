@@ -6,7 +6,7 @@ class DoubleSpinBox(QDoubleSpinBox):
     def __init__(
             self,
             selection_color: str,
-            primary_text_color: str,
+            text_color: str,
             first_background_color: str,
             second_background_color: str,
             parent=None
@@ -19,7 +19,7 @@ class DoubleSpinBox(QDoubleSpinBox):
                 border-radius: 5px;
                 padding: 1px 10px 1px 3px;
                 background: transparent;
-                color: $PRIMARY_TEXT_COLOR;
+                color: $TEXT_COLOR;
             }
 
             DoubleSpinBox::up-button {
@@ -80,7 +80,7 @@ class DoubleSpinBox(QDoubleSpinBox):
         """.replace(
             "$SELECTION", selection_color,
         ).replace(
-            "$PRIMARY_TEXT_COLOR", primary_text_color,
+            "$TEXT_COLOR", text_color,
         ).replace(
             "$BG1", first_background_color,
         ).replace(

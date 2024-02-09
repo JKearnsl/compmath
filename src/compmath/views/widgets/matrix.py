@@ -8,7 +8,7 @@ class Matrix(QTableView):
 
     def __init__(
             self,
-            primary_text_color: str,
+            text_color: str,
             selection_color: str,
             hover_color: str,
             background_color: str,
@@ -28,8 +28,8 @@ class Matrix(QTableView):
             QTableView {
                 border: 2px solid $HOVER;
                 border-radius: 5px;
-                background: $BG3;
-                color: $PRIMARY_TEXT_COLOR;
+                background: $BG;
+                color: $TEXT_COLOR;
             }
             QTableView:disabled {
                 background: $HOVER;
@@ -39,16 +39,16 @@ class Matrix(QTableView):
             }
             QTableView::item:selected {
                 background: $SELECTION;
-                color: $PRIMARY_TEXT_COLOR;
+                color: $TEXT_COLOR;
             }
             QTableView::item:hover {
                 background: $HOVER;
-                color: $PRIMARY_TEXT_COLOR;
+                color: $TEXT_COLOR;
             }
 
             QHeaderView::section {
-                background: $BG3;
-                color: $PRIMARY_TEXT_COLOR;
+                background: $BG;
+                color: $TEXT_COLOR;
                 padding: 5px;
                 border-bottom: 2px solid $HOVER;
             }
@@ -58,7 +58,7 @@ class Matrix(QTableView):
 
             QScrollBar:vertical {
                 border: none;
-                background: $BG3;
+                background: $BG;
                 width: 10px;
                 margin: 0px 0px 0px 0px;
             }
@@ -78,11 +78,11 @@ class Matrix(QTableView):
         """.replace(
             "$SELECTION", selection_color
         ).replace(
-            "$PRIMARY_TEXT_COLOR", primary_text_color
+            "$TEXT_COLOR", text_color
         ).replace(
             "$HOVER", hover_color
         ).replace(
-            "$BG3", background_color
+            "$BG", background_color
         ))
 
         self.model().itemChanged.connect(self.itemChanged.emit)

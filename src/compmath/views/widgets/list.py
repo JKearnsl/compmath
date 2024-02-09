@@ -7,10 +7,10 @@ from compmath.utils.icon import svg_ico
 class List(QListView):
     def __init__(
             self,
-            text_primary_color,
             hover_color,
-            selection_color,
-            text_tertiary_color,
+            selected_text_color,
+            selected_color,
+            text_color,
             parent=None
     ):
         super().__init__(parent)
@@ -21,7 +21,7 @@ class List(QListView):
                 selection-background-color: transparent;
                 outline: none;
                 font-size: 13px;
-                color: $TEXT_PRIMARY;
+                color: $TEXT_NORMAL;
             }
             QListView::item {
                 border: none;
@@ -32,16 +32,16 @@ class List(QListView):
             }
             QListView::item:selected {
                 background: $SELECTION;
-                color: $TEXT_TERTIARY;
+                color: $TEXT_SELECTED;
             }
                 """.replace(
-            "$TEXT_PRIMARY", text_primary_color
+            "$TEXT_SELECTED", selected_text_color
         ).replace(
             "$HOVER", hover_color
         ).replace(
-            "$SELECTION", selection_color
+            "$SELECTION", selected_color
         ).replace(
-            "$TEXT_TERTIARY", text_tertiary_color
+            "$TEXT_NORMAL", text_color
         ))
         self.setFrameShape(QtWidgets.QFrame.Shape.NoFrame)
         self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)

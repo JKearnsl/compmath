@@ -6,7 +6,7 @@ class Table(QTableWidget):
     def __init__(
             self,
             selection_color,
-            primary_text_color,
+            text_color,
             hover_color,
             background_color,
             parent=None
@@ -20,23 +20,23 @@ class Table(QTableWidget):
                 border: 2px solid $HOVER;
                 border-radius: 5px;
                 background: $BG1;
-                color: $PRIMARY_TEXT_COLOR;
+                color: $TEXT_COLOR;
             }
             QTableWidget::item {
                 padding: 5px;
             }
             QTableWidget::item:selected {
                 background: $SELECTION;
-                color: $PRIMARY_TEXT_COLOR;
+                color: $TEXT_COLOR;
             }
             QTableWidget::item:hover {
                 background: $HOVER;
-                color: $PRIMARY_TEXT_COLOR;
+                color: $TEXT_COLOR;
             }
             
             QHeaderView::section {
                 background: $BG1;
-                color: $PRIMARY_TEXT_COLOR;
+                color: $TEXT_COLOR;
                 padding: 5px;
                 border-bottom: 2px solid $HOVER;
             }
@@ -67,7 +67,7 @@ class Table(QTableWidget):
         """.replace(
             "$SELECTION", selection_color
         ).replace(
-            "$PRIMARY_TEXT_COLOR", primary_text_color
+            "$TEXT_COLOR", text_color
         ).replace(
             "$HOVER", hover_color
         ).replace(
