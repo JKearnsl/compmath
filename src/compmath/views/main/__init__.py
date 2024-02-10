@@ -33,8 +33,6 @@ class MainView(QWidget, DObserver, metaclass=TSMeta):
         )
 
         self.scheduler = QtScheduler()
-        self.scheduler.add_job(self.memory_usage_tick, 'interval', seconds=2)
-        self.scheduler.start()
 
         # Регистрация представлений
         self.model.add_observer(self)
@@ -56,6 +54,9 @@ class MainView(QWidget, DObserver, metaclass=TSMeta):
             item = self.ui.menu_list_widget.model().item(i)
             item.set_icon_color(self.widgets_factory.theme.text_tertiary)
         self.ui.menu_list_widget.setCurrentIndex(self.ui.menu_list_widget.model().index(0, 0))
+        if self.model.is_debug:
+            self.scheduler.add_job(self.memory_usage_tick, 'interval', seconds=2)
+            self.scheduler.start()
 
     def menu_select_changed(self, current: QModelIndex, prev: QModelIndex):
         item = self.ui.menu_list_widget.model().item(current.row())
