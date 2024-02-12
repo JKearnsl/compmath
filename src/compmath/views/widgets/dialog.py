@@ -70,7 +70,6 @@ class Dialog(QDialog):
 
         header_layout = QHBoxLayout()
         header_layout.setContentsMargins(0, 0, 0, 0)
-        # header_layout.addStretch(1)
         general_layout.addLayout(header_layout)
 
         # Close button
