@@ -152,7 +152,7 @@ class NoNLinearItemView(QWidget):
         bottom.addWidget(graphic)
 
         # События
-        fx_input.textChanged.connect(lambda text: self.model.set_fx(text))
+        fx_input.textChanged.connect(self.model.set_fx)
         eps_input.textChanged.connect(self.eps_changed)
         interval_a_input.textChanged.connect(self.interval_input_changed)
         interval_b_input.textChanged.connect(self.interval_input_changed)
