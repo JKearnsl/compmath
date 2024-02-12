@@ -9,7 +9,7 @@ class SakuraTheme(BaseTheme):
     __description__ = "Тема в стиле Сакура"
 
     first_background: str = "#FFF8F7"
-    second_background: str = "#FFE0E6"
+    second_background: str = "#ffe6eb"
     third_background: str = "#FFFFFF"
     primary: str = "#bf848f"
     hover: str = "#E0C6CB"
@@ -17,4 +17,3 @@ class SakuraTheme(BaseTheme):
     text_primary: str = "#ffffff"
     text_secondary: str = "#909fa6"
     text_tertiary: str = "#010000"
-# #b476aeff  cool color
