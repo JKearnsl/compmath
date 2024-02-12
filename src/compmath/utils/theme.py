@@ -32,8 +32,8 @@ def is_theme(theme_class: type) -> bool:
 def get_themes() -> tuple[dict[str, tuple[type[BaseTheme], str, str]], list[tuple[str, str]]]:
     items = os.listdir(__FOLDER)
 
-    normal_themes = dict()
-    error_themes = list()
+    normal_themes = {}
+    error_themes = []
     for filename in items:
         if (
                 os.path.isfile(os.path.join(__FOLDER, filename)) and

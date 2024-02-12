@@ -9,8 +9,8 @@ class SettingsModel(BaseModel):
         super().__init__()
         self.config = config
 
-        self.__loaded_themes = dict()
-        self.__error_themes = list()
+        self.__loaded_themes = {}
+        self.__error_themes = []
 
         self.load_themes()
 
