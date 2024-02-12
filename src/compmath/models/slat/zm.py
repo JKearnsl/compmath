@@ -1,4 +1,4 @@
-from compmath.models.slat.base import BaseSLATModel
+from compmath.models.slat.base import BaseSLATModel, TableRow
 
 
 class ZModel(BaseSLATModel):
@@ -10,11 +10,14 @@ class ZModel(BaseSLATModel):
         self._description = "Метод Зейделя - модификация метода простых итераций..."
 
     def calc(self):
+        self.table.clear()
+
         k = 0
         n = len(self.a())
         a_matrix = self.a()
         b_vector = self.b()
         x = self.x0.copy()
+        delta = 0
 
         while True:
             k += 1
@@ -27,8 +30,15 @@ class ZModel(BaseSLATModel):
             # Оценка точности
             delta = max(abs(x[i] - x_prev[i]) for i in range(n))
 
+            self.table.append(
+                TableRow(
+                    iter_num=k,
+                    vector=x.copy(),
+                    delta=delta
+                )
+            )
+
             if delta <= self.eps or k > self.iters_limit:
                 break
 
-        print(x, delta, k)
-        return x, delta, k
+        self.was_calculated()
