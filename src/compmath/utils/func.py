@@ -1,3 +1,4 @@
+import ast
 from typing import Callable
 
 
@@ -13,7 +14,7 @@ def make_callable(fx: str) -> Callable[[float | int], float]:
     :return: Функция
     """
     try:
-        return lambda x: eval(
+        return lambda x: ast.literal_eval(
             fx,
             {
                 "x": x
