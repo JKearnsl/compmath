@@ -126,3 +126,10 @@ class BaseSNEModel(BaseModel):
 
         self.equations[index] = value
         self.notify_observers()
+
+    def graphic(self, x_limits: tuple[int | float, int | float]) -> Graphic:
+        graphic = Graphic(x_limits=x_limits)
+        for func in filter(lambda x: x != "", self.equations):
+            print(func)
+            graphic.add_graph(make_callable(func))
+        return graphic
