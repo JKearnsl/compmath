@@ -211,6 +211,7 @@ class Graphic(QWidget):
         self.graphic_slider.setEnabled(True)
         self.graphic_slider.setMaximum(len(self._plots) - 1)
         self.graphic_slider.setValue(len(self._plots) - 1)
+        self.set_plot(len(self._plots) - 1)
 
     def set_plot(self, index: int):
         self._current_plot = index
