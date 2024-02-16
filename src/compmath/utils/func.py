@@ -1,3 +1,4 @@
+import ast
 from typing import Callable
 
 
@@ -12,6 +13,12 @@ def make_callable(fx: str) -> Callable[[float | int], float]:
     :param fx: Строка с функцией
     :return: Функция
     """
+    try:
+        # Check if the string is a valid Python literal
+        ast.parse(fx)
+    except SyntaxError:
+        raise FunctionValidateError(f"Invalid literal: {fx}")
+
     try:
         return lambda x: eval(
             fx,
