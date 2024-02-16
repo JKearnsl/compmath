@@ -119,11 +119,13 @@ class Graphic(QWidget):
         x_max = InputLabel(text_color)
         x_max.setFixedWidth(30)
         x_max.setFixedHeight(30)
+        x_max.setText("10")
         self._x_max = x_max
 
         x_min = InputLabel(text_color)
         x_min.setFixedWidth(30)
         x_min.setFixedHeight(30)
+        x_min.setText("-10")
         self._x_min = x_min
 
         graphic = GraphicCanvas("y")
