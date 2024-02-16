@@ -1,6 +1,7 @@
 class BaseTheme:
 
     __title__ = "title"
+    __uuid__ = "00000000-0000-0000-0000-000000000000"
     __author__ = "author"
     __version__ = "0.0.1"
     __description__ = "description"

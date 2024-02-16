@@ -4,6 +4,7 @@ from compmath.themes.base import BaseTheme
 class DefaultTheme(BaseTheme):
 
     __title__ = "default"
+    __uuid__ = "00000000-0000-0000-0000-000000000001"
     __author__ = "JKearnsl"
     __version__ = "0.0.1"
     __description__ = "Тема по умолчанию в строгом стиле"

@@ -4,6 +4,7 @@ from compmath.themes.base import BaseTheme
 class SakuraTheme(BaseTheme):
 
     __title__ = "Sakura"
+    __uuid__ = "00000000-0000-0000-0000-000000000002"
     __author__ = "JKearnsl"
     __version__ = "0.0.1"
     __description__ = "Тема в стиле Сакура"
