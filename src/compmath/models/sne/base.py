@@ -2,6 +2,8 @@ from abc import abstractmethod
 from dataclasses import dataclass
 
 from compmath.models.base import BaseModel
+from compmath.models.graphic import Graphic
+from compmath.utils.func import make_callable, FunctionValidateError
 
 
 @dataclass
@@ -18,8 +20,8 @@ class BaseSNEModel(BaseModel):
         self._title = "None"
         self._description = "None"
         self._eps = 0.0001
-        self.matrix: list[list[int | float]] = []
-        self.x0: list[int | float] = []
+        self.equations: list[str] = []
+        self.initial_guess: tuple[int | float, int | float] = (0, 1)
         self._iters_limit = 100
         self.iters = None
         self.table: list[TableRow] = []
@@ -44,12 +46,6 @@ class BaseSNEModel(BaseModel):
     def eps(self) -> float:
         return self._eps
 
-    def a(self) -> list[list[int | float]]:
-        return [row[:-1] for row in self.matrix]
-
-    def b(self) -> list[int | float]:
-        return [row[-1] for row in self.matrix]
-
     def set_eps(self, eps: float):
         if not isinstance(eps, (int, float)):
             raise ValueError(f"Неверная точность {eps!r} type {type(eps)!r}")
@@ -61,47 +57,14 @@ class BaseSNEModel(BaseModel):
         self._eps = eps
         self.notify_observers()
 
-    def resize(self, value: int) -> None:
-        if self.size() == value or value < 3 or value > 8:
-            return
+    def set_initial_guess(self, value: tuple[int | float, int | float]):
+        if not isinstance(value, tuple):
+            raise ValueError(f"Неверное начальное приближение {value!r} type {type(value)!r}")
 
-        if len(self.x0) < value:
-            for _ in range(len(self.x0), value):
-                self.x0.append(0)
-        elif len(self.x0) > value:
-            self.x0 = self.x0[:value]
+        if len(value) != 2:
+            raise ValueError(f"Неверное начальное приближение {value!r} type {type(value)!r}")
 
-        if not self.matrix:
-            for i in range(value):
-                self.matrix.append([0 for _ in range(value + 1)])
-            self.notify_observers()
-            return
-
-        delta = abs(len(self.matrix) - value)
-        if len(self.matrix) < value:
-            for i in range(len(self.matrix), value):
-                self.matrix.append([0 for _ in range(len(self.matrix[0]))])
-
-            for row in self.matrix:
-                for _ in range(delta):
-                    row.insert(-1, 0)
-        else:
-            self.matrix = self.matrix[:value]
-            for row in self.matrix:
-                for _ in range(delta):
-                    row.pop(-2)
-
-        self.notify_observers()
-
-    def size(self) -> int:
-        return len(self.matrix)
-
-    def set_item_value(self, row: int, column: int, value: int | float):
-        self.matrix[row][column] = value
-        self.notify_observers()
-
-    def set_item_x0_value(self, index: int, value: int | float):
-        self.x0[index] = value
+        self.initial_guess = value
         self.notify_observers()
 
     @abstractmethod
@@ -129,4 +92,37 @@ class BaseSNEModel(BaseModel):
             return
 
         self._iters_limit = value
+        self.notify_observers()
+
+    def set_equation_count(self, value: int):
+        if not isinstance(value, int):
+            raise ValueError(f"Неверное количество уравнений {value!r} type {type(value)!r}")
+
+        if value < 2:
+            self.validation_error("Неверное количество уравнений")
+            return
+
+        if value > len(self.equations):
+            self.equations.extend(["" for _ in range(value - len(self.equations))])
+        else:
+            self.equations = self.equations[:value]
+        self.notify_observers()
+
+    def set_equation(self, index: int, value: str):
+        if not isinstance(index, int):
+            raise ValueError(f"Неверный индекс уравнения {index!r} type {type(index)!r}")
+
+        if not isinstance(value, str):
+            raise ValueError(f"Неверное уравнение {value!r} type {type(value)!r}")
+
+        if index < 0 or index >= len(self.equations):
+            raise ValueError("Неверный индекс уравнения")
+
+        try:
+            make_callable(value)
+        except FunctionValidateError:
+            self.validation_error(f"Неверное уравнение {index + 1!r}")
+            return
+
+        self.equations[index] = value
         self.notify_observers()
