@@ -4,7 +4,8 @@ set -e
 
 PROGRAM_NAME='CompMath'
 PROGRAM_NAME_LOWER=$(echo "$PROGRAM_NAME" | tr '[:upper:]' '[:lower:]')
-PROGRAM_ASSET_PATH=./src/$PROGRAM_NAME_LOWER/assets
+PROGRAM_PATH=../src
+PROGRAM_ASSET_PATH=$PROGRAM_PATH/$PROGRAM_NAME_LOWER/assets
 DESKTOP_FILE_PATH=./linux/.desktop
 PYTHON_VERSION=3.12
 
@@ -84,13 +85,13 @@ update-desktop-database /usr/share/applications
 # Install app
 echo 'Установка приложения...'
 
-cp -r ./src "$INSTALL_PATH"/
+cp -r $PROGRAM_PATH "$INSTALL_PATH"/
 
 # Create config file
 getent passwd | while IFS=: read -r username _ uid _ _ home _; do
   if [ "$uid" -ge 1000 ] && [ -d "$home" ]; then
     mkdir -p "$home/.$PROGRAM_NAME_LOWER"
-    cp ./config.ini "$home/.$PROGRAM_NAME_LOWER/config.ini"
+    cp ../config.ini "$home/.$PROGRAM_NAME_LOWER/config.ini"
     chown -R "$username":"$username" "$home/.$PROGRAM_NAME_LOWER"
   fi
 done
@@ -100,7 +101,7 @@ cp ./uninstall.sh "$INSTALL_PATH"/
 chmod +x "$INSTALL_PATH"/uninstall.sh
 
 # Make executable
-cp ./"$PROGRAM_NAME_LOWER".sh "$INSTALL_PATH"/
+cp ../"$PROGRAM_NAME_LOWER".sh "$INSTALL_PATH"/
 chmod +x "$INSTALL_PATH"/"$PROGRAM_NAME_LOWER".sh
 ln -sf "$INSTALL_PATH"/"$PROGRAM_NAME_LOWER".sh /usr/local/bin/"$PROGRAM_NAME_LOWER"
 chmod +x /usr/local/bin/"$PROGRAM_NAME_LOWER"
