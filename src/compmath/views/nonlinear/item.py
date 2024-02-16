@@ -4,7 +4,8 @@ from PyQt6.QtWidgets import (
     QWidget,
     QVBoxLayout,
     QFormLayout,
-    QHBoxLayout, QTableWidgetItem, QSizePolicy
+    QHBoxLayout,
+    QTableWidgetItem
 )
 
 from compmath.models.nonlinear.base import BaseNoNLinearModel
@@ -164,7 +165,6 @@ class NoNLinearItemView(QWidget):
     def model_changed(self):
         self.error_label.setText("")
 
-    def was_calculated(self):
         if self.model.iters is not None:
             self.count_iters_input.setText(str(self.model.iters))
 
@@ -174,9 +174,10 @@ class NoNLinearItemView(QWidget):
         if self.model.table:
             self.table_button.setDisabled(False)
 
-        self.graphic.clear_plots()
-        for plot in self.model.graphics:
-            self.graphic.add_plot(plot.plot_items())
+        if self.model.graphics:
+            self.graphic.clear_plots()
+            for plot in self.model.graphics:
+                self.graphic.add_plot(plot.plot_items())
 
     def model_loaded(self):
         self.header.blockSignals(True)
@@ -205,6 +206,10 @@ class NoNLinearItemView(QWidget):
         self.interval_b_input.blockSignals(False)
         self.graphic.blockSignals(False)
         self.iters_limit_input.blockSignals(False)
+
+        # Paint graphic
+        if self.model.fx:
+            self.model.set_fx(self.model.fx)
 
     def validation_error(self, message: str):
         self.error_label.setText(message)

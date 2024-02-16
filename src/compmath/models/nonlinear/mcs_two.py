@@ -60,4 +60,4 @@ class MCSTwoModel(BaseNoNLinearModel):
 
         self.result = x
         self.iters = n
-        self.was_calculated()
+        self.notify_observers()

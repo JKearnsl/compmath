@@ -71,4 +71,4 @@ class HDModel(BaseNoNLinearModel):
 
         self.result = (a + b) / 2
         self.iters = n
-        self.was_calculated()
+        self.notify_observers()

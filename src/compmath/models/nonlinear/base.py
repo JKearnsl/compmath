@@ -56,12 +56,16 @@ class BaseNoNLinearModel(BaseModel):
 
     def set_fx(self, fx: str):
         try:
-            make_callable(fx)
+            func = make_callable(fx)
         except FunctionValidateError:
             self.validation_error("Инвалидная функция")
             return
 
         self._fx = fx
+        self.graphics.clear()
+        graphic = Graphic(x_limits=self.x_limits)
+        graphic.add_graph(func)
+        self.graphics.append(graphic)
         self.notify_observers()
 
     @property
@@ -139,10 +143,6 @@ class BaseNoNLinearModel(BaseModel):
     @abstractmethod
     def calc(self) -> None:
         ...
-
-    def was_calculated(self):
-        for observer in self._mObservers:
-            observer.was_calculated()
 
     def validation_error(self, error):
         for observer in self._mObservers:
