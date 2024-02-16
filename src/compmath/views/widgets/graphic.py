@@ -148,6 +148,7 @@ class Graphic(QWidget):
         fullscreen_btn.setIconSize(fullscreen_btn.size())
         fullscreen_btn.setIcon(svg_ico("icons:fullscreen.svg"))
         toolbar_layout.addWidget(fullscreen_btn)
+        self.toolbar = toolbar
 
         graphic_slider = QSlider(Qt.Orientation.Horizontal)
         graphic_slider.setFixedHeight(20)
@@ -155,7 +156,7 @@ class Graphic(QWidget):
         graphic_slider.setRange(0, 0)
         graphic_slider.setDisabled(True)
         graphic_slider.setTickPosition(QSlider.TickPosition.TicksBelow)
-        self._graphic_slider = graphic_slider
+        self.graphic_slider = graphic_slider
 
         layout.addWidget(x_min, 0, 0, 1, 1, Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(graphic, 0, 1, 1, 1, Qt.AlignmentFlag.AlignCenter)
@@ -194,9 +195,9 @@ class Graphic(QWidget):
 
     def add_plot(self, plot_items: list[PlotDataItem]):
         self._plots.append(plot_items)
-        self._graphic_slider.setEnabled(True)
-        self._graphic_slider.setMaximum(len(self._plots) - 1)
-        self._graphic_slider.setValue(len(self._plots) - 1)
+        self.graphic_slider.setEnabled(True)
+        self.graphic_slider.setMaximum(len(self._plots) - 1)
+        self.graphic_slider.setValue(len(self._plots) - 1)
 
     def set_plot(self, index: int):
         self._current_plot = index
@@ -208,7 +209,7 @@ class Graphic(QWidget):
         self._plots.clear()
         self._current_plot = None
         self._graphic.clear_temp_items()
-        self._graphic_slider.setDisabled(True)
+        self.graphic_slider.setDisabled(True)
 
     def show_full_screen(self):
         dialog = Dialog(
