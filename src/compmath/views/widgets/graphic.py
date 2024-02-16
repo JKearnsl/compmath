@@ -53,6 +53,19 @@ class GraphicCanvas(PlotWidget):
         return self._temp_items
 
 
+def copy_plot_data_item(item: PlotDataItem) -> PlotDataItem:
+    x, y = item.getData()
+
+    copied_item = PlotDataItem(x, y)
+
+    copied_item.setPen(item.opts['pen'])
+    copied_item.setSymbol(item.opts['symbol'])
+    copied_item.setSymbolBrush(item.opts['symbolBrush'])
+    copied_item.setSymbolPen(item.opts['symbolPen'])
+
+    return copied_item
+
+
 class Graphic(QWidget):
     limitInvalid = pyqtSignal()
     limitChanged = pyqtSignal()
@@ -224,7 +237,7 @@ class Graphic(QWidget):
 
         graphic = GraphicCanvas()
         for item in self._graphic.temp_items():
-            graphic.addItem(item)
+            graphic.addItem(copy_plot_data_item(item))
         dialog.layout().addWidget(graphic)
 
         dialog.show()
