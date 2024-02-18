@@ -227,7 +227,8 @@ class SNEItemView(QWidget):
             item = self.equation_list.item(index)
             if item is not None:
                 widget = self.equation_list.itemWidget(item)
-                widget.func.setText(str_func)
+                if widget.func.text() != str_func:
+                    widget.func.setText(str_func)
             else:
                 new_item = EquationItem()
                 new_widget = EquationItemWidget(index, str_func, self.widgets_factory)
@@ -295,7 +296,7 @@ class SNEItemView(QWidget):
         self.model.set_eps(value)
 
     def item_changed(self, index: int, value: str):
-        if (value := value.strip()) == "":
+        if value.strip() == "":
             return
         self.model.set_equation(index, value)
 
