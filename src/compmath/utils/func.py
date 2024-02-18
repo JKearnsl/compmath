@@ -56,6 +56,27 @@ def make_callable(func: str | Basic) -> FuncReturn:
     return wrapped_func
 
 
+def solve_rel_var(func: str | Basic, var: str):
+    """
+    Решение уравнения относительно переменной
+
+    :param func: Уравнение
+    :param var: Переменная
+    :return: Функция
+    """
+    if isinstance(func, str):
+        try:
+            expr = sympify(func)
+        except (SympifyError, TypeError):
+            raise FunctionValidateError(f"Invalid literal: {func}")
+    elif isinstance(func, Basic):
+        expr = func
+    else:
+        raise ValueError(f"Invalid literal: {func}")
+
+    return solve(expr, var)
+
+
 def derivative(fx: Callable[[float | int], float], h: float = 0.0001) -> Callable[[float | int], float]:
     """
     Вычисление производной функции
