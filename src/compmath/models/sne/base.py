@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 from compmath.models.base import BaseModel
 from compmath.models.graphic import Graphic
-from compmath.utils.func import make_callable, FunctionValidateError
+from compmath.utils.func import make_callable, solve_rel_var, is_valid_func
 
 
 @dataclass
@@ -20,7 +20,10 @@ class BaseSNEModel(BaseModel):
         self._title = "None"
         self._description = "None"
         self._eps = 0.0001
-        self.equations: list[str] = []
+        self.equations: list[str] = [
+            "sin(y) - 2*x - 1.6",
+            "cos(x + 0.5) + y - 0.8"
+        ]
         self.initial_guess: tuple[int | float, int | float] = (0, 1)
         self._iters_limit = 100
         self.iters = None
@@ -118,18 +121,31 @@ class BaseSNEModel(BaseModel):
         if index < 0 or index >= len(self.equations):
             raise ValueError("Неверный индекс уравнения")
 
-        try:
-            make_callable(value)
-        except FunctionValidateError:
-            self.validation_error(f"Неверное уравнение {index + 1!r}")
+        if not is_valid_func(value, ["x", "y"]):
+            self.validation_error(f"Неверное выражение {value!r}")
             return
 
         self.equations[index] = value
         self.notify_observers()
 
     def graphic(self, x_limits: tuple[int | float, int | float]) -> Graphic:
-        graphic = Graphic(x_limits=x_limits)
-        for func in filter(lambda x: x != "", self.equations):
-            print(func)
-            graphic.add_graph(make_callable(func))
+        graphic = Graphic(x_limits=x_limits, y_limits=x_limits)  # Todo add y_limits
+
+        iterable = zip(
+            filter(lambda f: f != "", self.equations),
+            [
+                ("x", "blue"),
+                ("y", "red")
+            ],
+            strict=False
+        )
+        for func_str, var in iterable:
+            solutions = solve_rel_var(func_str, var[0])
+
+            if len(solutions) == 0:
+                continue
+            if var[0] == "x":
+                graphic.add_graph(fx=make_callable(solutions[0]), color=var[1])
+            else:
+                graphic.add_graph(fy=make_callable(solutions[0]), color=var[1])
         return graphic
