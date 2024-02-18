@@ -1,5 +1,5 @@
 from typing import Callable, Protocol
-from sympy import sympify, lambdify, symbols, SympifyError, Basic, solve
+from sympy import sympify, lambdify, SympifyError, Basic, solve
 from sympy.core import Symbol
 
 
@@ -20,6 +20,19 @@ class OneArgProtocol(Protocol):
 class FuncReturn(Protocol):
     def __call__(self, x: float | int | None = None, y: float | int | None = None) -> float:
         ...
+
+
+def is_valid_func(func: str, valid_symbols: list[str] = None) -> bool:
+    if valid_symbols is None:
+        valid_symbols = ["x", "y"]
+    try:
+        expr = sympify(func)
+        symbols_list = [str(s) for s in expr.free_symbols]
+        if all(s in valid_symbols for s in symbols_list):
+            return True
+        return False
+    except (SympifyError, TypeError):
+        return False
 
 
 def make_callable(func: str | Basic) -> FuncReturn:
