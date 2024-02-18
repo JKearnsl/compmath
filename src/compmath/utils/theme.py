@@ -1,6 +1,7 @@
 import os
 import sys
 import importlib
+from uuid import UUID
 
 from compmath import themes
 from compmath.themes.base import BaseTheme
@@ -12,6 +13,7 @@ __DIRNAME = os.path.basename(__FOLDER)
 def is_theme(theme_class: type) -> bool:
     try:
         getattr(theme_class, "__title__")
+        getattr(theme_class, "__uuid__")
         getattr(theme_class, "__author__"),
         getattr(theme_class, "__version__"),
         getattr(theme_class, "__description__"),
@@ -29,7 +31,7 @@ def is_theme(theme_class: type) -> bool:
         return False
 
 
-def get_themes() -> tuple[dict[str, tuple[type[BaseTheme], str, str]], list[tuple[str, str]]]:
+def get_themes() -> tuple[dict[UUID, tuple[type[BaseTheme], str, str]], list[tuple[str, str]]]:
     items = os.listdir(__FOLDER)
 
     normal_themes = {}
@@ -59,9 +61,9 @@ def get_themes() -> tuple[dict[str, tuple[type[BaseTheme], str, str]], list[tupl
                                 theme_class != BaseTheme and
                                 issubclass(theme_class, BaseTheme) and
                                 is_theme(theme_class) and
-                                normal_themes.get(theme_class.__title__) is None
+                                normal_themes.get(theme_class.__uuid__) is None
                         ):
-                            normal_themes[theme_class.__title__] = (theme_class, module_name, module_path)
+                            normal_themes[UUID(theme_class.__uuid__)] = (theme_class, module_name, module_path)
                             is_found_theme_class = True
                             break
 

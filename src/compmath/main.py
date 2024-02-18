@@ -65,7 +65,7 @@ class CompMathApp(QApplication):
         # И иконку рабочего стола:
         # - https://askubuntu.com/questions/476981/how-do-i-make-a-desktop-icon-to-launch-a-program
 
-        theme = get_themes()[0].get(config.VAR.BASE.THEME_TITLE)
+        theme = get_themes()[0].get(config.VAR.BASE.THEME_UUID)
         if not theme:
             theme = BASE_THEME
 

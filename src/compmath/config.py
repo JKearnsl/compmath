@@ -1,6 +1,7 @@
 import os
 from dataclasses import dataclass
 import configparser
+from uuid import UUID
 
 from compmath.version import __version__
 
@@ -16,7 +17,7 @@ class Contact:
 class Base:
     APP_NAME: str
     DEBUG: bool
-    THEME_TITLE: str
+    THEME_UUID: UUID
     CONTACT: Contact
 
 
@@ -43,7 +44,7 @@ class InIConfig:
             BASE=Base(
                 APP_NAME=config["BASE"]["APP_NAME"],
                 DEBUG=str_to_bool(config["BASE"]["DEBUG"]),
-                THEME_TITLE=config["BASE"]["THEME_TITLE"],
+                THEME_UUID=UUID(config["BASE"]["THEME_UUID"]),
                 CONTACT=Contact(
                     NAME=config["CONTACT"]["NAME"],
                     URL=config["CONTACT"]["URL"],

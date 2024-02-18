@@ -1,4 +1,5 @@
 from typing import TypeVar
+from uuid import UUID
 
 from PyQt6.QtWidgets import QWidget
 
@@ -40,9 +41,9 @@ class SettingsView(Dialog, DObserver, metaclass=TSMeta):
         self.ui.ch_color_theme_widget.blockSignals(True)
         self.ui.ch_color_theme_widget.clear()
         current_theme_index = 0
-        for theme_name, theme in self.model.get_themes().items():
-            self.ui.ch_color_theme_widget.addItem(theme_name, theme)
-            if theme_name == self.widgets_factory.theme.__title__:
+        for theme_id, theme in self.model.get_themes().items():
+            self.ui.ch_color_theme_widget.addItem(getattr(theme[0], "__title__"), theme)
+            if theme_id == UUID(self.widgets_factory.theme.__uuid__):
                 current_theme_index = self.ui.ch_color_theme_widget.count() - 1
         self.ui.ch_color_theme_widget.setCurrentIndex(current_theme_index)
         self.ui.ch_color_theme_widget.blockSignals(False)
@@ -60,5 +61,5 @@ class SettingsView(Dialog, DObserver, metaclass=TSMeta):
             self.ui.ch_color_theme_widget.blockSignals(False)
             return
 
-        self.controller.change_theme(new_theme[0].__title__)
+        self.controller.change_theme(UUID(new_theme[0].__uuid__))
         self.controller.reboot()
