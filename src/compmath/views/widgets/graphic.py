@@ -210,7 +210,8 @@ class Graphic(QWidget):
 
     def add_plot(self, plot_items: list[PlotDataItem]):
         self._plots.append(plot_items)
-        self.graphic_slider.setEnabled(True)
+        if self.graphic_slider.isVisible():
+            self.graphic_slider.setEnabled(True)
         self.graphic_slider.setMaximum(len(self._plots) - 1)
         self.graphic_slider.setValue(len(self._plots) - 1)
         self.set_plot(len(self._plots) - 1)
