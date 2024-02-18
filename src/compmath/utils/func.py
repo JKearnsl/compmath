@@ -1,5 +1,5 @@
 from typing import Callable, Protocol
-from sympy import sympify, lambdify, symbols, SympifyError, Basic
+from sympy import sympify, lambdify, symbols, SympifyError, Basic, solve
 from sympy.core import Symbol
 
 
@@ -17,50 +17,41 @@ class OneArgProtocol(Protocol):
         ...
 
 
-class FuncProtocol(Protocol):
+class FuncReturn(Protocol):
     def __call__(self, x: float | int | None = None, y: float | int | None = None) -> float:
         ...
 
 
-def make_callable(fx: str | Basic) -> FuncProtocol:
+def make_callable(func: str | Basic) -> FuncReturn:
     """
     Создание функции из строки
 
-    :param fx: Строка с функцией
+    :param func: Строка с функцией
     :return: Функция
     """
-    if isinstance(fx, str):
+    if isinstance(func, str):
         try:
-            expr = sympify(fx)
+            expr = sympify(func)
         except (SympifyError, TypeError):
-            raise FunctionValidateError(f"Invalid literal: {fx}")
+            raise FunctionValidateError(f"Invalid literal: {func}")
     else:
-        expr = fx
+        expr = func
 
     # Список символов из выражения
     symbols_list = [s for s in expr.free_symbols if isinstance(s, Symbol)]
+    symbols_dict = {str(s): s for s in symbols_list}
 
-    # Если переменных нет, константа
-    if not symbols_list:
-        def constant_func(*args):
-            return expr
+    lambda_func = lambdify(symbols_list, expr, 'numpy')
 
-        return constant_func
-
-    sym_symbols = [symbols(str(symbol)) for symbol in symbols_list]
-    symbols_dict = {str(s): s for s in sym_symbols}
-
-    func = lambdify(sym_symbols, expr, 'numpy')
-
-    def wrapped_func(x=None, y=None):
+    def wrapped_func(a0: float | int | None = None, a1: float | int | None = None):
         if 'x' in symbols_dict and 'y' in symbols_dict:
-            return func(x, y)
-        elif 'x' in symbols_dict or 'y' in symbols_dict:
-            return func(x)
+            return lambda_func(a0, a1)
+        elif 'x' in symbols_dict:
+            return lambda_func(a0 or a1)
         elif 'y' in symbols_dict:
-            return func(y)
+            return lambda_func(a1 or a0)
         else:
-            raise ValueError("No variables found in the expression")
+            return lambda_func()
 
     return wrapped_func
 
