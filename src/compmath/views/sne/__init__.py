@@ -4,6 +4,7 @@ from PyQt6.QtWidgets import QWidget
 
 from compmath.models import MenuItem
 from compmath.models.sne.ntm import NTModel
+from compmath.models.sne.sim import SIModel
 from compmath.models.sne.zm import ZModel
 from compmath.utils.observer import DObserver
 from compmath.utils.ts_meta import TSMeta
@@ -38,12 +39,16 @@ class SNEView(QWidget, DObserver, metaclass=TSMeta):
         ...
 
     def model_loaded(self):
+        sim = SNEItemView(SIModel(), self.widgets_factory, self)
+        self.ui.central_layout.addWidget(sim)
+
         ntm = SNEItemView(NTModel(), self.widgets_factory, self)
         self.ui.central_layout.addWidget(ntm)
 
         zm = SNEItemView(ZModel(), self.widgets_factory, self)
         self.ui.central_layout.addWidget(zm)
 
+        sim.model_loaded()
         ntm.model_loaded()
         zm.model_loaded()
 
