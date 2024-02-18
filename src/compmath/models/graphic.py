@@ -24,30 +24,46 @@ class GraphModel:
 class Graphic:
     def __init__(
             self,
-            x_limits: tuple[float | int, float | int] = None
+            x_limits: tuple[float | int, float | int] = None,
+            y_limits: tuple[float | int, float | int] = None
     ):
         self.x_limits = x_limits
+        self.y_limits = y_limits
 
         self.graphs = []
 
     def add_graph(
             self,
-            fx: Callable[[float | int], float],
+            fx: Callable[[float | int], float] = None,
+            fy: Callable[[float | int], float] = None,
             *,
             color: str = 'blue',
             step: float | int = 0.1,
-            x_limits: tuple[float | int, float | int] = None
+            x_limits: tuple[float | int, float | int] = None,
+            y_limits: tuple[float | int, float | int] = None
     ) -> None:
-        if not (x_limits or self.x_limits):
-            raise ValueError("Не заданы пределы по X или Y")
+        if fx and not (x_limits or self.x_limits):
+            raise ValueError("Не задан предел по X")
 
-        x_data = np.arange(
-            x_limits[0] if x_limits else self.x_limits[0],
-            x_limits[1] if x_limits else self.x_limits[1],
-            step
-        )
+        if fy and not (y_limits or self.y_limits):
+            raise ValueError("Не задан предел по Y")
 
-        y_data = np.array([fx(x) for x in x_data])
+        if fx:
+            x_data = np.arange(
+                x_limits[0] if x_limits else self.x_limits[0],
+                x_limits[1] if x_limits else self.x_limits[1],
+                step
+            )
+            y_data = np.array([fx(x) for x in x_data])
+        elif fy:
+            y_data = np.arange(
+                y_limits[0] if y_limits else self.y_limits[0],
+                y_limits[1] if y_limits else self.y_limits[1],
+                step
+            )
+            x_data = np.array([fy(y) for y in y_data])
+        else:
+            raise ValueError("Не задана функция")
 
         graph = GraphModel(
             x_data=x_data,
