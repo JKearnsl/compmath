@@ -27,6 +27,8 @@ class BaseSNEModel(BaseModel):
             "cos(x + 0.5) + y - 0.8"
         ]
         self.initial_guess: tuple[int | float, int | float] = (0, 1)
+        self.graphics: list[Graphic] = []
+        self.x_limits = (-10, 10)
         self.solve_log: list[str] = []
         self._iters_limit = 100
         self.iters = None
