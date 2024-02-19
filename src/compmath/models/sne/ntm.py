@@ -2,7 +2,7 @@ from sympy import diff
 import numpy as np
 
 from compmath.models.sne.base import BaseSNEModel, TableRow
-from compmath.utils.func import solve_rel_var, make_callable
+from compmath.utils.func import make_callable
 
 
 class NTModel(BaseSNEModel):
@@ -41,7 +41,7 @@ class NTModel(BaseSNEModel):
             [diff(func_str_1, "x"), diff(func_str_1, "y")],
             [diff(func_str_2, "x"), diff(func_str_2, "y")]
         ]
-        x_vector = np.array(self.initial_guess, dtype=float)
+        x_vector = np.array([0, 0], dtype=float)
 
         self.solve_log.append(f"W(x, y) = {w}")
 
@@ -60,7 +60,7 @@ class NTModel(BaseSNEModel):
                 [w[1][0](*x_vector), w[1][1](*x_vector)]
             ])
 
-            delta_x = -np.dot(np.linalg.inv(w_matrix), [
+            delta_x = -np.linalg.inv(w_matrix) @ np.array([
                 make_callable(func_str_1)(*x_vector),
                 make_callable(func_str_2)(*x_vector)
             ])
