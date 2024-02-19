@@ -42,14 +42,14 @@ class SNEView(QWidget, DObserver, metaclass=TSMeta):
         sim = SNEItemView(SIModel(), self.widgets_factory, self)
         self.ui.central_layout.addWidget(sim)
 
-        ntm = SNEItemView(NTModel(), self.widgets_factory, self)
-        self.ui.central_layout.addWidget(ntm)
-
         zm = SNEItemView(ZModel(), self.widgets_factory, self)
         self.ui.central_layout.addWidget(zm)
 
+        ntm = SNEItemView(NTModel(), self.widgets_factory, self)
+        self.ui.central_layout.addWidget(ntm)
+
         sim.model_loaded()
-        ntm.model_loaded()
         zm.model_loaded()
+        ntm.model_loaded()
 
         self.model_changed()
