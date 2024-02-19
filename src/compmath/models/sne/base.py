@@ -21,7 +21,7 @@ class BaseSNEModel(BaseModel):
         super().__init__()
         self._title = "None"
         self._description = "None"
-        self._eps = 0.0001
+        self._eps = 0.00001
         self.equations: list[str] = [
             "sin(y) - 2*x - 1.6",
             "cos(x + 0.5) + y - 0.8"
