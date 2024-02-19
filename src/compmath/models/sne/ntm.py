@@ -1,8 +1,11 @@
+from typing import cast
+
 from sympy import diff
 import numpy as np
 
+from compmath.models.graphic import Graphic
 from compmath.models.sne.base import BaseSNEModel, TableRow
-from compmath.utils.func import make_callable
+from compmath.utils.func import make_callable, solve_rel_var
 
 
 class NTModel(BaseSNEModel):
@@ -16,6 +19,7 @@ class NTModel(BaseSNEModel):
     def calc(self):
         self.table.clear()
         self.solve_log.clear()
+        self.graphics.clear()
 
         if len(self.equations) != 2:
             self.validation_error("Должно быть два уравнения")
@@ -35,6 +39,11 @@ class NTModel(BaseSNEModel):
             return
 
         # Решение
+
+        fi_x_y = (
+            make_callable(solve_rel_var(func_str_1, "x")[0]),
+            make_callable(solve_rel_var(func_str_2, "y")[0])
+        )
 
         # Матрица Якоби
         w = [
@@ -72,6 +81,15 @@ class NTModel(BaseSNEModel):
             delta = np.max(np.abs(delta_x))
 
             self.table.append(TableRow(k, x_vector, delta))
+            graphic = Graphic(x_limits=self.x_limits, y_limits=self.x_limits)
+            graphic.add_graph(fx=fi_x_y[0], color="blue")
+            graphic.add_graph(fy=fi_x_y[1], color="red")
+            graphic.add_point(
+                cast(float, x_vector[1]),
+                cast(float, x_vector[0]),
+                color="green"
+            )
+            self.graphics.append(graphic)
 
         self.solve_log.append(f"\nРешение: {x_vector}")
         self.notify_observers()
