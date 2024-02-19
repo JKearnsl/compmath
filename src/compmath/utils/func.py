@@ -51,18 +51,22 @@ def make_callable(func: str | Basic) -> FuncReturn:
         expr = func
 
     # Список символов из выражения
-    symbols_list = [s for s in expr.free_symbols if isinstance(s, Symbol)]
-    symbols_dict = {str(s): s for s in symbols_list}
+    symbols_str_list = [str(s) for s in expr.free_symbols if isinstance(s, Symbol)]
+
+    if len(symbols_str_list) > 1 and "x" in symbols_str_list:
+        symbols_str_list.sort(key=lambda var: var != "x")
+
+    symbols_list = [Symbol(s) for s in symbols_str_list]
 
     lambda_func = lambdify(symbols_list, expr, 'numpy')
 
     def wrapped_func(a0: float | int | None = None, a1: float | int | None = None):
-        if 'x' in symbols_dict and 'y' in symbols_dict:
+        if 'x' in symbols_str_list and 'y' in symbols_str_list:
             return lambda_func(a0, a1)
-        elif 'x' in symbols_dict:
-            return lambda_func(a0 or a1)
-        elif 'y' in symbols_dict:
-            return lambda_func(a1 or a0)
+        elif 'x' in symbols_str_list:
+            return lambda_func(a0 if a0 is not None else a1)
+        elif 'y' in symbols_str_list:
+            return lambda_func(a1 if a1 is not None else a0)
         else:
             return lambda_func()
 
