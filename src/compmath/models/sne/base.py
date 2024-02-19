@@ -179,12 +179,12 @@ class BaseSNEModel(BaseModel):
         self.solve_log.append(f"fi(x, y) = {fi_x_y}")
         self.solve_log.append(f"fi₁'(x, y) = {fi_1_x_y}")
         self.solve_log.append(f"fi₂'(x, y) = {fi_2_x_y}")
-        self.solve_log.append(f"a = {a}\nb = {b}")
+        self.solve_log.append(f"\na = {a}\nb = {b}\n")
         self.solve_log.append(f"abs(fi₁.₁'(a, b)) + abs(fi₁.₂'(a, b)) = {one} {'<' if one < 1 else '>'} 1")
         self.solve_log.append(f"abs(fi₂.₁'(a, b)) + abs(fi₂.₂'(a, b)) = {two} {'<' if two < 1 else '>'} 1")
 
         if not (result := one < 1 and two < 1):
-            self.solve_log.append("Условие сходимости не выполнено")
+            self.solve_log.append("\nУсловие сходимости не выполнено\n")
         else:
-            self.solve_log.append("Условие сходимости выполнено")
+            self.solve_log.append("\nУсловие сходимости выполнено\n")
         return result
