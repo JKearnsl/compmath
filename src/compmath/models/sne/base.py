@@ -1,6 +1,8 @@
 from abc import abstractmethod
 from dataclasses import dataclass
 
+from sympy import diff
+
 from compmath.models.base import BaseModel
 from compmath.models.graphic import Graphic
 from compmath.utils.func import make_callable, solve_rel_var, is_valid_func
@@ -25,6 +27,7 @@ class BaseSNEModel(BaseModel):
             "cos(x + 0.5) + y - 0.8"
         ]
         self.initial_guess: tuple[int | float, int | float] = (0, 1)
+        self.solve_log: list[str] = []
         self._iters_limit = 100
         self.iters = None
         self.table: list[TableRow] = []
@@ -149,3 +152,39 @@ class BaseSNEModel(BaseModel):
             else:
                 graphic.add_graph(fy=make_callable(solutions[0]), color=var[1])
         return graphic
+
+    def is_converges(self, func1: str, func2: str) -> bool:
+        self.solve_log.append("\nПроверка итерационной сходимости\n")
+
+        fi_x_y = (
+            solve_rel_var(func1, "x")[0],
+            solve_rel_var(func2, "y")[0]
+        )
+
+        fi_1_x_y = (
+            diff(fi_x_y[0], "x"),
+            diff(fi_x_y[0], "y")
+        )
+
+        fi_2_x_y = (
+            diff(fi_x_y[1], "x"),
+            diff(fi_x_y[1], "y")
+        )
+
+        a, b = self.initial_guess
+
+        one = abs(make_callable(fi_1_x_y[0])(a, b)) + abs(make_callable(fi_1_x_y[1])(a, b))
+        two = abs(make_callable(fi_2_x_y[0])(a, b)) + abs(make_callable(fi_2_x_y[1])(a, b))
+
+        self.solve_log.append(f"fi(x, y) = {fi_x_y}")
+        self.solve_log.append(f"fi₁'(x, y) = {fi_1_x_y}")
+        self.solve_log.append(f"fi₂'(x, y) = {fi_2_x_y}")
+        self.solve_log.append(f"a = {a}\nb = {b}")
+        self.solve_log.append(f"abs(fi₁.₁'(a, b)) + abs(fi₁.₂'(a, b)) = {one} {'<' if one < 1 else '>'} 1")
+        self.solve_log.append(f"abs(fi₂.₁'(a, b)) + abs(fi₂.₂'(a, b)) = {two} {'<' if two < 1 else '>'} 1")
+
+        if not (result := one < 1 and two < 1):
+            self.solve_log.append("Условие сходимости не выполнено")
+        else:
+            self.solve_log.append("Условие сходимости выполнено")
+        return result
