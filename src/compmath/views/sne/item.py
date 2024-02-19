@@ -299,7 +299,7 @@ class SNEItemView(QWidget):
     def show_result(self):
         modal = self.widgets_factory.modal(self.parent)
         modal.setFixedWidth(800)
-        modal.setFixedHeight(450)
+        modal.setFixedHeight(600)
         modal.layout().setContentsMargins(5, 0, 5, 5)
 
         sheet = QWidget(modal)
@@ -318,6 +318,7 @@ class SNEItemView(QWidget):
         sheet.setLayout(central_layout)
 
         scroll_area = QScrollArea(modal)
+        scroll_area.setFixedHeight(550)
         scroll_area.setObjectName("scroll_area")
         scroll_area.setStyleSheet("""
             QWidget#scroll_area {
@@ -329,12 +330,25 @@ class SNEItemView(QWidget):
         scroll_area.setWidget(sheet)
         modal.layout().addWidget(scroll_area)
 
+        content_layout = QHBoxLayout()
+        content_layout.setContentsMargins(0, 0, 0, 0)
+        content_layout.setSpacing(0)
+        central_layout.addLayout(content_layout)
+
         if self.model.solve_log:
             text_area = self.widgets_factory.textarea()
             text_area.setFixedHeight(400)
             text_area.setReadOnly(True)
             text_area.setPlainText("\n".join(self.model.solve_log))
-            central_layout.addWidget(text_area)
+            content_layout.addWidget(text_area)
+
+        if self.model.graphics:
+            graphic_widget = self.widgets_factory.graphic()
+            graphic_widget.graphic_slider.setEnabled(True)
+            graphic_widget.setFixedSize(QSize(300, 300))
+            for graphic in self.model.graphics:
+                graphic_widget.add_plot(graphic.plot_items())
+            content_layout.addWidget(graphic_widget)
 
         if self.model.table:
             table = self.widgets_factory.table()
@@ -352,11 +366,17 @@ class SNEItemView(QWidget):
                 *[f"a{i}" for i in range(len(self.model.equations))]
             ])
             table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeMode.ResizeToContents)
+            # align center
+            for i in range(len(self.model.equations) + 2):
+                table.horizontalHeaderItem(i).setTextAlignment(Qt.AlignmentFlag.AlignCenter)
             for i, row in enumerate(self.model.table):
                 table.setItem(i, 0, QTableWidgetItem(str(row.iter_num)))
                 table.setItem(i, 1, QTableWidgetItem(str(row.delta)))
+                table.item(i, 0).setTextAlignment(Qt.AlignmentFlag.AlignCenter)
+                table.item(i, 1).setTextAlignment(Qt.AlignmentFlag.AlignCenter)
                 for j, x in enumerate(row.vector):
                     table.setItem(i, j + 2, QTableWidgetItem(str(x)))
+                    table.item(i, j + 2).setTextAlignment(Qt.AlignmentFlag.AlignCenter)
             central_layout.addWidget(table)
         modal.exec()
 
