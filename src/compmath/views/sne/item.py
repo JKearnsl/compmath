@@ -7,7 +7,7 @@ from PyQt6.QtWidgets import (
     QVBoxLayout,
     QHBoxLayout,
     QTableWidgetItem,
-    QHeaderView, QListWidget, QListWidgetItem
+    QHeaderView, QListWidget, QListWidgetItem, QScrollArea
 )
 
 from compmath.models.sne.base import BaseSNEModel
@@ -236,10 +236,6 @@ class SNEItemView(QWidget):
                 self.equation_list.addItem(new_item)
                 self.equation_list.setItemWidget(new_item, new_widget)
 
-    def was_calculated(self):
-        if self.model.table:
-            self.result_button.setDisabled(False)
-
     def model_loaded(self):
         self.header.blockSignals(True)
         self.description.blockSignals(True)
@@ -305,27 +301,63 @@ class SNEItemView(QWidget):
         modal.setFixedWidth(800)
         modal.setFixedHeight(450)
         modal.layout().setContentsMargins(5, 0, 5, 5)
-        table = self.widgets_factory.table()
-        table.setFixedHeight(400)
-        table.setRowCount(len(self.model.table))
-        table.add_style("""
-            QTableWidget {
-                border: none;
+
+        sheet = QWidget(modal)
+        sheet.setObjectName("sheet")
+        sheet.setStyleSheet("""
+            QWidget#sheet {
+                background-color: transparent;
             }
-            """)
-        table.setColumnCount(len(self.model.x0) + 2)
-        table.setHorizontalHeaderLabels([
-            "№",
-            "delta",
-            *[f"x{i}" for i in range(len(self.model.x0))]
-        ])
-        table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeMode.ResizeToContents)
-        for i, row in enumerate(self.model.table):
-            table.setItem(i, 0, QTableWidgetItem(str(row.iter_num)))
-            table.setItem(i, 1, QTableWidgetItem(str(row.delta)))
-            for j, x in enumerate(row.vector):
-                table.setItem(i, j + 2, QTableWidgetItem(str(x)))
-        modal.layout().addWidget(table)
+        """)
+        modal.layout().addWidget(sheet)
+
+        central_layout = QVBoxLayout(sheet)
+        central_layout.setContentsMargins(30, 20, 30, 20)
+        central_layout.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
+        central_layout.setSpacing(10)
+        sheet.setLayout(central_layout)
+
+        scroll_area = QScrollArea(modal)
+        scroll_area.setObjectName("scroll_area")
+        scroll_area.setStyleSheet("""
+            QWidget#scroll_area {
+                border: none;
+                outline: none;
+            }
+        """)
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setWidget(sheet)
+        modal.layout().addWidget(scroll_area)
+
+        if self.model.solve_log:
+            text_area = self.widgets_factory.textarea()
+            text_area.setFixedHeight(400)
+            text_area.setReadOnly(True)
+            text_area.setPlainText("\n".join(self.model.solve_log))
+            central_layout.addWidget(text_area)
+
+        if self.model.table:
+            table = self.widgets_factory.table()
+            table.setFixedHeight(400)
+            table.setRowCount(len(self.model.table))
+            table.add_style("""
+                QTableWidget {
+                    border: none;
+                }
+                """)
+            table.setColumnCount(len(self.model.equations) + 2)
+            table.setHorizontalHeaderLabels([
+                "№",
+                "delta",
+                *[f"a{i}" for i in range(len(self.model.equations))]
+            ])
+            table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeMode.ResizeToContents)
+            for i, row in enumerate(self.model.table):
+                table.setItem(i, 0, QTableWidgetItem(str(row.iter_num)))
+                table.setItem(i, 1, QTableWidgetItem(str(row.delta)))
+                for j, x in enumerate(row.vector):
+                    table.setItem(i, j + 2, QTableWidgetItem(str(x)))
+            central_layout.addWidget(table)
         modal.exec()
 
     def iters_limit_changed(self):
