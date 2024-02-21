@@ -19,7 +19,7 @@ from compmath.views.widgets.input_label import InputLabel
 
 
 class GraphicCanvas(PlotWidget):
-    def __init__(self, background_color: str = "white", parent=None):
+    def __init__(self, background_color: str = "white", axis_color: str = "black", parent=None):
         self.axis_x = AxisItem(orientation='bottom')
         self.axis_y = AxisItem(orientation='left')
         super().__init__(
@@ -30,14 +30,13 @@ class GraphicCanvas(PlotWidget):
         self._temp_items = []
 
         # Создание линий, которые будут служить осями
-        x_axis_line = InfiniteLine(pos=0, angle=0, movable=False)
-        y_axis_line = InfiniteLine(pos=0, angle=90, movable=False)
+        x_axis_line = InfiniteLine(pos=0, angle=0, movable=False, pen=axis_color)
+        y_axis_line = InfiniteLine(pos=0, angle=90, movable=False, pen=axis_color)
 
         self.addItem(x_axis_line)
         self.addItem(y_axis_line)
 
         self.showGrid(x=True, y=True)
-
         self.setBackground(background_color)
 
     def add_temp_item(self, item: PlotDataItem):
@@ -128,7 +127,7 @@ class Graphic(QWidget):
         x_min.setText("-10")
         self._x_min = x_min
 
-        graphic = GraphicCanvas(dialog_background_color)
+        graphic = GraphicCanvas(dialog_background_color, text_color)
         self._graphic = graphic
 
         toolbar = QWidget()
