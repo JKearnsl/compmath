@@ -38,7 +38,7 @@ class GraphicCanvas(PlotWidget):
 
         self.showGrid(x=True, y=True)
 
-        self.setBackground('w')
+        self.setBackground(background_color)
 
     def add_temp_item(self, item: PlotDataItem):
         self._temp_items.append(item)
@@ -128,7 +128,7 @@ class Graphic(QWidget):
         x_min.setText("-10")
         self._x_min = x_min
 
-        graphic = GraphicCanvas("y")
+        graphic = GraphicCanvas(dialog_background_color)
         self._graphic = graphic
 
         toolbar = QWidget()
