@@ -1,11 +1,11 @@
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QLocale
 from PyQt6.QtGui import QDoubleValidator, QIntValidator
 from PyQt6.QtWidgets import (
     QWidget,
     QVBoxLayout,
     QFormLayout,
     QHBoxLayout,
-    QTableWidgetItem
+    QTableWidgetItem, QHeaderView
 )
 
 from compmath.models.nonlinear.base import BaseNoNLinearModel
@@ -93,7 +93,9 @@ class NoNLinearItemView(QWidget):
 
         eps_label = widgets_factory.label("Точность: ")
         eps_input = widgets_factory.line_edit()
-        eps_input.setValidator(QDoubleValidator())
+        validator = QDoubleValidator()
+        validator.setLocale(QLocale(QLocale.Language.English, QLocale.Country.UnitedStates))
+        eps_input.setValidator(validator)
         self.eps_input = eps_input
         form.addRow(eps_label, eps_input)
 
@@ -214,9 +216,6 @@ class NoNLinearItemView(QWidget):
     def validation_error(self, message: str):
         self.error_label.setText(message)
 
-    def error_handler(self, error):
-        self.error_label.setText(error)
-
     def interval_input_changed(self):
         value_a = self.interval_a_input.text()
         value_b = self.interval_b_input.text()
@@ -247,6 +246,10 @@ class NoNLinearItemView(QWidget):
     def limit_changed(self):
         if self.graphic.x_limits() != self.model.x_limits:
             self.model.set_x_limits(self.graphic.x_limits())
+            self.model.reset_graphic()
+        if self.graphic.y_limits() != self.model.y_limits:
+            self.model.set_y_limits(self.graphic.y_limits())
+            self.model.reset_graphic()
 
     def iters_limit_changed(self):
         value = self.iters_limit_input.text()
@@ -284,6 +287,7 @@ class NoNLinearItemView(QWidget):
             "f(b)",
             "|a - b|"
         ])
+        table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeMode.ResizeToContents)
         for i, row in enumerate(self.model.table):
             table.setItem(i, 0, QTableWidgetItem(str(row.iter_num)))
             table.setItem(i, 1, QTableWidgetItem(str(row.a)))
@@ -293,5 +297,6 @@ class NoNLinearItemView(QWidget):
             table.setItem(i, 5, QTableWidgetItem(str(row.fa)))
             table.setItem(i, 6, QTableWidgetItem(str(row.fb)))
             table.setItem(i, 7, QTableWidgetItem(str(row.distance)))
+            table.item(i, 0).setTextAlignment(Qt.AlignmentFlag.AlignCenter)
         modal.layout().addWidget(table)
         modal.exec()
