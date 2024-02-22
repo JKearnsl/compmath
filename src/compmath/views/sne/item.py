@@ -188,12 +188,12 @@ class SNEItemView(QWidget):
         equation_list = QListWidget()
         equation_list.setObjectName("equation_list")
         equation_list.setStyleSheet("""
-                    QListWidget#equation_list {
-                        background-color: $BG2;
-                        border-radius: 5px;
-                        border: 2px solid $HOVER;
-                    }
-                """.replace(
+            QListWidget#equation_list {
+                background-color: $BG2;
+                border-radius: 5px;
+                border: 2px solid $HOVER;
+            }
+        """.replace(
             "$BG2", widgets_factory.theme.second_background
         ).replace(
             "$HOVER", widgets_factory.theme.hover
@@ -202,6 +202,7 @@ class SNEItemView(QWidget):
         right.addWidget(equation_list)
 
         # События
+        graphic.limitChanged.connect(self.limit_changed)
         initial_guess_input.textChanged.connect(self.initial_guess_changed)
         equation_count_input.valueChanged.connect(self.model.set_equation_count)
         eps_input.textChanged.connect(self.eps_changed)
@@ -218,7 +219,7 @@ class SNEItemView(QWidget):
         if self.model.equations:
             self.graphic.clear_plots()
             self.graphic.add_plot(
-                self.model.graphic(self.graphic.x_limits()).plot_items()
+                self.model.graphic().plot_items()
             )
 
         if self.equation_list.count() > len(self.model.equations):
@@ -396,3 +397,9 @@ class SNEItemView(QWidget):
 
     def set_equation_count(self, value: int):
         self.model.set_equation_count(value)
+
+    def limit_changed(self):
+        if self.graphic.x_limits() != self.model.x_limits:
+            self.model.set_x_limits(self.graphic.x_limits())
+        if self.graphic.y_limits() != self.model.y_limits:
+            self.model.set_y_limits(self.graphic.y_limits())
