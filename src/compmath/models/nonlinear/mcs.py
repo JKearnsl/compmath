@@ -33,7 +33,7 @@ class MCSModel(BaseNoNLinearModel):
         a, b = self.interval
 
         if function(a) * function(b) > 0:
-            self.raise_error("На данном интервале нет корней")
+            self.validation_error("На данном интервале нет корней")
             return
 
         n = 0

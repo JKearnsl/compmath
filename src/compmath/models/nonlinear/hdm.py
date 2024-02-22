@@ -37,7 +37,7 @@ class HDModel(BaseNoNLinearModel):
         a, b = self.interval
 
         if function(a) * function(b) > 0:
-            self.raise_error("Корни f(a) и f(b) одного знака")
+            self.validation_error("Корни f(a) и f(b) одного знака")
             return
 
         n = 0
