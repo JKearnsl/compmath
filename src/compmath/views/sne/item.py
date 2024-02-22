@@ -1,6 +1,6 @@
 from typing import cast
 
-from PyQt6.QtCore import Qt, pyqtSignal, QSize
+from PyQt6.QtCore import Qt, pyqtSignal, QSize, QLocale
 from PyQt6.QtGui import QDoubleValidator, QIntValidator
 from PyQt6.QtWidgets import (
     QWidget,
@@ -152,7 +152,9 @@ class SNEItemView(QWidget):
         eps_label = widgets_factory.label("Точность: ")
         eps_input = widgets_factory.line_edit()
         eps_input.setMaximumWidth(100)
-        eps_input.setValidator(QDoubleValidator())
+        validator = QDoubleValidator()
+        validator.setLocale(QLocale(QLocale.Language.English, QLocale.Country.UnitedStates))
+        eps_input.setValidator(validator)
         eps_layout.addWidget(eps_label)
         eps_layout.addWidget(eps_input, alignment=Qt.AlignmentFlag.AlignLeft)
         self.eps_input = eps_input
