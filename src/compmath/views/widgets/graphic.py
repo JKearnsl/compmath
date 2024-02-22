@@ -7,7 +7,7 @@ from PyQt6.QtWidgets import (
     QHBoxLayout,
     QToolButton,
     QVBoxLayout,
-    QSlider
+    QSlider, QSizePolicy
 )
 
 from pyqtgraph import PlotDataItem, AxisItem
@@ -83,6 +83,7 @@ class Graphic(QWidget):
         self._plots: list[list[PlotDataItem]] = []
         self._current_plot = None
 
+        self._text_color = text_color
         self._text_header_color = text_header_color
         self._hover_color = hover_color
         self._dialog_background_color = dialog_background_color
@@ -93,7 +94,7 @@ class Graphic(QWidget):
         widget_layout.setSpacing(0)
         self.setLayout(widget_layout)
 
-        sheet = QWidget()
+        sheet = QWidget(self)
         sheet.setObjectName("sheet")
         widget_layout.addWidget(sheet)
         sheet.setStyleSheet("""
@@ -115,26 +116,51 @@ class Graphic(QWidget):
         layout.setSpacing(0)
         sheet.setLayout(layout)
 
-        x_max = InputLabel(text_color)
-        x_max.setFixedWidth(30)
-        x_max.setFixedHeight(30)
-        x_max.setText("10")
-        self._x_max = x_max
+        x_limits_layout = QHBoxLayout()
 
         x_min = InputLabel(text_color)
         x_min.setFixedWidth(30)
         x_min.setFixedHeight(30)
         x_min.setText("-10")
+        x_limits_layout.addWidget(x_min)
         self._x_min = x_min
+
+        x_limits_layout.addStretch(1)
+
+        x_max = InputLabel(text_color)
+        x_max.setFixedWidth(30)
+        x_max.setFixedHeight(30)
+        x_max.setText("10")
+        x_limits_layout.addWidget(x_max)
+        self._x_max = x_max
+
+        y_limits_layout = QVBoxLayout()
+
+        y_max = InputLabel(text_color)
+        y_max.setFixedWidth(30)
+        y_max.setFixedHeight(30)
+        y_max.setText("10")
+        y_limits_layout.addWidget(y_max)
+        self._y_max = y_max
+
+        y_limits_layout.addStretch(1)
+
+        y_min = InputLabel(text_color)
+        y_min.setFixedWidth(30)
+        y_min.setFixedHeight(30)
+        y_min.setText("-10")
+        y_limits_layout.addWidget(y_min)
+        self._y_min = y_min
 
         graphic = GraphicCanvas(dialog_background_color, text_color)
         self._graphic = graphic
 
         toolbar = QWidget()
-        toolbar.setFixedHeight(30)
-        toolbar_layout = QHBoxLayout()
+        toolbar.setFixedWidth(30)
+        toolbar_layout = QVBoxLayout()
         toolbar.setLayout(toolbar_layout)
-        toolbar_layout.setContentsMargins(0, 0, 0, 0)
+        toolbar_layout.setContentsMargins(0, 5, 0, 5)
+        toolbar_layout.setAlignment(Qt.AlignmentFlag.AlignBottom)
         toolbar_layout.setSpacing(10)
 
         # Fullscreen button
@@ -172,31 +198,40 @@ class Graphic(QWidget):
         graphic_slider.setTickPosition(QSlider.TickPosition.TicksBelow)
         self.graphic_slider = graphic_slider
 
-        layout.addWidget(x_min, 0, 0, 1, 1, Qt.AlignmentFlag.AlignCenter)
-        layout.addWidget(graphic, 0, 1, 1, 1, Qt.AlignmentFlag.AlignCenter)
-        layout.addWidget(x_max, 0, 2, 1, 1, Qt.AlignmentFlag.AlignCenter)
-        layout.addWidget(toolbar, 1, 1, 1, 1, Qt.AlignmentFlag.AlignRight)
-        layout.addWidget(graphic_slider, 2, 0, 1, 3, Qt.AlignmentFlag.AlignCenter)
+        layout.addLayout(y_limits_layout, 1, 0, 1, 1, Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(graphic, 1, 1, 1, 1, Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(toolbar, 1, 2, 1, 1, Qt.AlignmentFlag.AlignRight)
+        layout.addLayout(x_limits_layout, 2, 1, 1, 1, Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(graphic_slider, 3, 0, 1, 3, Qt.AlignmentFlag.AlignCenter)
 
         x_max.finishEditing.connect(self.limit_changed)
         x_min.finishEditing.connect(self.limit_changed)
+        y_max.finishEditing.connect(self.limit_changed)
+        y_min.finishEditing.connect(self.limit_changed)
         fullscreen_btn.clicked.connect(self.show_full_screen)
         graphic_slider.valueChanged.connect(self.set_plot)
 
     def x_limits(self) -> tuple[float, float]:
         return float(self._x_min.text()), float(self._x_max.text())
 
+    def y_limits(self) -> tuple[float, float]:
+        return float(self._y_min.text()), float(self._y_max.text())
+
     def limit_changed(self):
         x_max = self._x_max.text()
         x_min = self._x_min.text()
+        y_max = self._y_max.text()
+        y_min = self._y_min.text()
 
-        if not x_max or not x_min:
+        if not x_max or not x_min or not y_max or not y_min:
             self.limitInvalid.emit()
             return
 
         try:
             float(x_max)
             float(x_min)
+            float(y_max)
+            float(y_min)
         except ValueError:
             self.limitInvalid.emit()
             return
@@ -206,6 +241,10 @@ class Graphic(QWidget):
     def set_x_limits(self, x_limits: tuple[float, float]):
         self._x_max.setText(str(x_limits[1]))
         self._x_min.setText(str(x_limits[0]))
+
+    def set_y_limits(self, y_limits: tuple[float, float]):
+        self._y_max.setText(str(y_limits[1]))
+        self._y_min.setText(str(y_limits[0]))
 
     def add_plot(self, plot_items: list[PlotDataItem]):
         self._plots.append(plot_items)
@@ -238,7 +277,7 @@ class Graphic(QWidget):
         dialog.setModal(True)
         dialog.setFixedSize(800, 450)
 
-        graphic = GraphicCanvas()
+        graphic = GraphicCanvas(self._dialog_background_color, self._text_color)
         for item in self._graphic.temp_items():
             graphic.addItem(copy_plot_data_item(item))
         dialog.layout().addWidget(graphic)
