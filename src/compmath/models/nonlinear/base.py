@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from dataclasses import dataclass
 
-from compmath.models.base import BaseModel
+from compmath.models.base import BaseGraphicModel
 from compmath.models.graphic import Graphic
 from compmath.utils.func import make_callable, FunctionValidateError
 
@@ -18,7 +18,7 @@ class TableRow:
     distance: float | None
 
 
-class BaseNoNLinearModel(BaseModel):
+class BaseNoNLinearModel(BaseGraphicModel):
 
     def __init__(self):
         super().__init__()
@@ -30,8 +30,6 @@ class BaseNoNLinearModel(BaseModel):
         self._iters_limit = 100
         self.result = None
         self.iters = None
-        self._x_limits = (-10, 10)
-        self.graphics: list[Graphic] = []
         self.table: list[TableRow] = []
 
     @property
@@ -63,9 +61,23 @@ class BaseNoNLinearModel(BaseModel):
 
         self._fx = fx
         self.graphics.clear()
-        graphic = Graphic(x_limits=self.x_limits)
+        graphic = Graphic(x_limits=self._x_limits, y_limits=self._y_limits)
         graphic.add_graph(func)
         self.graphics.append(graphic)
+        self.notify_observers()
+
+    def reset_graphic(self):
+        self.graphics.clear()
+        graphic = Graphic(x_limits=self._x_limits, y_limits=self._y_limits)
+
+        try:
+            func = make_callable(self.fx)
+        except FunctionValidateError:
+            func = None
+
+        if func:
+            graphic.add_graph(func)
+            self.graphics.append(graphic)
         self.notify_observers()
 
     @property
@@ -97,16 +109,12 @@ class BaseNoNLinearModel(BaseModel):
         if not isinstance(eps, (int, float)):
             raise ValueError(f"Неверная точность {eps!r} type {type(eps)!r}")
 
-        if eps <= 0:
+        if eps <= 0 or eps >= 1:
             self.validation_error("Неверная точность")
             return
 
         self._eps = eps
         self.notify_observers()
-
-    @property
-    def x_limits(self) -> tuple[float | int, float | int]:
-        return self._x_limits
 
     @property
     def iters_limit(self) -> int:
@@ -123,27 +131,6 @@ class BaseNoNLinearModel(BaseModel):
         self._iters_limit = value
         self.notify_observers()
 
-    def set_x_limits(self, x_limits: tuple[float | int, float | int]):
-        if not isinstance(x_limits, tuple):
-            raise ValueError("Неверно задан предел по X")
-
-        if len(x_limits) != 2:
-            raise ValueError("Неверно задан предел по X")
-
-        if not isinstance(x_limits[0], (int, float)) or not isinstance(x_limits[1], (int, float)):
-            raise ValueError("Неверно задан предел по X")
-
-        if x_limits[0] >= x_limits[1]:
-            self.validation_error("Неверно задан предел по X")
-            return
-
-        self._x_limits = x_limits
-        self.calc()
-
     @abstractmethod
     def calc(self) -> None:
         ...
-
-    def validation_error(self, error):
-        for observer in self._mObservers:
-            observer.validation_error(error)

@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 from sympy import diff
 
-from compmath.models.base import BaseModel
+from compmath.models.base import BaseGraphicModel
 from compmath.models.graphic import Graphic
 from compmath.utils.func import make_callable, solve_rel_var, is_valid_func
 
@@ -15,7 +15,7 @@ class TableRow:
     delta: float
 
 
-class BaseSNEModel(BaseModel):
+class BaseSNEModel(BaseGraphicModel):
 
     def __init__(self):
         super().__init__()
@@ -27,8 +27,6 @@ class BaseSNEModel(BaseModel):
             "cos(x + 0.5) + y - 0.8"
         ]
         self.initial_guess: tuple[int | float, int | float] = (0, 1)
-        self.graphics: list[Graphic] = []
-        self.x_limits = (-10, 10)
         self.solve_log: list[str] = []
         self._iters_limit = 100
         self.iters = None
@@ -78,10 +76,6 @@ class BaseSNEModel(BaseModel):
     @abstractmethod
     def calc(self) -> None:
         ...
-
-    def was_calculated(self):
-        for observer in self._mObservers:
-            observer.was_calculated()
 
     def validation_error(self, error):
         for observer in self._mObservers:
@@ -133,8 +127,8 @@ class BaseSNEModel(BaseModel):
         self.equations[index] = value
         self.notify_observers()
 
-    def graphic(self, x_limits: tuple[int | float, int | float]) -> Graphic:
-        graphic = Graphic(x_limits=x_limits, y_limits=x_limits)  # Todo add y_limits
+    def graphic(self) -> Graphic:
+        graphic = Graphic(x_limits=self._x_limits, y_limits=self._y_limits)
 
         iterable = zip(
             filter(lambda f: f != "", self.equations),
