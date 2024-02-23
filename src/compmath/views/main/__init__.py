@@ -46,8 +46,18 @@ class MainView(QWidget, DObserver, metaclass=TSMeta):
     def model_changed(self):
         pass
 
-    def memory_usage_tick(self):
-        self.ui.memory_usage_label.setText(f"ОЗУ: {self.model.get_ram_usage()} МБ")
+    def process_stats_tick(self):
+        info = self.model.process_info()
+        ram_mb = info[0]
+        ram_total_mb = info[1]
+        ram_percent = info[2]
+        cpu_percent = info[3]
+
+        self.ui.memory_usage_label.setText(f"ОЗУ: {ram_mb} МБ")
+        self.ui.memory_usage_label.setToolTip(
+            f"RAM {ram_percent:.2f}% [{ram_mb}/{ram_total_mb}] МБ\n"
+            f"CPU {cpu_percent:.2f}%"
+        )
 
     def model_loaded(self):
         for i in range(self.ui.menu_list_widget.model().rowCount()):
@@ -55,7 +65,7 @@ class MainView(QWidget, DObserver, metaclass=TSMeta):
             item.set_icon_color(self.widgets_factory.theme.text_tertiary)
         self.ui.menu_list_widget.setCurrentIndex(self.ui.menu_list_widget.model().index(0, 0))
         if self.model.is_debug:
-            self.scheduler.add_job(self.memory_usage_tick, 'interval', seconds=2)
+            self.scheduler.add_job(self.process_stats_tick, 'interval', seconds=2)
             self.scheduler.start()
 
     def menu_select_changed(self, current: QModelIndex, prev: QModelIndex):
