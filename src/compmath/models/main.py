@@ -25,5 +25,9 @@ class MainModel(BaseModel):
         self.scope = scope
 
     @staticmethod
-    def get_ram_usage() -> int:
-        return int(psutil.Process().memory_info().rss / (1024 * 1024))
+    def process_info() -> tuple[int, int, float, float]:
+        ram_mb = int(psutil.Process().memory_info().rss / (1024 * 1024))
+        ram_total_mb = int(psutil.virtual_memory().total / (1024 * 1024))
+        ram_percent = psutil.Process().memory_percent("rss")
+        cpu_percent = psutil.Process().cpu_percent(interval=1)
+        return ram_mb, ram_total_mb, ram_percent, cpu_percent
