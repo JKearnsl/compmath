@@ -127,6 +127,7 @@ class AIFItemView(QWidget):
 
         # События
         point_count_input.valueChanged.connect(self.point_count_changed)
+        input_table.cellChanged.connect(self.point_changed)
         graphic.limitChanged.connect(self.limit_changed)
         result_button.clicked.connect(self.show_result)
         calc_button.clicked.connect(self.model.calc)
@@ -143,6 +144,7 @@ class AIFItemView(QWidget):
                 self.graphic.add_plot(plot.plot_items())
 
         self.input_table.setRowCount(len(self.model.points))
+        self.input_table.blockSignals(True)
         for i, row in enumerate(self.model.points):
             item_x = self.input_table.item(i, 0)
             item_y = self.input_table.item(i, 1)
@@ -154,6 +156,11 @@ class AIFItemView(QWidget):
                 item = QTableWidgetItem()
                 item.setText(str(row[1]))
                 self.input_table.setItem(i, 1, item)
+        self.input_table.blockSignals(False)
+
+        if self.model.points:
+            self.graphic.clear_plots()
+            self.graphic.add_plot(self.model.graphic().plot_items())
 
     def model_loaded(self):
         self.header.blockSignals(True)
@@ -177,9 +184,6 @@ class AIFItemView(QWidget):
     def validation_error(self, message: str):
         self.error_label.setText(message)
 
-    def error_handler(self, error):
-        self.error_label.setText(error)
-
     def limit_changed(self):
         if self.graphic.x_limits() != self.model.x_limits:
             self.model.set_x_limits(self.graphic.x_limits())
@@ -193,6 +197,20 @@ class AIFItemView(QWidget):
         except ValueError:
             return
         self.model.resize(count)
+
+    def point_changed(self, row_index: int):
+        x = self.input_table.item(row_index, 0)
+        y = self.input_table.item(row_index, 1)
+        try:
+            x_value = float(x.text())
+        except (ValueError, AttributeError):
+            x_value = 0
+        try:
+            y_value = float(y.text())
+        except (ValueError, AttributeError):
+            y_value = 0
+
+        self.model.set_point(row_index, (x_value, y_value))
 
     def show_result(self):
         ...
