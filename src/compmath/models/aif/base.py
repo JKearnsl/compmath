@@ -2,6 +2,7 @@ from abc import abstractmethod
 from dataclasses import dataclass
 
 from compmath.models.base import BaseGraphicModel
+from compmath.models.graphic import Graphic
 
 
 @dataclass
@@ -48,7 +49,7 @@ class BaseAIFModel(BaseGraphicModel):
             self._points = self._points[:size]
         self.notify_observers()
 
-    def set_point(self, pos: int, point: tuple[float, float]):
+    def set_point(self, row: int, point: tuple[float, float]):
         if not isinstance(point, tuple):
             raise ValueError("Точка не является кортежем")
 
@@ -58,8 +59,14 @@ class BaseAIFModel(BaseGraphicModel):
         if not isinstance(point[0], (int, float)) or not isinstance(point[1], (int, float)):
             raise ValueError("Точка не является парой чисел")
 
-        self._points[pos] = point
+        self._points[row] = point
         self.notify_observers()
+
+    def graphic(self) -> Graphic:
+        graphic = Graphic(self.x_limits, self.y_limits)
+        for point in self.points:
+            graphic.add_point(point[0], point[1])
+        return graphic
 
     @abstractmethod
     def calc(self) -> None:
