@@ -90,3 +90,16 @@ class Graphic:
                 plot_item = PlotDataItem([graph.x], [graph.y], pen=None, symbol='o', symbolBrush=graph.color)
             plot_items.append(plot_item)
         return plot_items
+
+    def show(self):
+        """
+        Debug method for show plot
+
+
+        :return:
+        """
+        plot = pg.plot()
+        for plot_item in self.plot_items():
+            plot.addItem(plot_item)
+        plot.show()
+        return plot
