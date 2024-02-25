@@ -4,7 +4,7 @@ import numpy as np
 
 from compmath.models.aif.base import BaseAIFModel
 from compmath.models.graphic import Graphic
-from compmath.utils.func import linfit, expfit
+from compmath.utils.func import linfit, expfit, lgsfit, sinfit, pwrfit
 
 
 class LSModel(BaseAIFModel):
@@ -39,6 +39,9 @@ class LSModel(BaseAIFModel):
         self.results.append(self.polynomial_regression(points, 3))
         self.results.append(self.lclif(points))
         self.results.append(self.ndp(points, expfit))
+        self.results.append(self.ndp(points, lgsfit))
+        self.results.append(self.ndp(points, sinfit))
+        self.results.append(self.ndp(points, pwrfit))
 
         self.notify_observers()
 
@@ -72,7 +75,7 @@ class LSModel(BaseAIFModel):
 
         def func(arg): return a0 + a1 * arg
 
-        log.append(f"Уравнение регрессии: f(x) = {a0} + {a1} * x")
+        log.append(f"\nУравнение регрессии: \nf(x) = {a0} + {a1} * x\n")
 
         # Сумма квадратов разностей:
         sum_diff = sum([(y[i] - func(x[i])) ** 2 for i in range(n)])
@@ -103,9 +106,9 @@ class LSModel(BaseAIFModel):
         y = [point[1] for point in points]
 
         coefficients = np.polyfit(x, y, degree)
-        log.append(f"Коэффициенты полинома: {coefficients}")
-        polynomial = np.poly1d(coefficients)
-        log.append(f"Уравнение регрессии: f(x) = {polynomial}")
+        log.append(f"Коэффициенты полинома: \n{'\n'.join([str(coefficients[i]) for i in range(degree + 1)])}")
+        polynomial = np.polynomial.Polynomial(np.flip(coefficients))
+        log.append(f"\nУравнение регрессии: f(x) = {polynomial}\n")
 
         # Индекс корреляции
         gamma = np.sqrt(
@@ -141,9 +144,11 @@ class LSModel(BaseAIFModel):
         def f(t): return 1, t, t ** 3, t ** 5, t ** 7
 
         k = linfit(x, y, f)
-        log.append(f"Коэффициенты линейной комбинации: K = {k}")
+        log.append(f"Коэффициенты линейной комбинации: K = \n{'\n'.join([str(_) for _ in k])}\n")
 
         def k1(t): return np.dot(k, f(t))
+
+        log.append(f"\nУравнение регрессии: k1(t) = k * f(t)\n")
 
         # Сумма квадратов разностей:
         sum_diff = sum([(y[i] - k1(x[i])) ** 2 for i in range(len(points))])
@@ -185,7 +190,7 @@ class LSModel(BaseAIFModel):
 
         g = [1, 1, 0]
         q = fit(x, y, g)
-        log.append(f"Коэффициенты нелинейной зависимости от параметра: q = {q[0]}")
+        log.append(f"Коэффициенты нелинейной зависимости от параметра: q = \n{'\n'.join([str(_) for _ in q[0]])}\n")
 
         def func(t): return q[1](t)
 
