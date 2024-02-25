@@ -1,10 +1,12 @@
-from PyQt6.QtCore import Qt
+from typing import cast
+
+from PyQt6.QtCore import Qt, QSize
 from PyQt6.QtWidgets import (
     QWidget,
     QVBoxLayout,
     QFormLayout,
     QHBoxLayout,
-    QTableWidgetItem, QHeaderView
+    QTableWidgetItem, QHeaderView, QScrollArea
 )
 
 from compmath.models.aif.base import BaseAIFModel
@@ -213,4 +215,104 @@ class AIFItemView(QWidget):
         self.model.set_point(row_index, (x_value, y_value))
 
     def show_result(self):
-        ...
+        modal = self.widgets_factory.modal(self.parent)
+        modal.setFixedWidth(800)
+        modal.setFixedHeight(600)
+        modal.layout().setContentsMargins(5, 0, 5, 5)
+
+        sheet = QWidget(modal)
+        sheet.setObjectName("sheet")
+        sheet.setStyleSheet("""
+            QWidget#sheet {
+                background-color: transparent;
+            }
+        """)
+        modal.layout().addWidget(sheet)
+
+        central_layout = QVBoxLayout(sheet)
+        central_layout.setContentsMargins(30, 20, 30, 20)
+        central_layout.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
+        central_layout.setSpacing(10)
+        sheet.setLayout(central_layout)
+
+        scroll_area = QScrollArea(modal)
+        scroll_area.setFixedHeight(550)
+        scroll_area.setObjectName("scroll_area")
+        scroll_area.setStyleSheet("""
+            QScrollArea#scroll_area {
+                border: none;
+                outline: none;
+                background-color: transparent;
+            }
+        """)
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setWidget(sheet)
+        modal.layout().addWidget(scroll_area)
+
+        items = list(sorted(self.model.results, key=lambda x: (abs(x[2][0]), abs(1 - x[2][1]))))
+
+        for number, item in enumerate(self.model.results, 1):
+            graphic, log, (sum_diff, coefficient), title = item
+
+            item_widget = QWidget()
+            central_layout.addWidget(item_widget)
+            item_widget.setObjectName(f"item{number}_widget")
+            item_widget.setStyleSheet("""
+                QWidget#item$NUMBER_widget {
+                    background-color: transparent;
+                }
+            """.replace(
+                "$NUMBER", str(number)
+            ))
+
+            main_layout = QVBoxLayout(item_widget)
+            main_layout.setContentsMargins(15, 0, 15, 15)
+            main_layout.setSpacing(0)
+
+            header_layout = self.widgets_factory.heading3(f"№{number}. {title}")
+            main_layout.addWidget(header_layout)
+
+            content_layout = QHBoxLayout()
+            content_layout.setContentsMargins(5, 5, 5, 0)
+            content_layout.setSpacing(10)
+            main_layout.addLayout(content_layout)
+
+            text_layout = QVBoxLayout()
+            text_layout.setContentsMargins(0, 0, 0, 0)
+            text_layout.setSpacing(0)
+            content_layout.addLayout(text_layout)
+
+            log_area = self.widgets_factory.textarea()
+            log_area.setFixedHeight(400)
+            log_area.setReadOnly(True)
+            log_area.setPlainText("\n".join(log))
+            text_layout.addWidget(log_area)
+
+            result_box = QFormLayout()
+            result_box.setContentsMargins(5, 5, 5, 5)
+            result_box.setSpacing(5)
+            text_layout.addLayout(result_box)
+
+            sum_diff_label = self.widgets_factory.label("Сумма квадратов разностей:")
+            sum_diff_value = self.widgets_factory.line_edit()
+            sum_diff_value.setReadOnly(True)
+            sum_diff_value.setText(str(sum_diff))
+            result_box.addRow(sum_diff_label, sum_diff_value)
+
+            coefficient_label = self.widgets_factory.label("Коэффициент корреляции:")
+            coefficient_value = self.widgets_factory.line_edit()
+            coefficient_value.setReadOnly(True)
+            coefficient_value.setText(str(coefficient))
+            result_box.addRow(coefficient_label, coefficient_value)
+
+            rating = self.widgets_factory.label("Рейтинг:")
+            rating_value = self.widgets_factory.label(f"{len(items) - items.index(item)} из {len(items)}")
+            result_box.addRow(rating, rating_value)
+
+            graphic_widget = self.widgets_factory.graphic()
+            graphic_widget.setFixedSize(QSize(300, 300))
+            graphic_widget.add_plot(graphic.plot_items())
+            graphic_widget.graphic_slider.setEnabled(False)
+            content_layout.addWidget(graphic_widget)
+
+        modal.exec()
