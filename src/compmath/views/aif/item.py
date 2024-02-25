@@ -4,7 +4,9 @@ from PyQt6.QtWidgets import (
     QVBoxLayout,
     QFormLayout,
     QHBoxLayout,
-    QTableWidgetItem, QHeaderView, QScrollArea
+    QTableWidgetItem,
+    QHeaderView,
+    QScrollArea
 )
 
 from compmath.models.aif.base import BaseAIFModel
@@ -262,6 +264,12 @@ class AIFItemView(QWidget):
             """.replace(
                 "$NUMBER", str(number)
             ))
+            if items.index(item) == 0:
+                log.append(
+                    "\nДанный вариант аппроксимирующей функции "
+                    "наилучшим образом среди рассмотренных приближает "
+                    "исходную таблично заданную функцию."
+                )
 
             main_layout = QVBoxLayout(item_widget)
             main_layout.setContentsMargins(15, 0, 15, 15)
