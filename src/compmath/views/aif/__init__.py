@@ -3,10 +3,10 @@ from typing import TypeVar
 from PyQt6.QtWidgets import QWidget
 
 from compmath.models import MenuItem
-from compmath.models.aif.lsm import LSModel
+from compmath.models.aif.alsm import ALSModel
 from compmath.utils.observer import DObserver
 from compmath.utils.ts_meta import TSMeta
-from compmath.views.aif.item import AIFItemView
+from compmath.views.aif.approximation import AItemView
 from compmath.views.aif.static_ui import UiAIFPage
 
 ViewWidget = TypeVar('ViewWidget', bound=QWidget)
@@ -37,9 +37,9 @@ class AIFView(QWidget, DObserver, metaclass=TSMeta):
         ...
 
     def model_loaded(self):
-        lsm = AIFItemView(LSModel(), self.widgets_factory, self)
-        self.ui.central_layout.addWidget(lsm)
+        alsm = AItemView(ALSModel(), self.widgets_factory, self)
+        self.ui.central_layout.addWidget(alsm)
 
-        lsm.model_loaded()
+        alsm.model_loaded()
 
         self.model_changed()

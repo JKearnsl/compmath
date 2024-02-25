@@ -13,7 +13,7 @@ from compmath.models.aif.base import BaseAIFModel
 from compmath.views.widgets import WidgetsFactory
 
 
-class AIFItemView(QWidget):
+class AItemView(QWidget):
     def __init__(
             self,
             model: BaseAIFModel,

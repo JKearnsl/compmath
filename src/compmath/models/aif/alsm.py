@@ -7,15 +7,15 @@ from compmath.models.graphic import Graphic
 from compmath.utils.func import linfit, expfit, lgsfit, sinfit, pwrfit
 
 
-class LSModel(BaseAIFModel):
+class ALSModel(BaseAIFModel):
     """
-    Метод наименьших квадратов
+    Аппроксимация: Метод наименьших квадратов
 
     """
 
     def __init__(self):
         super().__init__()
-        self._title = "Метод наименьших квадратов"
+        self._title = "Аппроксимация: Метод наименьших квадратов"
         self._description = """
             ...
         """
