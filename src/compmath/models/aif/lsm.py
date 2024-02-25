@@ -32,7 +32,9 @@ class LSModel(BaseAIFModel):
     def calc(self) -> None:
         points = sorted(self.points, key=lambda _: _[0])
 
-        graphic, log = self.linear_regression(points)
+        self._results.append(self.linear_regression(points))
+        self._results.append(self.polynomial_regression(points, 2))
+        self._results.append(self.polynomial_regression(points, 3))
 
         self.notify_observers()
 
@@ -56,7 +58,7 @@ class LSModel(BaseAIFModel):
         sum_y2 = sum([i ** 2 for i in y])
         sum_xy = sum([x[i] * y[i] for i in range(n)])
         r = (n * sum_xy - sum_x * sum_y) / ((n * sum_x2 - sum_x ** 2) * (n * sum_y2 - sum_y ** 2)) ** 0.5
-        log.append(f"Коэффициент корреляции: {r}")
+        log.append(f"Коэффициент корреляции: r = {r}")
 
         # Линейная регрессия
         a1 = (n * sum_xy - sum_x * sum_y) / (n * sum_x2 - sum_x ** 2)
@@ -73,5 +75,42 @@ class LSModel(BaseAIFModel):
         for point in points:
             graphic.add_point(point[0], point[1])
         graphic.add_graph(func)
+
+        return graphic, log
+
+    def polynomial_regression(self, points: list[tuple[float, float]], n: int) -> tuple[Graphic, list[str]]:
+        """
+        Полиномиальная регрессия n-ой степени
+
+        :param points: отсортированный двумерный массив точек (x, y)
+        :param n: степень полинома
+        :return: график, лог
+        """
+        graphic = Graphic(self._x_limits, self._y_limits)
+        log = [f"\nПолиномиальная регрессия {n}-степени:\n"]
+
+        # Коэффициент корреляции
+        n = len(points)
+        x = [point[0] for point in points]
+        y = [point[1] for point in points]
+
+        coefficients = np.polyfit(x, y, n)
+        log.append(f"Коэффициенты полинома: {coefficients}")
+        polynomial = np.poly1d(coefficients)
+        log.append(f"Уравнение регрессии: f(x) = {polynomial}")
+
+        # Индекс корреляции
+        gamma = np.sqrt(
+            1 -
+            sum([(y[i] - polynomial(x[i])) ** 2 for i in range(n)]) /
+            sum([(y[i] - sum(y) / n) ** 2 for i in range(n)])
+        )
+        log.append(f"Коэффициент корреляции: γ = {gamma}")
+
+        # Сумма квадратов разностей:
+        sum_diff = sum([(y[i] - polynomial(x[i])) ** 2 for i in range(n)])
+        log.append(f"Сумма квадратов разностей: {sum_diff}")
+
+        graphic.add_graph(cast(Callable[[float], float], polynomial))
 
         return graphic, log
