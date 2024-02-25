@@ -4,7 +4,7 @@ import numpy as np
 
 from compmath.models.aif.base import BaseAIFModel
 from compmath.models.graphic import Graphic
-from compmath.utils.func import linfit
+from compmath.utils.func import linfit, expfit
 
 
 class LSModel(BaseAIFModel):
@@ -36,11 +36,12 @@ class LSModel(BaseAIFModel):
         self.results.append(self.linear_regression(points))
         self.results.append(self.polynomial_regression(points, 2))
         self.results.append(self.polynomial_regression(points, 3))
-        self.lclif(points)
+        self.results.append(self.lclif(points))
+        self.ndp(points)
 
         self.notify_observers()
 
-    def linear_regression(self, points: list[tuple[float, float]]) -> tuple[Graphic, list[str]]:
+    def linear_regression(self, points: list[tuple[float, float]]) -> tuple[Graphic, list[str], tuple[float, float]]:
         """
         Линейная регрессия
 
@@ -78,9 +79,11 @@ class LSModel(BaseAIFModel):
             graphic.add_point(point[0], point[1])
         graphic.add_graph(func)
 
-        return graphic, log
+        return graphic, log, (sum_diff, r)
 
-    def polynomial_regression(self, points: list[tuple[float, float]], n: int) -> tuple[Graphic, list[str]]:
+    def polynomial_regression(
+            self, points: list[tuple[float, float]], n: int
+    ) -> tuple[Graphic, list[str], tuple[float, float]]:
         """
         Полиномиальная регрессия n-ой степени
 
@@ -115,9 +118,9 @@ class LSModel(BaseAIFModel):
 
         graphic.add_graph(cast(Callable[[float], float], polynomial))
 
-        return graphic, log
+        return graphic, log, (sum_diff, gamma)
 
-    def lclif(self, points: list[tuple[float, float]]) -> tuple[Graphic, list[str]]:
+    def lclif(self, points: list[tuple[float, float]]) -> tuple[Graphic, list[str], tuple[float, float]]:
         """
         Линейная комбинация линейно-независимых функций
 
@@ -152,4 +155,46 @@ class LSModel(BaseAIFModel):
 
         graphic.add_graph(k1)
 
-        return graphic, log
+        return graphic, log, (sum_diff, gamma)
+
+    def ndp(
+            self,
+            points: list[tuple[float, float]],
+            fit: Callable[[list[float], list[float], list[float | int] | None], tuple] = expfit
+    ) -> tuple[Graphic, list[str], tuple[float, float]]:
+        """
+        Нелинейная зависимость от параметра
+
+        :param fit: функция регрессии
+        :param points:
+        :return:
+        """
+
+        graphic = Graphic(self._x_limits, self._y_limits)
+        log = [f"\nНелинейная зависимость от параметра (метод {fit.__name__}):\n"]
+
+        x = [point[0] for point in points]
+        y = [point[1] for point in points]
+
+        g = [1, 1, 0]
+        q = fit(x, y, g)
+        log.append(f"Коэффициенты нелинейной зависимости от параметра: q = {q}")
+
+        def func(t): return q[0] * np.exp(q[1] * t) + q[2]
+
+        # Сумма квадратов разностей:
+        sum_diff = sum([(y[i] - func(x[i])) ** 2 for i in range(len(points))])
+        log.append(f"Сумма квадратов разностей: {sum_diff}")
+
+        # Индекс корреляции
+        n = len(points)
+        gamma = np.sqrt(
+            1 -
+            sum([(y[i] - func(x[i])) ** 2 for i in range(n)]) /
+            sum([(y[i] - sum(y) / n) ** 2 for i in range(n)])
+        )
+        log.append(f"Индекс корреляции: γ = {gamma}")
+
+        graphic.add_graph(func)
+
+        return graphic, log, (sum_diff, gamma)
