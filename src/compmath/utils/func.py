@@ -1,6 +1,9 @@
 from typing import Callable, Protocol
-from sympy import sympify, lambdify, SympifyError, Basic, solve
+
+import numpy as np
+from sympy import sympify, lambdify, SympifyError, Basic, solve, symbols
 from sympy.core import Symbol
+from numpy.linalg import lstsq
 
 
 class FunctionValidateError(Exception):
@@ -139,3 +142,33 @@ def line_between_points(
     m = (y2 - y1) / (x2 - x1)
     b = y1 - m * x1
     return lambda x: m * x + b
+
+
+def linfit(x: list[float], y: list[float], func: Callable[[float], tuple]) -> tuple:
+    """
+    Возвращает вектор коэффициентов линейной комбинации функций в векторе func,
+    наилучшим образом аппроксимирующей данные в векторах x и y.
+
+    :param x: вектор аргументов
+    :param y: вектор значений
+    :param func: функция, принимающая один аргумент и возвращающая кортеж значений
+    :return: кортеж коэффициентов аппроксимации
+    """
+    # Создание символов для переменных
+    parameters = symbols(' '.join(['a' + str(i) for i in range(len(func(x[0])))]))
+
+    # Создание функции, представляющей собой линейную комбинацию заданных функций
+    lin_comb = sum(coeff * term for coeff, term in zip(parameters, func(x[0])))
+
+    # Конвертация символьной функции в функцию NumPy
+    f = lambdify(parameters, lin_comb, modules='numpy')
+
+    # Подготовка данных для метода наименьших квадратов
+    x_data = np.array(x)
+    y_data = np.array(y)
+    A = np.array([func(xi) for xi in x_data])
+
+    # Решение методом наименьших квадратов
+    parameters_values, _ = lstsq(A, y_data, rcond=None)[:2]
+
+    return tuple(parameters_values)
