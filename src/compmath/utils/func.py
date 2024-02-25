@@ -175,7 +175,7 @@ def linfit(x: list[float], y: list[float], func: Callable[[float], tuple]) -> tu
     return tuple(parameters_values)
 
 
-def expfit(x: list[float], y: list[float], g: list[float | int] = None) -> tuple:
+def expfit(x: list[float], y: list[float], g: list[float | int] = None) -> tuple[tuple, Callable[[float], tuple]]:
     """
     Экспоненциальная регрессия
 
@@ -195,7 +195,7 @@ def expfit(x: list[float], y: list[float], g: list[float | int] = None) -> tuple
     Если этот аргумент не используется, то функция expfit генерирует приближение из линии,
     аппроксимирующей диаграмму вектора y.
 
-    :return: кортеж коэффициентов
+    :return: кортеж коэффициентов и функция
     """
     if g is None:
         g = [1.0, 1.0, 1.0]
@@ -211,10 +211,10 @@ def expfit(x: list[float], y: list[float], g: list[float | int] = None) -> tuple
         g,
     )[0]
 
-    return tuple(popt)
+    return tuple(popt), lambda x: popt[0] * np.exp(popt[1] * x) + popt[2]
 
 
-def lgsfit(x: list[float], y: list[float], g: list[float | int] = None) -> tuple:
+def lgsfit(x: list[float], y: list[float], g: list[float | int] = None) -> tuple[tuple, Callable[[float], tuple]]:
     """
     Логистическая регрессия
 
@@ -231,7 +231,7 @@ def lgsfit(x: list[float], y: list[float], g: list[float | int] = None) -> tuple
     :param g: трехэлементный вектор действительных приближенных значений
     для параметров A, b и C в логистическом уравнении.
 
-    return: кортеж коэффициентов
+    return: кортеж коэффициентов и функция
     """
     if g is None:
         g = [1.0, 1.0, 1.0]
@@ -247,10 +247,10 @@ def lgsfit(x: list[float], y: list[float], g: list[float | int] = None) -> tuple
         g,
     )[0]
 
-    return tuple(popt)
+    return tuple(popt), lambda x: popt[0] / (1 + popt[1] * np.exp(-popt[2] * x))
 
 
-def sinfit(x: list[float], y: list[float], g: list[float | int] = None) -> tuple:
+def sinfit(x: list[float], y: list[float], g: list[float | int] = None) -> tuple[tuple, Callable[[float], tuple]]:
     """
     Синусоидальная регрессия
 
@@ -266,7 +266,7 @@ def sinfit(x: list[float], y: list[float], g: list[float | int] = None) -> tuple
     :param g: трехэлементный вектор действительных приближенных значений
     для параметров A, b и C в синусоидальном уравнении.
 
-    return: кортеж коэффициентов
+    return: кортеж коэффициентов и функция
     """
     if g is None:
         g = [1.0, 1.0, 1.0]
@@ -282,10 +282,10 @@ def sinfit(x: list[float], y: list[float], g: list[float | int] = None) -> tuple
         g,
     )[0]
 
-    return tuple(popt)
+    return tuple(popt), lambda x: popt[0] * np.sin(x + popt[1]) + popt[2]
 
 
-def pwrfit(x: list[float], y: list[float], g: list[float | int] = None) -> tuple:
+def pwrfit(x: list[float], y: list[float], g: list[float | int] = None) -> tuple[tuple, Callable[[float], tuple]]:
     """
     Степенная регрессия
 
@@ -301,7 +301,7 @@ def pwrfit(x: list[float], y: list[float], g: list[float | int] = None) -> tuple
     :param g: трехэлементный вектор действительных приближенных значений
     для параметров A, b и C в степенном уравнении.
 
-    return: кортеж коэффициентов
+    return: кортеж коэффициентов и функция
     """
     if g is None:
         g = [1.0, 1.0, 1.0]
@@ -317,4 +317,4 @@ def pwrfit(x: list[float], y: list[float], g: list[float | int] = None) -> tuple
         g,
     )[0]
 
-    return tuple(popt)
+    return tuple(popt), lambda x: popt[0] * x ** popt[1] + popt[2]
