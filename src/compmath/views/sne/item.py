@@ -324,9 +324,10 @@ class SNEItemView(QWidget):
         scroll_area.setFixedHeight(550)
         scroll_area.setObjectName("scroll_area")
         scroll_area.setStyleSheet("""
-            QWidget#scroll_area {
+            QScrollArea#scroll_area {
                 border: none;
                 outline: none;
+                background: transparent;
             }
         """)
         scroll_area.setWidgetResizable(True)
@@ -335,7 +336,7 @@ class SNEItemView(QWidget):
 
         content_layout = QHBoxLayout()
         content_layout.setContentsMargins(0, 0, 0, 0)
-        content_layout.setSpacing(0)
+        content_layout.setSpacing(10)
         central_layout.addLayout(content_layout)
 
         if self.model.solve_log:
