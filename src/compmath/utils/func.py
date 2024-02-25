@@ -4,6 +4,7 @@ import numpy as np
 from sympy import sympify, lambdify, SympifyError, Basic, solve, symbols
 from sympy.core import Symbol
 from numpy.linalg import lstsq
+from scipy.optimize import curve_fit
 
 
 class FunctionValidateError(Exception):
@@ -172,3 +173,40 @@ def linfit(x: list[float], y: list[float], func: Callable[[float], tuple]) -> tu
     parameters_values, _ = lstsq(A, y_data, rcond=None)[:2]
 
     return tuple(parameters_values)
+
+
+def expfit(x: list[float], y: list[float], g: list[float | int] = None) -> tuple:
+    """
+    Экспоненциальная регрессия
+
+    Функция expfit использует для минимизации метод Левенберга-Марквардта.
+    Используйте функцию expfit, чтобы выполнить экспоненциальную регрессию.
+    Экспоненциальные функции используются для всех процессов,
+    которые затухают или нарастают до устойчивого состояния,
+    таких как радиоактивный распад, нестационарный отклик RC-цепи
+    или смещение сильно демпфированной пружины.
+
+    :param x: вектор аргументов
+    :param y: вектор значений
+    :param g: трехэлементный вектор действительных приближенных значений
+    для параметров A, b и C в экспоненциальном уравнении.
+    Если этот аргумент не используется, то функция expfit генерирует приближение из линии,
+    аппроксимирующей диаграмму вектора y.
+
+    :return: кортеж коэффициентов
+    """
+    if g is None:
+        g = [1.0, 1.0, 1.0]
+
+    x_data = np.array(x)
+    y_data = np.array(y)
+
+    # Выполнение подгонки к экспоненциальной функции с использованием метода Левенберга-Марквардта
+    popt = curve_fit(
+        lambda x, a, b, c: a * np.exp(b * x) + c,
+        x_data,
+        y_data,
+        g,
+    )[0]
+
+    return tuple(popt)
