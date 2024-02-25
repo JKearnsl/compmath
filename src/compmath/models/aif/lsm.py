@@ -4,6 +4,7 @@ import numpy as np
 
 from compmath.models.aif.base import BaseAIFModel
 from compmath.models.graphic import Graphic
+from compmath.utils.func import linfit
 
 
 class LSModel(BaseAIFModel):
@@ -32,9 +33,10 @@ class LSModel(BaseAIFModel):
     def calc(self) -> None:
         points = sorted(self.points, key=lambda _: _[0])
 
-        self._results.append(self.linear_regression(points))
-        self._results.append(self.polynomial_regression(points, 2))
-        self._results.append(self.polynomial_regression(points, 3))
+        self.results.append(self.linear_regression(points))
+        self.results.append(self.polynomial_regression(points, 2))
+        self.results.append(self.polynomial_regression(points, 3))
+        self.lclif(points)
 
         self.notify_observers()
 
@@ -105,12 +107,49 @@ class LSModel(BaseAIFModel):
             sum([(y[i] - polynomial(x[i])) ** 2 for i in range(n)]) /
             sum([(y[i] - sum(y) / n) ** 2 for i in range(n)])
         )
-        log.append(f"Коэффициент корреляции: γ = {gamma}")
+        log.append(f"Индекс корреляции: γ = {gamma}")
 
         # Сумма квадратов разностей:
         sum_diff = sum([(y[i] - polynomial(x[i])) ** 2 for i in range(n)])
         log.append(f"Сумма квадратов разностей: {sum_diff}")
 
         graphic.add_graph(cast(Callable[[float], float], polynomial))
+
+        return graphic, log
+
+    def lclif(self, points: list[tuple[float, float]]) -> tuple[Graphic, list[str]]:
+        """
+        Линейная комбинация линейно-независимых функций
+
+        :param points: отсортированный двумерный массив точек (x, y)
+        :return: график, лог
+        """
+        graphic = Graphic(self._x_limits, self._y_limits)
+        log = ["\nЛинейная комбинация линейно-независимых функций:\n"]
+
+        x = [point[0] for point in points]
+        y = [point[1] for point in points]
+
+        def f(t): return 1, t, t ** 3, t ** 5, t ** 7
+
+        k = linfit(x, y, f)
+        log.append(f"Коэффициенты линейной комбинации: K = {k}")
+
+        def k1(t): return np.dot(k, f(t))
+
+        # Сумма квадратов разностей:
+        sum_diff = sum([(y[i] - k1(x[i])) ** 2 for i in range(len(points))])
+        log.append(f"Сумма квадратов разностей: {sum_diff}")
+
+        # Индекс корреляции
+        n = len(points)
+        gamma = np.sqrt(
+            1 -
+            sum([(y[i] - k1(x[i])) ** 2 for i in range(n)]) /
+            sum([(y[i] - sum(y) / n) ** 2 for i in range(n)])
+        )
+        log.append(f"Индекс корреляции: γ = {gamma}")
+
+        graphic.add_graph(k1)
 
         return graphic, log
