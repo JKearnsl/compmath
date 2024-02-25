@@ -135,7 +135,7 @@ class AIFItemView(QWidget):
     def model_changed(self):
         self.error_label.setText("")
 
-        if self.model.table:
+        if self.model.results:
             self.result_button.setDisabled(False)
 
         if self.model.graphics:

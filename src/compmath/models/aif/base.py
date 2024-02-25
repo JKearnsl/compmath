@@ -20,7 +20,7 @@ class BaseAIFModel(BaseGraphicModel):
         self._title = "None"
         self._description = "None"
         self._points: list[tuple[float, float]] = []
-        self._results: list[tuple[Graphic, list[str]]] = []
+        self.results: list[tuple[Graphic, list[str]]] = []
 
     @property
     def title(self) -> str:
