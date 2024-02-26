@@ -1,10 +1,11 @@
-from typing import Callable, Protocol
+from typing import Callable, Protocol, Sequence
 
 import numpy as np
 from sympy import sympify, lambdify, SympifyError, Basic, solve, symbols
 from sympy.core import Symbol
 from numpy.linalg import lstsq
 from scipy.optimize import curve_fit
+from scipy.interpolate import CubicSpline
 
 
 class FunctionValidateError(Exception):
@@ -318,3 +319,19 @@ def pwrfit(x: list[float], y: list[float], g: list[float | int] = None) -> tuple
     )[0]
 
     return tuple(popt), lambda x: popt[0] * x ** popt[1] + popt[2]
+
+
+def cspline(x: list[float], y: list[float]) -> np.ndarray[float]:
+    """
+    Кубический сплайн
+
+    :param x: вектор аргументов
+    :param y: вектор значений
+    :return: vs вектор
+    """
+
+    x_data = np.array(x)
+    y_data = np.array(y)
+
+    cs = CubicSpline(x_data, y_data)
+    return cs.x
