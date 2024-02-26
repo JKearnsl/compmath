@@ -335,3 +335,23 @@ def cspline(x: list[float], y: list[float]) -> np.ndarray[float]:
 
     cs = CubicSpline(x_data, y_data)
     return cs.x
+
+
+def interp(vs: Sequence[float], vx: Sequence[float], vy: Sequence[float], x: float):
+    """
+    Функция interp в интерполяции и регрессии используется для интерполяции в данной точке
+    выходных данных одной из следующих функций: cspline, lspline, pspline, bspline или loess.
+
+    :param vs: Является вектором, созданным одной из следующих функций: cspline, lspline, pspline, bspline или loess.
+    :param vx: Вектор аргументов
+    :param vy: Вектор значений
+    :param x: является вещественным значением независимой переменной,
+    для которого требуется рассчитать кривую интерполяции.
+    Для получения наилучших результатов это значение должно быть в диапазоне значений vx
+
+    :return: Возвращает интерполированное значение в точке x из коэффициентов вектора vs и исходные данные в vx и vy.
+    """
+    x_data = np.array(vx)
+    y_data = np.array(vy)
+
+    return np.interp(x, x_data, y_data)
