@@ -4,9 +4,11 @@ from PyQt6.QtWidgets import QWidget
 
 from compmath.models import MenuItem
 from compmath.models.aif.alsm import ALSModel
+from compmath.models.aif.interspline import InterSplineModel
 from compmath.utils.observer import DObserver
 from compmath.utils.ts_meta import TSMeta
 from compmath.views.aif.approximation import AItemView
+from compmath.views.aif.interpolation import InterItemView
 from compmath.views.aif.static_ui import UiAIFPage
 
 ViewWidget = TypeVar('ViewWidget', bound=QWidget)
@@ -40,6 +42,10 @@ class AIFView(QWidget, DObserver, metaclass=TSMeta):
         alsm = AItemView(ALSModel(), self.widgets_factory, self)
         self.ui.central_layout.addWidget(alsm)
 
+        inter = InterItemView(InterSplineModel(), self.widgets_factory, self)
+        self.ui.central_layout.addWidget(inter)
+
         alsm.model_loaded()
+        inter.model_loaded()
 
         self.model_changed()
