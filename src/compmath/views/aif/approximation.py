@@ -81,6 +81,7 @@ class AItemView(QWidget):
         form_stub = QWidget()
         left.addWidget(form_stub)
         form = QFormLayout()
+        self.form = form
         form.setContentsMargins(0, 0, 0, 0)
         form.setSpacing(10)
         form.setFormAlignment(Qt.AlignmentFlag.AlignRight)
