@@ -5,7 +5,7 @@ from sympy import sympify, lambdify, SympifyError, Basic, solve, symbols
 from sympy.core import Symbol
 from numpy.linalg import lstsq
 from scipy.optimize import curve_fit
-from scipy.interpolate import CubicSpline
+from scipy.interpolate import CubicSpline, interp1d, BarycentricInterpolator
 
 
 class FunctionValidateError(Exception):
@@ -262,8 +262,8 @@ def sinfit(x: list[float], y: list[float], g: list[float | int] = None) -> tuple
 
     f(x) = A * sin(x + b) + C
 
-    :param x: вектор аргументов
-    :param y: вектор значений
+    :param x: Вектор аргументов
+    :param y: Вектор значений
     :param g: трехэлементный вектор действительных приближенных значений
     для параметров A, b и C в синусоидальном уравнении.
 
@@ -321,37 +321,47 @@ def pwrfit(x: list[float], y: list[float], g: list[float | int] = None) -> tuple
     return tuple(popt), lambda x: popt[0] * x ** popt[1] + popt[2]
 
 
-def cspline(x: list[float], y: list[float]) -> np.ndarray[float]:
+def cspline(x: list[float], y: list[float]) -> interp1d:
     """
     Кубический сплайн
 
     :param x: вектор аргументов
     :param y: вектор значений
-    :return: vs вектор
+    :return:
     """
 
     x_data = np.array(x)
     y_data = np.array(y)
 
-    cs = CubicSpline(x_data, y_data)
-    return cs.x
+    return interp1d(x_data, y_data, kind='cubic', fill_value="extrapolate")
 
 
-def interp(vs: Sequence[float], vx: Sequence[float], vy: Sequence[float], x: float):
+def pspline(x: list[float], y: list[float]):
     """
-    Функция interp в интерполяции и регрессии используется для интерполяции в данной точке
-    выходных данных одной из следующих функций: cspline, lspline, pspline, bspline или loess.
+    Параболический сплайн
 
-    :param vs: Является вектором, созданным одной из следующих функций: cspline, lspline, pspline, bspline или loess.
-    :param vx: Вектор аргументов
-    :param vy: Вектор значений
-    :param x: является вещественным значением независимой переменной,
-    для которого требуется рассчитать кривую интерполяции.
-    Для получения наилучших результатов это значение должно быть в диапазоне значений vx
-
-    :return: Возвращает интерполированное значение в точке x из коэффициентов вектора vs и исходные данные в vx и vy.
+    :param x: список значений x
+    :param y: список значений y
+    :return: вектор коэффициентов параболического сплайна
     """
-    x_data = np.array(vx)
-    y_data = np.array(vy)
 
-    return np.interp(x, x_data, y_data)
+    x_data = np.array(x)
+    y_data = np.array(y)
+
+    return interp1d(x_data, y_data, kind='quadratic', fill_value="extrapolate")
+
+
+def lspline(x: list[float], y: list[float]):
+    """
+    Линейный сплайн
+
+    :param x: список значений x
+    :param y: список значений y
+    :return: вектор коэффициентов линейного сплайна
+    """
+    # Используем CubicSpline для интерполяции
+
+    x_data = np.array(x)
+    y_data = np.array(y)
+
+    return interp1d(x_data, y_data, kind='linear', fill_value="extrapolate")
