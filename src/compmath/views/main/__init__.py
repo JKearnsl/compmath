@@ -1,4 +1,4 @@
-from PyQt6 import QtWidgets, QtCore
+from PyQt6 import QtWidgets, QtCore, sip
 from PyQt6.QtCore import QModelIndex
 from PyQt6.QtWidgets import QWidget
 from apscheduler.schedulers.qt import QtScheduler
@@ -53,11 +53,12 @@ class MainView(QWidget, DObserver, metaclass=TSMeta):
         ram_percent = info[2]
         cpu_percent = info[3]
 
-        self.ui.memory_usage_label.setText(f"ОЗУ: {ram_mb} МБ")
-        self.ui.memory_usage_label.setToolTip(
-            f"RAM {ram_percent:.2f}% [{ram_mb}/{ram_total_mb}] МБ\n"
-            f"CPU {cpu_percent:.2f}%"
-        )
+        if self and not sip.isdeleted(self):
+            self.ui.memory_usage_label.setText(f"ОЗУ: {ram_mb} МБ")
+            self.ui.memory_usage_label.setToolTip(
+                f"RAM {ram_percent:.2f}% [{ram_mb}/{ram_total_mb}] МБ\n"
+                f"CPU {cpu_percent:.2f}%"
+            )
 
     def model_loaded(self):
         for i in range(self.ui.menu_list_widget.model().rowCount()):
