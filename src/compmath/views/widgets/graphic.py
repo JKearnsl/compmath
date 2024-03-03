@@ -1,3 +1,6 @@
+import logging
+
+from PyQt6 import sip
 from PyQt6.QtCore import QPointF, Qt, pyqtSignal
 from PyQt6.QtGui import QColor
 from PyQt6.QtWidgets import (
@@ -7,7 +10,7 @@ from PyQt6.QtWidgets import (
     QHBoxLayout,
     QToolButton,
     QVBoxLayout,
-    QSlider, QSizePolicy
+    QSlider
 )
 
 from pyqtgraph import PlotDataItem, AxisItem
@@ -40,13 +43,19 @@ class GraphicCanvas(PlotWidget):
         self.setBackground(background_color)
 
     def add_temp_item(self, item: PlotDataItem):
-        self._temp_items.append(item)
-        self.addItem(item)
+        if self and not sip.isdeleted(self):
+            self._temp_items.append(item)
+            self.addItem(item)
+        else:
+            logging.warning("[GraphicWidget] is deleted")
 
     def clear_temp_items(self):
-        for item in self._temp_items:
-            self.removeItem(item)
-        self._temp_items.clear()
+        if self and not sip.isdeleted(self):
+            for item in self._temp_items:
+                self.removeItem(item)
+            self._temp_items.clear()
+        else:
+            logging.warning("GraphicWidget is deleted")
 
     def temp_items(self) -> list[PlotDataItem]:
         return self._temp_items
@@ -82,6 +91,7 @@ class Graphic(QWidget):
 
         self._plots: list[list[PlotDataItem]] = []
         self._current_plot = None
+        self._slider_enabled = True
 
         self._text_color = text_color
         self._text_header_color = text_header_color
@@ -248,10 +258,13 @@ class Graphic(QWidget):
 
     def add_plot(self, plot_items: list[PlotDataItem]):
         self._plots.append(plot_items)
-        if self.graphic_slider.isVisible():
-            self.graphic_slider.setEnabled(True)
-        self.graphic_slider.setMaximum(len(self._plots) - 1)
-        self.graphic_slider.setValue(len(self._plots) - 1)
+        if self._slider_enabled:
+            if self.graphic_slider and not sip.isdeleted(self):
+                self.graphic_slider.setEnabled(True)
+                self.graphic_slider.setMaximum(len(self._plots) - 1)
+                self.graphic_slider.setValue(len(self._plots) - 1)
+            else:
+                logging.error("[GraphicWidget] GraphicSlider is deleted")
         self.set_plot(len(self._plots) - 1)
 
     def set_plot(self, index: int):
@@ -283,3 +296,7 @@ class Graphic(QWidget):
         dialog.layout().addWidget(graphic)
 
         dialog.show()
+
+    def setSliderEnabled(self, enabled: bool):
+        self._slider_enabled = enabled
+        self.graphic_slider.setVisible(enabled)
