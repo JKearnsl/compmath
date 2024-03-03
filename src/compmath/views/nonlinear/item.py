@@ -198,6 +198,7 @@ class NoNLinearItemView(QWidget):
         self.interval_a_input.setText(str(self.model.interval[0]))
         self.interval_b_input.setText(str(self.model.interval[1]))
         self.graphic.set_x_limits(self.model.x_limits)
+        self.graphic.set_y_limits(self.model.y_limits)
         self.iters_limit_input.setText(str(self.model.iters_limit))
 
         self.header.blockSignals(False)
