@@ -3,8 +3,10 @@ from typing import TypeVar
 from PyQt6.QtWidgets import QWidget
 
 from compmath.models import MenuItem
+from compmath.models.ni.lrm import LRModel
 from compmath.utils.observer import DObserver
 from compmath.utils.ts_meta import TSMeta
+from compmath.views.ni.item import NItemView
 from compmath.views.ni.static_ui import UiNIPage
 
 ViewWidget = TypeVar('ViewWidget', bound=QWidget)
@@ -32,7 +34,10 @@ class NIView(QWidget, DObserver, metaclass=TSMeta):
         # События
 
     def model_changed(self):
-        ...
+        lrm = NItemView(LRModel(), self.widgets_factory, self)
+        self.ui.central_layout.addWidget(lrm)
+
+        lrm.model_loaded()
 
     def model_loaded(self):
         self.model_changed()
