@@ -1,4 +1,3 @@
-from compmath.config import InIConfig
 from compmath.models import MenuItem
 from compmath.models.base import BaseModel
 
