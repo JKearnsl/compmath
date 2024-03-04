@@ -1,11 +1,11 @@
-from typing import Callable, Protocol, Sequence
+from typing import Callable, Protocol
 
 import numpy as np
+from numpy.linalg import lstsq
+from scipy.interpolate import interp1d
+from scipy.optimize import curve_fit
 from sympy import sympify, lambdify, SympifyError, Basic, solve, symbols
 from sympy.core import Symbol
-from numpy.linalg import lstsq
-from scipy.optimize import curve_fit
-from scipy.interpolate import CubicSpline, interp1d, BarycentricInterpolator
 
 
 class FunctionValidateError(Exception):
