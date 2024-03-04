@@ -20,9 +20,9 @@ class HDModel(BaseNoNLinearModel):
             <i>f(x) = 0</i>.
             </p>
         """
-        self._fx = "x**3 - 2*x - 5"
-        self._interval = (2, 3)
-        self._eps = 0.001
+        self._fx = "0.5**x + 1 - (x-2)**2"
+        self._interval = (0, 1)
+        self._eps = 0.0001
 
     def calc(self) -> None:
         """
@@ -45,7 +45,7 @@ class HDModel(BaseNoNLinearModel):
             n += 1
             x = (a + b) / 2
 
-            graphic = Graphic(x_limits=self.x_limits)
+            graphic = Graphic(x_limits=self.x_limits, y_limits=self.y_limits)
             graphic.add_graph(function)
             graphic.add_point(a, function(a), color='yellow')
             graphic.add_point(b, function(b), color='yellow')

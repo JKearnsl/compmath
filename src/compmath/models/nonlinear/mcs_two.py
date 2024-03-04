@@ -10,9 +10,9 @@ class MCSTwoModel(BaseNoNLinearModel):
         self._title = "Метод секущих (Двух шаговый)"
         self._description = """
         """
-        self._fx = "x**3 - 2*x - 5"
-        self._interval = (2, 3)
-        self._eps = 0.001
+        self._fx = "0.5**x + 1 - (x-2)**2"
+        self._interval = (0, 1)
+        self._eps = 0.0001
 
     def calc(self) -> None:
         """
@@ -34,7 +34,7 @@ class MCSTwoModel(BaseNoNLinearModel):
             a = b
             b = x
 
-            graphic = Graphic(x_limits=self.x_limits)
+            graphic = Graphic(x_limits=self.x_limits, y_limits=self.y_limits)
             graphic.add_graph(function)
             graphic.add_graph(line_between_points(a, function(a), b, function(b)), x_limits=(a, b))
             graphic.add_point(x, function(x), color="red")
