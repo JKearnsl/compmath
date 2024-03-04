@@ -99,15 +99,18 @@ class NoNLinearItemView(QWidget):
         self.eps_input = eps_input
         form.addRow(eps_label, eps_input)
 
+        double_validator = QDoubleValidator()
+        double_validator.setLocale(QLocale(QLocale.Language.English, QLocale.Country.UnitedStates))
+
         interval_a_label = widgets_factory.label("a = ")
         interval_a_input = widgets_factory.line_edit()
-        interval_a_input.setValidator(QDoubleValidator())
+        interval_a_input.setValidator(double_validator)
         self.interval_a_input = interval_a_input
         form.addRow(interval_a_label, interval_a_input)
 
         interval_b_label = widgets_factory.label("b = ")
         interval_b_input = widgets_factory.line_edit()
-        interval_b_input.setValidator(QDoubleValidator())
+        interval_b_input.setValidator(double_validator)
         self.interval_b_input = interval_b_input
         form.addRow(interval_b_label, interval_b_input)
 
