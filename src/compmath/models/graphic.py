@@ -4,6 +4,8 @@ from typing import Callable, Sequence, cast
 
 import numpy as np
 import pyqtgraph as pg
+from PyQt6.QtCore import QRectF, QPointF
+from PyQt6.QtGui import QPicture, QPainter, QPolygonF
 from pyqtgraph import PlotDataItem
 
 
@@ -25,11 +27,85 @@ class GraphModel:
 
 @dataclass
 class RectModel:
-    x: float | int
-    y: float | int
     x1: float | int
     y1: float | int
+    x2: float | int
+    y2: float | int
     color: str
+    width: float | int
+    fill: str | None
+
+
+@dataclass
+class PolygonModel:
+    points: Sequence[tuple[float | int, float | int] | QPointF]
+    color: str
+    width: float | int
+    fill: str | None
+
+
+class RectItem(pg.GraphicsObject):
+    def __init__(self, rect: QRectF, pen: pg.mkPen = None, brush: pg.mkBrush = None):
+        super().__init__()
+        if not pen:
+            self.pen = pg.mkPen(
+                color='red',
+                width=1
+            )
+        else:
+            self.pen = pen
+        self.brush = brush
+        self.picture = QPicture()
+        self._rect = rect
+        self._generate_picture()
+
+    @property
+    def rect(self):
+        return self._rect
+
+    def _generate_picture(self):
+        painter = QPainter(self.picture)
+        painter.setPen(self.pen)
+        if self.brush:
+            painter.setBrush(self.brush)
+        painter.drawRect(self.rect)
+        painter.end()
+
+    def paint(self, painter, option, widget=None):
+        painter.drawPicture(0, 0, self.picture)
+
+    def boundingRect(self):
+        return QRectF(self.picture.boundingRect())
+
+
+class PolygonItem(pg.GraphicsObject):
+    def __init__(self, points: QPolygonF, pen=None, brush=None):
+        super().__init__()
+        if not pen:
+            self.pen = pg.mkPen(
+                color='red',
+                width=1
+            )
+        else:
+            self.pen = pen
+        self.picture = QPicture()
+        self.points = points
+        self.brush = brush
+        self._generate_picture()
+
+    def _generate_picture(self):
+        painter = QPainter(self.picture)
+        painter.setPen(self.pen)
+        if self.brush:
+            painter.setBrush(self.brush)
+        painter.drawPolygon(self.points)
+        painter.end()
+
+    def paint(self, painter, option, widget=None):
+        painter.drawPicture(0, 0, self.picture)
+
+    def boundingRect(self):
+        return QRectF(self.picture.boundingRect())
 
 
 class Graphic:
@@ -129,10 +205,29 @@ class Graphic:
                     symbolBrush=graph.color
                 )
             elif isinstance(graph, RectModel):
-                plot_item = PlotDataItem(
-                    [graph.x, graph.x, graph.x1, graph.x1, graph.x],
-                    [graph.y, graph.y1, graph.y1, graph.y, graph.y],
-                    pen=pg.mkPen(graph.color)
+                plot_item = RectItem(
+                    QRectF(
+                        graph.x1,
+                        graph.y1,
+                        graph.x2 - graph.x1,
+                        graph.y2 - graph.y1
+                    ),
+                    pen=pg.mkPen(
+                        color=graph.color,
+                        width=graph.width
+                    ),
+                    brush=pg.mkBrush(graph.fill) if graph.fill else None
+                )
+            elif isinstance(graph, PolygonModel):
+                plot_item = PolygonItem(
+                    QPolygonF([
+                    QPointF(*point) for point in graph.points
+                    ]),
+                    pen=pg.mkPen(
+                        color=graph.color,
+                        width=graph.width
+                    ),
+                    brush=pg.mkBrush(graph.fill) if graph.fill else None
                 )
             else:
                 raise ValueError(f"Неизвестный тип графика {type(graph)}")
@@ -154,18 +249,38 @@ class Graphic:
 
     def add_rect(
             self,
-            x: int | float,
-            y: int | float,
             x1: int | float,
             y1: int | float,
-            color: str = 'blue'
+            x2: int | float,
+            y2: int | float,
+            color: str = 'blue',
+            width: int | float = 1,
+            fill: str | None = None
     ) -> None:
         self.graphs.append(
             RectModel(
-                x=x,
-                y=y,
                 x1=x1,
                 y1=y1,
-                color=color
+                x2=x2,
+                y2=y2,
+                color=color,
+                width=width,
+                fill=fill
+            )
+        )
+
+    def add_polygon(
+            self,
+            points: Sequence[tuple[float | int, float | int] | QPointF],
+            color: str = 'blue',
+            width: int | float = 1,
+            fill: str | None = None
+    ) -> None:
+        self.graphs.append(
+            PolygonModel(
+                points=points,
+                color=color,
+                width=width,
+                fill=fill
             )
         )
