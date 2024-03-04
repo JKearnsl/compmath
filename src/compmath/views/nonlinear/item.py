@@ -172,6 +172,7 @@ class NoNLinearItemView(QWidget):
 
         if self.model.result is not None:
             self.result_input.setText(str(self.model.result))
+            self.result_input.setCursorPosition(0)
 
         if self.model.table:
             self.table_button.setDisabled(False)
