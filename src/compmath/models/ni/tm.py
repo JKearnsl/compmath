@@ -47,19 +47,30 @@ class TModel(BaseNIModel):
         rows = deque(maxlen=1000)
 
         h = (b - a) / n
-        x = 0
-        y = 0
         result = 0
-        for i in range(n):
+        for i in range(1, n + 1):
             x = a + i * h
-            y = function(x + h)
-            result += y * h
+            y = function(x)
+            y_prev = function(x - h)
+            delta_t = x - (x - h)
+
+            s = ((y + y_prev) / 2) * delta_t
+            result += s
 
             if n <= 100:
-                graphic.add_rect(x, y, x + h, 0, color="red")
+                graphic.add_polygon(
+                    [
+                        (x - h, 0),
+                        (x, 0),
+                        (x, y),
+                        (x - h, y_prev)
+                    ],
+                    color="red",
+                    width=2
+                )
 
             if n <= 1000:
-                rows.append(TableRow(i, x, y, result))
+                rows.append(TableRow(i, x, y, s))
 
         graphic.add_graph(
             function,
@@ -70,7 +81,7 @@ class TModel(BaseNIModel):
 
         if n > 1000:
             rows.append(TableRow(0, a, function(a), 0))
-            rows.append(TableRow(n, x, y, result))
+            rows.append(TableRow(n, b, function(b), result))
 
         self.graphics.append(graphic)
         self.table = list(rows)
