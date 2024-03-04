@@ -4,6 +4,10 @@ from PyQt6.QtWidgets import QWidget
 
 from compmath.models import MenuItem
 from compmath.models.ni.lrm import LRModel
+from compmath.models.ni.mrm import MRModel
+from compmath.models.ni.rrm import RRModel
+from compmath.models.ni.sm import SModel
+from compmath.models.ni.tm import TModel
 from compmath.utils.observer import DObserver
 from compmath.utils.ts_meta import TSMeta
 from compmath.views.ni.item import NItemView
@@ -37,7 +41,23 @@ class NIView(QWidget, DObserver, metaclass=TSMeta):
         lrm = NItemView(LRModel(), self.widgets_factory, self)
         self.ui.central_layout.addWidget(lrm)
 
+        rrm = NItemView(RRModel(), self.widgets_factory, self)
+        self.ui.central_layout.addWidget(rrm)
+
+        mrm = NItemView(MRModel(), self.widgets_factory, self)
+        self.ui.central_layout.addWidget(mrm)
+
+        tm = NItemView(TModel(), self.widgets_factory, self)
+        self.ui.central_layout.addWidget(tm)
+
+        sm = NItemView(SModel(), self.widgets_factory, self)
+        self.ui.central_layout.addWidget(sm)
+
         lrm.model_loaded()
+        rrm.model_loaded()
+        mrm.model_loaded()
+        tm.model_loaded()
+        sm.model_loaded()
 
     def model_loaded(self):
         self.model_changed()
