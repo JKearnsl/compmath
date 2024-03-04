@@ -49,19 +49,18 @@ class RRModel(BaseNIModel):
         rows = deque(maxlen=1000)
 
         h = (b - a) / n
-        x = 0
-        y = 0
         result = 0
         for i in range(n):
             x = a + i * h
             y = function(x + h)
-            result += y * h
+            s = y * h
+            result += s
 
             if n <= 100:
                 graphic.add_rect(x, y, x + h, 0, color="red")
 
-            if n <= 1000:
-                rows.append(TableRow(i, x, y, result))
+            if n <= 1000 or i == 0 or i == n - 1:
+                rows.append(TableRow(i, x, y, s))
 
         graphic.add_graph(
             function,
@@ -69,10 +68,6 @@ class RRModel(BaseNIModel):
             width=2,
             fill="red" if n > 100 else False
         )
-
-        if n > 1000:
-            rows.append(TableRow(0, a, function(a), 0))
-            rows.append(TableRow(n, x, y, result))
 
         self.graphics.append(graphic)
         self.table = list(rows)

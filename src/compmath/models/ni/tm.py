@@ -69,7 +69,7 @@ class TModel(BaseNIModel):
                     width=2
                 )
 
-            if n <= 1000:
+            if n <= 1000 or i == 1 or i == n:
                 rows.append(TableRow(i, x, y, s))
 
         graphic.add_graph(
@@ -78,10 +78,6 @@ class TModel(BaseNIModel):
             width=2,
             fill="red" if n > 100 else False
         )
-
-        if n > 1000:
-            rows.append(TableRow(0, a, function(a), 0))
-            rows.append(TableRow(n, b, function(b), result))
 
         self.graphics.append(graphic)
         self.table = list(rows)
