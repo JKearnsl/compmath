@@ -189,7 +189,10 @@ class SLATItemView(QWidget):
         self.size_input.blockSignals(False)
 
         self.size_input.setRange(3, 8)
-        self.size_input.setValue(4)  # TODO: bug with value 3: bad spawn matrix
+        model_size = self.model.size()
+        self.size_input.setValue(4)  # TODO: fix this bug
+        if model_size:
+            self.size_input.setValue(model_size)
 
     def validation_error(self, message: str):
         self.error_label.setText(message)
