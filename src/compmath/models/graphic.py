@@ -77,6 +77,9 @@ class RectItem(pg.GraphicsObject):
     def boundingRect(self):
         return QRectF(self.picture.boundingRect())
 
+    def getData(self) -> tuple[Sequence[float | int], Sequence[float | int]]:
+        return self.rect.x(), self.rect.y()
+
 
 class PolygonItem(pg.GraphicsObject):
     def __init__(self, points: QPolygonF, pen=None, brush=None):
@@ -106,6 +109,9 @@ class PolygonItem(pg.GraphicsObject):
 
     def boundingRect(self):
         return QRectF(self.picture.boundingRect())
+
+    def getData(self) -> tuple[Sequence[float | int], Sequence[float | int]]:
+        return self.rect.x(), self.rect.y()
 
 
 class Graphic:
