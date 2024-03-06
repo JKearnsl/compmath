@@ -17,15 +17,16 @@ class LRModel(BaseNIModel):
             отрезка интегрирования.
             </p>
         """
-        self._fx = "x**3 - 2*x - 5"
-        self._interval = (2, 3)
+        self._fx = "sin(2*x**2 + 1)"
+        self._interval = (0, 1)
         self._intervals = 10
-        self._x_limits = (1, 20)
-        self._y_limits = (-10, 20)
+        self._x_limits = (-2, 2)
+        self._y_limits = (-2, 2)
 
     def calc(self, in_thread: bool = False) -> None:
         self.graphics.clear()
         self.table.clear()
+        self.calc_intermediate()
 
         function = make_callable(self.fx)
         a, b = self.interval
