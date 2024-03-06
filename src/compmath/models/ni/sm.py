@@ -35,10 +35,6 @@ class SModel(BaseNIModel):
             self.validation_error("Левая граница интервала не может быть больше правой")
             return
 
-        if function(a) * function(b) > 0:
-            self.validation_error("На данном интервале нет корней")
-            return
-
         if n % 2 != 0:
             self.validation_error("Количество интервалов должно быть четным")
             return

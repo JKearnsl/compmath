@@ -36,10 +36,6 @@ class RRModel(BaseNIModel):
             self.validation_error("Левая граница интервала не может быть больше правой")
             return
 
-        if function(a) * function(b) > 0:
-            self.validation_error("На данном интервале нет корней")
-            return
-
         graphic = Graphic(x_limits=self.x_limits, y_limits=self.y_limits)
         graphic.add_graph(function)
         graphic.add_graph(lambda x: 0, width=2)
