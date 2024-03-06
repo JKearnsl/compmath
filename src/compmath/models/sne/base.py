@@ -23,8 +23,8 @@ class BaseSNEModel(BaseGraphicModel):
         self._description = "None"
         self._eps = 0.00001
         self.equations: list[str] = [
-            "sin(y) - 2*x - 1.6",
-            "cos(x + 0.5) + y - 0.8"
+            "x + cos(y) - 3",
+            "cos(x - 1) - y - 1.2"
         ]
         self.initial_guess: tuple[int | float, int | float] = (0, 1)
         self.solve_log: list[str] = []
