@@ -1,10 +1,11 @@
+from copy import deepcopy
 from typing import cast, Callable
 
 import numpy as np
 
 from compmath.models.aif.base import BaseAIFModel
 from compmath.models.graphic import Graphic
-from compmath.utils.func import linfit, expfit, lgsfit, sinfit, pwrfit
+from compmath.utils.func import linfit, expfit, lgsfit, sinfit, pwrfit, gauss_calc
 
 
 class ALSModel(BaseAIFModel):
@@ -30,15 +31,38 @@ class ALSModel(BaseAIFModel):
             (-1.13, 8.01),
             (-0.60, 10.04)
         ]
+        # self._points = [
+        #     (1.2, 2.59),
+        #     (1.57, 2.06),
+        #     (1.94, 1.58),
+        #     (2.31, 1.25),
+        #     (2.68, 0.91),
+        #     (3.05, 0.66),
+        #     (3.42, 0.38),
+        #     (3.79, 0.21)
+        # ]
 
     def calc(self) -> None:
         self.results.clear()
         points = sorted(self.points, key=lambda _: _[0])
 
         self.results.append(self.linear_regression(points))
-        self.results.append(self.polynomial_regression(points, 2))
-        self.results.append(self.polynomial_regression(points, 3))
+
+        x_vector, y_vector = zip(*points)
+        matrix_a = [[None for _ in range(4)] for _ in range(4)]
+        for i, row in enumerate(matrix_a):
+            for j, col in enumerate(row):
+                matrix_a[i][j] = sum(x**(i + j) for x in x_vector)
+
+        b_vector = [None for _ in range(4)]
+        for i in range(len(b_vector)):
+            b_vector[i] = sum(y * x**i for x, y in zip(x_vector, y_vector))
+
+        self.results.append(self.polynomial_regression(points, 2, matrix_a, b_vector))
+        self.results.append(self.polynomial_regression(points, 3, matrix_a, b_vector))
+        self.results.append(self.polynomial_regression(points, 4, matrix_a, b_vector))
         self.results.append(self.lclif(points))
+
         self.results.append(self.ndp(points, expfit))
         self.results.append(self.ndp(points, lgsfit))
         self.results.append(self.ndp(points, sinfit))
@@ -89,13 +113,19 @@ class ALSModel(BaseAIFModel):
         return graphic, log, (sum_diff, r), "Линейная регрессия"
 
     def polynomial_regression(
-            self, points: list[tuple[float, float]], degree: int
+            self,
+            points: list[tuple[float, float]],
+            degree: int,
+            a_matrix: list[list],
+            b_vector: list
     ) -> tuple[Graphic, list[str], tuple[float, float], str]:
         """
         Полиномиальная регрессия n-ой степени
 
         :param points: отсортированный двумерный массив точек (x, y)
         :param degree: степень полинома
+        :param a_matrix
+        :param b_vector
         :return: график, лог
         """
         graphic = Graphic(self._x_limits, self._y_limits)
@@ -126,6 +156,18 @@ class ALSModel(BaseAIFModel):
         for point in points:
             graphic.add_point(point[0], point[1])
         graphic.add_graph(cast(Callable[[float], float], polynomial))
+
+        # Gauss
+        gauss_vector = gauss_calc(deepcopy(a_matrix), deepcopy(b_vector), degree)
+        log.append(
+            f"\nМатрица A: \n{'\n'.join(['\t'.join([str(round(_, 4)) for _ in row]) for row in a_matrix])}"
+        )
+        log.append(
+            f"\nВектор B: \n{'\n'.join([str(round(_, 5)) for _ in b_vector])}"
+        )
+        log.append(
+            f"\nКоэффициенты полинома (метод Гаусса): \n{'\n'.join([str(coefficient) for coefficient in gauss_vector])}"
+        )
 
         return graphic, log, (sum_diff, gamma), f"Полиномиальная регрессия {degree}-степени"
 
@@ -190,7 +232,11 @@ class ALSModel(BaseAIFModel):
         y = [point[1] for point in points]
 
         g = [1, 1, 0]
-        q = fit(x, y, g)
+        try:
+            q = fit(x, y, g)
+        except RuntimeError as err:
+            log.append(str(err))
+            return graphic, log, (np.inf, 0), f"Нелинейная зависимость от параметра (метод {fit.__name__})"
         log.append(f"Коэффициенты нелинейной зависимости от параметра: q = \n{'\n'.join([str(_) for _ in q[0]])}\n")
 
         def func(t): return q[1](t)
