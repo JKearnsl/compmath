@@ -426,8 +426,6 @@ def surface_area(fx_str: str, a: float | int, b: float | int, symbol: str) -> fl
 
 
 def gauss_calc(a_matrix: list[list[float]], b_vector: list[float], n: int) -> list[float]:
-    a0 = [row[:] for row in a_matrix]
-    b0 = b_vector[:]
 
     for k in range(n - 1):
         if a_matrix[k][k] == 0:
