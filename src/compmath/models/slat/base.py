@@ -1,5 +1,8 @@
 from abc import abstractmethod
+from copy import deepcopy
 from dataclasses import dataclass
+
+import numpy as np
 
 from compmath.models.base import BaseModel
 
@@ -18,11 +21,16 @@ class BaseSLATModel(BaseModel):
         self._title = "None"
         self._description = "None"
         self._eps = 0.0001
-        self.matrix: list[list[int | float]] = []
+        self.matrix: list[list[int | float]] = [
+            [1.53, -1.65, -0.76, 2.18],
+            [0.86, 1.17, 1.84, 1.95],
+            [0.32, -0.65, 1.11, -0.47]
+        ]
         self.x0: list[int | float] = []
         self._iters_limit = 100
         self.iters = None
         self.table: list[TableRow] = []
+        self.solve_log: list[str] = []
 
     @property
     def title(self) -> str:
@@ -130,3 +138,12 @@ class BaseSLATModel(BaseModel):
 
         self._iters_limit = value
         self.notify_observers()
+
+    def normal_matrix(self) -> tuple[np.ndarray, np.ndarray]:
+        new_matrix = np.array(deepcopy(self.matrix), dtype=float)
+        a_matrix = np.dot(new_matrix.T, new_matrix)
+        b_matrix = np.dot(new_matrix.T, self.b())
+        return a_matrix, b_matrix
+
+    def transform_matrix(self) -> tuple[np.ndarray, np.ndarray]:
+        ...
