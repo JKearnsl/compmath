@@ -52,7 +52,8 @@ class NTModel(BaseSNEModel):
         ]
         x_vector = np.array([0, 0], dtype=float)
 
-        self.solve_log.append(f"W(x, y) = {w}")
+        self.solve_log.append(f"Матрица Якоби:")
+        self.solve_log.append(f"W(x, y) = \n{'\n'.join('\t'.join(str(el) for el in row) for row in w)}")
 
         for i, row in enumerate(w):
             for j, el in enumerate(row):
