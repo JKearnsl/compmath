@@ -123,24 +123,30 @@ class NItemView(QWidget):
         self.result_input = result_input
         form.addRow(result_label, result_input)
 
-        buttons_layout = QHBoxLayout()
+        buttons_layout = QVBoxLayout()
         buttons_layout.setContentsMargins(0, 0, 0, 0)
         buttons_layout.setAlignment(Qt.AlignmentFlag.AlignRight)
         buttons_layout.setSpacing(10)
         left.addLayout(buttons_layout)
 
+        calc_button = widgets_factory.button("Рассчитать")
+        calc_button.setMaximumWidth(200)
+        calc_button.setMinimumWidth(180)
+        buttons_layout.addWidget(calc_button)
+        self.calc_button = calc_button
+
+        intermediate_result = widgets_factory.button("Промежуточные результаты")
+        intermediate_result.setMaximumWidth(200)
+        intermediate_result.setMinimumWidth(180)
+        buttons_layout.addWidget(intermediate_result)
+        self.intermediate_result = intermediate_result
+
         table_button = widgets_factory.button("Таблица")
-        table_button.setMaximumWidth(150)
-        table_button.setMinimumWidth(100)
+        table_button.setMaximumWidth(200)
+        table_button.setMinimumWidth(180)
         table_button.setDisabled(True)
         buttons_layout.addWidget(table_button)
         self.table_button = table_button
-
-        calc_button = widgets_factory.button("Рассчитать")
-        calc_button.setMaximumWidth(150)
-        calc_button.setMinimumWidth(100)
-        buttons_layout.addWidget(calc_button)
-        self.calc_button = calc_button
 
         graphic = widgets_factory.graphic()
         graphic.setFixedWidth(350)
@@ -159,6 +165,7 @@ class NItemView(QWidget):
         graphic.limitChanged.connect(self.limit_changed)
         table_button.clicked.connect(self.show_table)
         calc_button.clicked.connect(self.calc_button_clicked)
+        intermediate_result.clicked.connect(self.show_intermediate_result)
 
     def model_changed(self):
         if not self and sip.isdeleted(self):
@@ -274,6 +281,56 @@ class NItemView(QWidget):
         self.intervals_input.setDisabled(False)
         self.interval_a_input.setDisabled(False)
         self.interval_b_input.setDisabled(False)
+
+    def show_intermediate_result(self):
+        modal = self.widgets_factory.modal(self.parent)
+        modal.setFixedWidth(400)
+        modal.setFixedHeight(250)
+        modal.layout().setContentsMargins(5, 0, 5, 5)
+        modal.layout().setSpacing(20)
+
+        widgets_factory = self.widgets_factory
+
+        form_stub = QWidget()
+        modal.layout().addWidget(form_stub)
+        form = QFormLayout()
+        form.setContentsMargins(5, 5, 5, 5)
+        form.setSpacing(10)
+        form.setFormAlignment(Qt.AlignmentFlag.AlignRight)
+        form.setLabelAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignTop)
+        form_stub.setLayout(form)
+
+        surface_area_label = widgets_factory.label("S поверхн: ")
+        surface_area = widgets_factory.line_edit()
+        surface_area.setReadOnly(True)
+        surface_area.setText(str(self.model.surface_area))
+        form.addRow(surface_area_label, surface_area)
+
+        volume_label = widgets_factory.label("Объем тела: ")
+        volume = widgets_factory.line_edit()
+        volume.setReadOnly(True)
+        volume.setText(str(self.model.volume))
+        form.addRow(volume_label, volume)
+
+        arc_length_label = widgets_factory.label("Длина дуги: ")
+        arc_length = widgets_factory.line_edit()
+        arc_length.setReadOnly(True)
+        arc_length.setText(str(self.model.arc_length))
+        form.addRow(arc_length_label, arc_length)
+
+        reference_label = widgets_factory.label("Эталон: ")
+        reference_result = widgets_factory.line_edit()
+        reference_result.setReadOnly(True)
+        reference_result.setText(str(self.model.reference_result))
+        form.addRow(reference_label, reference_result)
+
+        result_label = widgets_factory.label("Результат: ")
+        result_input = widgets_factory.line_edit()
+        result_input.setReadOnly(True)
+        result_input.setText(str(self.model.result))
+        form.addRow(result_label, result_input)
+
+        modal.exec()
 
     def show_table(self):
         modal = self.widgets_factory.modal(self.parent)
