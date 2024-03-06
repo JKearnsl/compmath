@@ -3,11 +3,11 @@ from PyQt6.QtWidgets import (
     QDialog,
     QVBoxLayout,
     QPushButton,
-    QLayout,
     QHBoxLayout,
     QWidget,
     QGraphicsDropShadowEffect,
-    QLabel
+    QLabel,
+    QBoxLayout
 )
 
 
@@ -163,7 +163,7 @@ class Dialog(QDialog):
         general_layout.addLayout(self._layout)
         general_layout.addStretch(1)
 
-    def layout(self) -> QLayout | None:
+    def layout(self) -> QBoxLayout:
         return self._layout
 
     def setWindowTitle(self, title: str):
