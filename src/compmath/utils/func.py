@@ -421,5 +421,35 @@ def surface_area(fx_str: str, a: float | int, b: float | int, symbol: str) -> fl
     func = parse_expr(fx_str)
 
     df_dx = diff(func, symbol)
-    result = integrate(func * sqrt(1 + df_dx**2), (symbol, a, b))
+    result = integrate(func * sqrt(1 + df_dx ** 2), (symbol, a, b))
     return 2 * pi * result
+
+
+def gauss_calc(a_matrix: list[list[float]], b_vector: list[float], n: int) -> list[float]:
+    a0 = [row[:] for row in a_matrix]
+    b0 = b_vector[:]
+
+    for k in range(n - 1):
+        if a_matrix[k][k] == 0:
+            m = k + 1
+            while m < n and a_matrix[m][k] == 0:
+                m += 1
+            if m == n:
+                return []
+            else:
+                # Обмен строк
+                a_matrix[k], a_matrix[m] = a_matrix[m], a_matrix[k]
+                b_vector[k], b_vector[m] = b_vector[m], b_vector[k]
+
+        for i in range(k + 1, n):
+            q = a_matrix[i][k] / a_matrix[k][k]
+            for j in range(k, n):
+                a_matrix[i][j] -= q * a_matrix[k][j]
+            b_vector[i] -= q * b_vector[k]
+
+    x_vector = [b_vector[c] / a_matrix[c][c] for c in range(n)]
+    for i in range(n - 1, -1, -1):
+        s = sum(a_matrix[i][j] * x_vector[j] for j in range(i + 1, n))
+        x_vector[i] = (b_vector[i] - s) / a_matrix[i][i]
+
+    return x_vector
