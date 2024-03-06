@@ -44,6 +44,8 @@ class InterSplineModel(BaseAIFModel):
         self.results.append(self.parabolic_spline(points))
         self.results.append(self.linear_spline(points))
 
+        self.results.append(self.lagrange(points))
+
         self.notify_observers()
 
     def cubic_spline(self, points: list[tuple[float, float]]) -> tuple[Graphic, list[str], str]:
@@ -116,3 +118,26 @@ class InterSplineModel(BaseAIFModel):
         graphic.add_graph(func)
 
         return graphic, log, "Линейный сплайн"
+
+    def lagrange(self, points: list[tuple[float, float]]) -> tuple[Graphic, list[str], str]:
+        graphic = Graphic(self._x_limits, self._y_limits)
+        log = []
+
+        x_point = self.x
+        x_vector, y_vector = zip(*points)
+
+        s = 0
+        for i in range(len(points)):
+            p = 1
+            for j in range(len(points)):
+                if i != j:
+                    p = p * (x_point - x_vector[j]) / (x_vector[i] - x_vector[j])
+            s += y_vector[i] * p
+
+        log.append(f"Для x = {x_point}, y = {s}")
+
+        for point in points:
+            graphic.add_point(*point)
+        graphic.add_point(x_point, s, color="blue")
+
+        return graphic, log, "Полином Лагранжа",
