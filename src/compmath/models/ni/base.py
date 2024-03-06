@@ -1,9 +1,10 @@
 from abc import abstractmethod
 from dataclasses import dataclass
+from math import pi
 
 from compmath.models.base import BaseGraphicModel
 from compmath.models.graphic import Graphic
-from compmath.utils.func import make_callable, FunctionValidateError
+from compmath.utils.func import make_callable, FunctionValidateError, integral, arc_length, surface_area
 
 
 @dataclass
@@ -24,6 +25,10 @@ class BaseNIModel(BaseGraphicModel):
         self._interval = (0, 1)
         self._intervals = 1
         self.result = None
+        self._reference_result = None
+        self._surface_area = None
+        self._volume = None
+        self._arc_length = None
         self.table: list[TableRow] = []
 
     @property
@@ -45,6 +50,61 @@ class BaseNIModel(BaseGraphicModel):
     @property
     def fx(self) -> str:
         return self._fx
+
+    def calc_intermediate(self) -> None:
+        if self._fx:
+            try:
+                func = make_callable(self.fx)
+                if not self.fx.count("x"):
+                    return None
+            except FunctionValidateError:
+                return None
+
+            result1 = integral(func, *self.interval)
+            # result2 = surface_area(self.fx, *self.interval, symbol="x")
+            result3 = pi * integral(make_callable(f"({self.fx})**2"), *self.interval)
+            result4 = arc_length(self.fx, *self.interval, symbol="x")
+
+            self._reference_result = result1
+            # self._surface_area = result2
+            self._volume = result3
+            self._arc_length = result4
+
+    @property
+    def reference_result(self) -> float | None:
+        """
+        Эталонное значение интеграла
+
+        :return:
+        """
+        return self._reference_result
+
+    @property
+    def surface_area(self) -> float | int | None:
+        """
+        Площадь поверхности
+
+        :return:
+        """
+        return self._surface_area
+
+    @property
+    def volume(self) -> float | int | None:
+        """
+        Объем тела вращения
+
+        :return:
+        """
+        return self._volume
+
+    @property
+    def arc_length(self) -> float | int | None:
+        """
+        Длина дуги
+
+        :return:
+        """
+        return self._arc_length
 
     def set_fx(self, fx: str):
         try:
@@ -69,7 +129,6 @@ class BaseNIModel(BaseGraphicModel):
         if func:
             graphic.add_graph(func)
             self.graphics.append(graphic)
-
 
         self.notify_observers()
 
