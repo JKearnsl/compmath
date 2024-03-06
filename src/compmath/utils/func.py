@@ -1,10 +1,13 @@
-from typing import Callable, Protocol
+from math import pi
+from typing import Callable, Protocol, cast
 
 import numpy as np
 from numpy.linalg import lstsq
+from scipy import LowLevelCallable
+from scipy.integrate import quad
 from scipy.interpolate import interp1d
 from scipy.optimize import curve_fit
-from sympy import sympify, lambdify, SympifyError, Basic, solve, symbols
+from sympy import sympify, lambdify, SympifyError, Basic, solve, symbols, integrate, diff, sqrt, parse_expr
 from sympy.core import Symbol
 
 
@@ -365,3 +368,58 @@ def lspline(x: list[float], y: list[float]):
     y_data = np.array(y)
 
     return interp1d(x_data, y_data, kind='linear', fill_value="extrapolate")
+
+
+def integral(fx: Callable[[float | int], float] | LowLevelCallable, a: float | int, b: float | int) -> float:
+    """
+    Вычисление определенного интеграла
+
+    :param fx: функция
+    :param a: нижний предел
+    :param b: верхний предел
+    :param symbol: символ
+    :return: значение определенного интеграла
+    """
+    integral_value, error = cast(tuple[float, float], quad(fx, a, b))
+    return integral_value
+
+
+def arc_length(fx_str: str, a: float | int, b: float | int, symbol: str) -> float:
+    """
+    Вычисление длины дуги
+
+    :param fx_str: функция
+    :param a: нижний предел
+    :param b: верхний предел
+    :param symbol: символ
+    :return: длина дуги
+    """
+    x = symbols('x')
+    fx = lambdify(x, fx_str, "numpy")
+
+    # вычислите производную
+    df_dx_str = str(diff(fx_str, 'x'))
+    df_dx = lambdify(x, df_dx_str, "numpy")
+
+    def integrand(x):
+        return sqrt(1 + df_dx(x) ** 2)
+
+    result, error = cast(tuple[float, float], quad(integrand, a, b))
+    return result
+
+
+def surface_area(fx_str: str, a: float | int, b: float | int, symbol: str) -> float:
+    """
+    Вычисление площади поверхности
+
+    :param fx_str: функция
+    :param a: нижний предел
+    :param b: верхний предел
+    :param symbol: символ
+    :return: площадь поверхности
+    """
+    func = parse_expr(fx_str)
+
+    df_dx = diff(func, symbol)
+    result = integrate(func * sqrt(1 + df_dx**2), (symbol, a, b))
+    return 2 * pi * result
