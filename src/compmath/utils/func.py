@@ -481,8 +481,9 @@ def gauss_calc(
         delta_vector.append(b_vector_copy[i] - s)
 
     result_matrix = []
-    for i, row in enumerate(a_matrix):
-        result_matrix.append([*row, b_vector[i]])
+    for i in range(n):
+        result_matrix.append([a_matrix_copy[i][j] for j in range(n)])
+        result_matrix[i].append(b_vector_copy[i])
 
     return x_vector, delta_vector, result_matrix
 
