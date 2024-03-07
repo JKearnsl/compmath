@@ -172,7 +172,10 @@ class SLATItemView(QWidget):
         self.iters_limit_input.blockSignals(True)
 
         self.header.setText(self.model.title)
-        self.description.setText(self.model.description)
+        if self.model.description:
+            self.description.setText(self.model.description)
+        else:
+            self.description.setVisible(False)
         self.eps_input.setText(str(self.model.eps))
         self.matrix.set_a(self.model.a())
         self.matrix.set_b(self.model.b())
@@ -243,11 +246,7 @@ class SLATItemView(QWidget):
 
         sheet = QWidget(modal)
         sheet.setObjectName("sheet")
-        sheet.setStyleSheet("""
-            QWidget#sheet {
-                background-color: transparent;
-            }
-        """)
+        sheet.setStyleSheet(""" QWidget#sheet { background-color: transparent; } """)
         modal.layout().addWidget(sheet)
 
         central_layout = QVBoxLayout(sheet)
