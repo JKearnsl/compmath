@@ -485,3 +485,15 @@ def gauss_calc(
         result_matrix.append([*row, b_vector[i]])
 
     return x_vector, delta_vector, result_matrix
+
+
+def is_diagonal_dominance(matrix: Sequence[Sequence[float]]) -> bool:
+    matrix = np.array(matrix)
+
+    diagonal = np.abs(matrix.diagonal())
+
+    # Сумма абсолютных значений элементов вне диагонали
+    off_diagonal = np.sum(np.abs(matrix), axis=1) - diagonal
+
+    # Проверить диагональное преобладание
+    return np.all(diagonal >= off_diagonal)
