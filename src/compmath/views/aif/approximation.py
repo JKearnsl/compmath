@@ -1,3 +1,4 @@
+import numpy as np
 from PyQt6 import sip
 from PyQt6.QtCore import Qt, QSize
 from PyQt6.QtWidgets import (
@@ -56,7 +57,7 @@ class AItemView(QWidget):
         error_label.setWordWrap(True)
         error_label.setTextFormat(Qt.TextFormat.RichText)
         error_label.setFixedHeight(15)
-        error_label.setFixedWidth(200)
+        error_label.setFixedWidth(400)
         error_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         error_label.setStyleSheet("""
             QLabel {
@@ -252,7 +253,13 @@ class AItemView(QWidget):
         scroll_area.setWidget(sheet)
         modal.layout().addWidget(scroll_area)
 
-        items = list(sorted(self.model.results, key=lambda x: (abs(x[2][0]), abs(1 - x[2][1]))))
+        items = list(sorted(
+            self.model.results,
+            key=lambda x: (
+                abs(float("inf") if np.isnan(x[2][0]) else x[2][0]),
+                abs(0 if np.isnan(x[2][1]) else (1 - x[2][1]))
+            )
+        ))
 
         for number, item in enumerate(self.model.results, 1):
             graphic, log, (sum_diff, coefficient), title = item
