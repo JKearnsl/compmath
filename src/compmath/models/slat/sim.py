@@ -7,16 +7,17 @@ class SIModel(BaseSLATModel):
         super().__init__()
 
         self._title = "Метод простых итераций"
+        self._description = ""
 
     def calc(self):
-        self.table.clear()
+        self.results.clear()
+        table = []
 
         k = 0
         n = len(self.a())
         a_matrix = self.a()
         b_vector = self.b()
         x = self.x0.copy()
-        delta = 0
 
         while True:
             k += 1
@@ -28,7 +29,7 @@ class SIModel(BaseSLATModel):
             # Оценка точности
             delta = max(abs(x[i] - x_prev[i]) for i in range(n))
 
-            self.table.append(
+            table.append(
                 TableRow(
                     iter_num=k,
                     vector=x.copy(),
@@ -39,4 +40,5 @@ class SIModel(BaseSLATModel):
             if delta <= self.eps or k >= self.iters_limit:
                 break
 
-        self.was_calculated()
+        self.results.append(([], table, "Результаты"))
+        self.notify_observers()
