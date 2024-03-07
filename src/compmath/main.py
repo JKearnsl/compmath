@@ -3,6 +3,7 @@ import os
 import shutil
 import sys
 import tempfile
+from subprocess import Popen
 
 from PyQt6 import QtCore, QtGui
 from PyQt6.QtWidgets import QApplication, QStyleFactory
@@ -36,6 +37,7 @@ class CompMathApp(QApplication):
 
         config = InIConfig(config_path)
 
+        # Application settings
         self.setApplicationName(config.VAR.BASE.APP_NAME)
         self.setApplicationDisplayName(config.VAR.BASE.APP_NAME)
         self.setOrganizationName("jkearnsl")
@@ -51,20 +53,22 @@ class CompMathApp(QApplication):
         app_icon.addFile("icons:logo-256.png", QtCore.QSize(256, 256))
         self.setWindowIcon(app_icon)
 
-        # Для сессии Wayland необходимо установить .desktop файл
-        # Источники:
-        # - https://github.com/OpenShot/openshot-qt/pull/3354
-        # - https://github.com/openscad/openscad/blob/master/src/openscad.cc#L724
-        # - https://github.com/openscad/openscad/issues/4505
-        # - https://specifications.freedesktop.org/desktop-entry-spec/latest/ar01s02.html
-        # - https://nicolasfella.de/posts/fixing-wayland-taskbar-icons/
-        # - https://github.com/PhotoFlare/photoflare/pull/465/files#diff-c1c1d39b766177a787f02a2fd79839ceb5db497c09348db95001752e5f5b0dde
-        # - https://specifications.freedesktop.org/desktop-entry-spec/desktop-entry-spec-latest.html
-        # Для Windows необходимо установить .ico файл, а также app_id:
-        # - https://stackoverflow.com/questions/1551605/how-to-set-applications-taskbar-icon-in-windows-7/1552105#1552105
-        # И иконку рабочего стола:
-        # - https://askubuntu.com/questions/476981/how-do-i-make-a-desktop-icon-to-launch-a-program
+        # Compmath Calc Server
+        subprocess = Popen(
+            [
+                "gunicorn",
+                "--bind",
+                f"{config.VAR.CALC_SERVER.HOST}:{config.VAR.CALC_SERVER.PORT}",
+                "--workers",
+                "4",
+                "--worker-class",
+                "uvicorn.workers.UvicornWorker",
+                "compmath_calc_server.main:application"
+            ]
+        )
+        atexit.register(subprocess.terminate)
 
+        # Theme
         theme = get_themes()[0].get(config.VAR.BASE.THEME_UUID)
         if not theme:
             theme = BASE_THEME
