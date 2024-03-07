@@ -133,8 +133,8 @@ class BaseSLATModel(BaseModel):
         self._iters_limit = value
         self.notify_observers()
 
-    def normal_matrix(self) -> tuple[np.ndarray, np.ndarray]:
-        new_matrix = np.array(deepcopy(self.matrix), dtype=float)
+    def normal_matrix(self) -> tuple[np.ndarray[float], np.ndarray[float]]:
+        new_matrix = np.array(deepcopy(self.a()), dtype=float)
         a_matrix = np.dot(new_matrix.T, new_matrix)
         b_matrix = np.dot(new_matrix.T, self.b())
         return a_matrix, b_matrix
