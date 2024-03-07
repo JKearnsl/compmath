@@ -1,3 +1,4 @@
+from compmath.api.factory import APIFactory
 from compmath.config import InIConfig
 from compmath.views.widgets import WidgetsFactory
 from compmath.views.main import MainView
@@ -25,10 +26,12 @@ class MainController:
             self,
             model: 'MainModel',
             widgets_factory: 'WidgetsFactory',
+            api_factory: APIFactory,
             config: 'InIConfig',
             app_controller
     ):
         self.model = model
+        self.api_factory = api_factory
         self.config = config
         self.widgets_factory = widgets_factory
         self.app_controller = app_controller
@@ -46,27 +49,27 @@ class MainController:
         match page_id:
             case MenuItem.RESEARCH:
                 ResearchController(
-                    ResearchModel(), self.widgets_factory, self.view
+                    ResearchModel(), self.widgets_factory, self.api_factory, self.view
                 )
             case MenuItem.NONLINEAR:
                 NoNLinearController(
-                    NoNLinearModel(), self.widgets_factory, self.view
+                    NoNLinearModel(), self.widgets_factory, self.api_factory, self.view
                 )
             case MenuItem.SLAT:
                 SLATController(
-                    SLATModel(), self.widgets_factory, self.view
+                    SLATModel(), self.widgets_factory, self.api_factory, self.view
                 )
             case MenuItem.SNE:
                 SNEController(
-                    SNEModel(), self.widgets_factory, self.view
+                    SNEModel(), self.widgets_factory, self.api_factory, self.view
                 )
             case MenuItem.NI:
                 NIController(
-                    NIModel(), self.widgets_factory, self.view
+                    NIModel(), self.widgets_factory, self.api_factory, self.view
                 )
             case MenuItem.AIF:
                 AIFController(
-                    AIFModel(), self.widgets_factory, self.view
+                    AIFModel(), self.widgets_factory, self.api_factory, self.view
                 )
             case _:
                 raise ValueError(f'Unknown page_id: {page_id}')
