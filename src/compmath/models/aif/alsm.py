@@ -166,7 +166,8 @@ class ALSModel(BaseAIFModel):
             f"\nВектор B: \n{'\n'.join([str(round(_, 5)) for _ in b_vector])}"
         )
         log.append(
-            f"\nКоэффициенты полинома (метод Гаусса): \n{'\n'.join([str(coefficient) for coefficient in gauss_vector])}"
+            f"\nКоэффициенты полинома (метод Гаусса): "
+            f"\n{'\n'.join([str(coefficient) for coefficient in gauss_vector[0]])}"
         )
 
         return graphic, log, (sum_diff, gamma), f"Полиномиальная регрессия {degree}-степени"
