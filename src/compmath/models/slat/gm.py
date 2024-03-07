@@ -19,12 +19,13 @@ class GModel(BaseSLATModel):
         a_matrix = deepcopy(self.a())
         b_vector = deepcopy(self.b())
         x = deepcopy(self.x0)
-        delta = 0
 
         # Исходная матрица
         log_original = ["\nИсходная матрица\n"]
-        for row in a_matrix:
-            log_original.append("\t".join(str(cell) for cell in row))
+        for i, row in enumerate(a_matrix):
+            log_original.append(
+                "\t".join(str(cell) for cell in row) + "\t|   " + str(b_vector[i])
+            )
         log_original.append("\nИсходный вектор свободных членов\n")
         log_original.append("\t".join(str(cell) for cell in b_vector))
 
@@ -32,8 +33,10 @@ class GModel(BaseSLATModel):
         original_gauss_vector = gauss_calc(a_matrix, b_vector, n)
         log_original.append("\n".join(str(cell) for cell in original_gauss_vector[0]))
 
+        log_original.append("\nВектор невязок\n")
         log_original.append("\n".join(str(cell) for cell in original_gauss_vector[1]))
 
+        log_original.append("\nТреугольная матрица\n")
         for row in original_gauss_vector[2]:
             log_original.append("\t".join(str(round(cell, 2)) for cell in row))
 
@@ -47,22 +50,23 @@ class GModel(BaseSLATModel):
         # Нормализованная матрица
         log_normalized = ["\nНормализованная матрица\n"]
         normal_a_matrix, normal_b_vector = self.normal_matrix()
-        for row in normal_a_matrix:
-            log_normalized.append("\t".join(str(round(cell, 2)) for cell in row))
+        for i, row in enumerate(normal_a_matrix):
+            log_normalized.append(
+                "\t".join(str(round(cell, 2)) for cell in row) + "\t|   " + str(round(normal_b_vector[i], 2))
+            )
 
         log_normalized.append("\nРешение методом Гаусса\n")
         normal_gauss_vector = gauss_calc(normal_a_matrix, normal_b_vector, n)
         log_normalized.append("\n".join(str(cell) for cell in normal_gauss_vector[0]))
 
+        log_normalized.append("\nВектор невязок\n")
+        log_normalized.append("\n".join(str(round(cell, 2)) for cell in normal_gauss_vector[1]))
 
-        log_normalized.append("\t".join(str(round(cell, 2)) for cell in normal_gauss_vector[1]))
-
+        log_normalized.append("\nТреугольная матрица\n")
         for row in normal_gauss_vector[2]:
             log_normalized.append("\t".join(str(round(cell, 2)) for cell in row))
 
         self.results.append((log_normalized, [], "Нормализованная матрица"))
-
-
 
         self.notify_observers()
 
