@@ -1,3 +1,4 @@
+from PyQt6 import sip
 from PyQt6.QtCore import Qt, QSize
 from PyQt6.QtWidgets import (
     QWidget,
@@ -136,7 +137,8 @@ class AItemView(QWidget):
         calc_button.clicked.connect(self.model.calc)
 
     def model_changed(self):
-        self.error_label.setText("")
+        if not sip.isdeleted(self.error_label):
+            self.error_label.setText("")
 
         if self.model.results:
             self.result_button.setDisabled(False)
