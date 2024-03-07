@@ -137,7 +137,7 @@ class ALSModel(BaseAIFModel):
         y = [point[1] for point in points]
 
         coefficients = np.polyfit(x, y, degree)
-        log.append(f"Коэффициенты полинома: \n{'\n'.join([str(coefficients[i]) for i in range(degree + 1)])}")
+        log.append(f"Коэффициенты полинома: \n{'\n'.join([str(coefficient) for coefficient in coefficients])}")
         polynomial = np.polynomial.Polynomial(np.flip(coefficients))
         log.append(f"\nУравнение регрессии: f(x) = {polynomial}\n")
 
@@ -169,6 +169,14 @@ class ALSModel(BaseAIFModel):
             f"\nКоэффициенты полинома (метод Гаусса): "
             f"\n{'\n'.join([str(coefficient) for coefficient in gauss_vector[0]])}"
         )
+        log.append(
+            f"\nВектор невязок: "
+            f"\n{'\n'.join([str(round(_, 5)) for _ in gauss_vector[1]])}"
+        )
+
+        log.append("\nТреугольная матрица\n")
+        for row in gauss_vector[2]:
+            log.append("\t".join(str(round(cell, 2)) for cell in row))
 
         return graphic, log, (sum_diff, gamma), f"Полиномиальная регрессия {degree}-степени"
 
