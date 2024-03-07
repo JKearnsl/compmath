@@ -28,9 +28,7 @@ class BaseSLATModel(BaseModel):
         ]
         self.x0: list[int | float] = []
         self._iters_limit = 100
-        self.iters = None
-        self.table: list[TableRow] = []
-        self.solve_log: list[str] = []
+        self.results: list[tuple[list[str], list[TableRow], str]] = []
 
     @property
     def title(self) -> str:
@@ -115,10 +113,6 @@ class BaseSLATModel(BaseModel):
     @abstractmethod
     def calc(self) -> None:
         ...
-
-    def was_calculated(self):
-        for observer in self._mObservers:
-            observer.was_calculated()
 
     def validation_error(self, error):
         for observer in self._mObservers:
