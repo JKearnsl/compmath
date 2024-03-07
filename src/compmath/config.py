@@ -22,9 +22,16 @@ class Base:
 
 
 @dataclass
+class CalcServer:
+    HOST: str
+    PORT: int
+
+
+@dataclass
 class Config:
     VERSION: str
     BASE: Base
+    CALC_SERVER: CalcServer
 
 
 def str_to_bool(value: str) -> bool:
@@ -50,6 +57,10 @@ class InIConfig:
                     URL=config["CONTACT"]["URL"],
                     EMAIL=config["CONTACT"]["EMAIL"]
                 ),
+            ),
+            CALC_SERVER=CalcServer(
+                HOST=config["CALC_SERVER"]["HOST"],
+                PORT=int(config["CALC_SERVER"]["PORT"])
             )
         )
         self.path = path
