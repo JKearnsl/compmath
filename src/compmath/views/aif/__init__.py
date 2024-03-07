@@ -2,6 +2,7 @@ from typing import TypeVar
 
 from PyQt6.QtWidgets import QWidget
 
+from compmath.api.factory import APIFactory
 from compmath.models import MenuItem
 from compmath.models.aif.alsm import ALSModel
 from compmath.models.aif.interspline import InterSplineModel
@@ -17,11 +18,12 @@ ViewWidget = TypeVar('ViewWidget', bound=QWidget)
 class AIFView(QWidget, DObserver, metaclass=TSMeta):
     id: MenuItem
 
-    def __init__(self, controller, model, widgets_factory, parent: ViewWidget):
+    def __init__(self, controller, model, widgets_factory, api_factory: APIFactory, parent: ViewWidget):
         super().__init__(parent)
         self.id = model.id
         self.controller = controller
         self.model = model
+        self.api_factory = api_factory
         self.widgets_factory = widgets_factory
 
         parent.ui.content_layout.addWidget(self)
@@ -39,10 +41,10 @@ class AIFView(QWidget, DObserver, metaclass=TSMeta):
         ...
 
     def model_loaded(self):
-        alsm = AItemView(ALSModel(), self.widgets_factory, self)
+        alsm = AItemView(ALSModel(self.api_factory.create_aif()), self.widgets_factory, self)
         self.ui.central_layout.addWidget(alsm)
 
-        inter = InterItemView(InterSplineModel(), self.widgets_factory, self)
+        inter = InterItemView(InterSplineModel(self.api_factory.create_aif()), self.widgets_factory, self)
         self.ui.central_layout.addWidget(inter)
 
         alsm.model_loaded()
