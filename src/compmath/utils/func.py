@@ -428,9 +428,18 @@ def surface_area(fx_str: str, a: float | int, b: float | int, symbol: str) -> fl
 
 def gauss_calc(
         a_matrix: Sequence[Sequence[float]],
-        b_vector: Sequence[Sequence],
+        b_vector: Sequence[float],
         n: int
 ) -> tuple[Sequence[float], Sequence[float], Sequence[Sequence[float]]] | None:
+    """
+    Метод Гаусса
+
+
+    :param a_matrix:
+    :param b_vector:
+    :param n:
+    :return: Вектор решений, вектор невязок, преобразованная матрица
+    """
     a_matrix = deepcopy(a_matrix)
     b_vector = deepcopy(b_vector)
 
@@ -449,6 +458,7 @@ def gauss_calc(
                 a_matrix[k], a_matrix[m] = a_matrix[m], a_matrix[k]
                 b_vector[k], b_vector[m] = b_vector[m], b_vector[k]
 
+        # Прямой ход
         for i in range(k + 1, n):
             q = a_matrix[i][k] / a_matrix[k][k]
             for j in range(k, n):
@@ -456,10 +466,13 @@ def gauss_calc(
             b_vector[i] -= q * b_vector[k]
 
     x_vector = [b_vector[c] / a_matrix[c][c] for c in range(n)]
+
+    # Обратный ход
     for i in range(n - 1, -1, -1):
         s = sum(a_matrix[i][j] * x_vector[j] for j in range(i + 1, n))
         x_vector[i] = (b_vector[i] - s) / a_matrix[i][i]
 
+    # Невязки
     delta_vector = []
     for i in range(n):
         s = 0
@@ -467,4 +480,8 @@ def gauss_calc(
             s += a_matrix_copy[i][j] * x_vector[j]
         delta_vector.append(b_vector_copy[i] - s)
 
-    return x_vector, delta_vector, a_matrix
+    result_matrix = []
+    for i, row in enumerate(a_matrix):
+        result_matrix.append([*row, b_vector[i]])
+
+    return x_vector, delta_vector, result_matrix
