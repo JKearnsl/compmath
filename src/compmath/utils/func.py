@@ -1,5 +1,6 @@
+from copy import deepcopy
 from math import pi
-from typing import Callable, Protocol, cast
+from typing import Callable, Protocol, cast, Sequence
 
 import numpy as np
 from numpy.linalg import lstsq
@@ -425,7 +426,16 @@ def surface_area(fx_str: str, a: float | int, b: float | int, symbol: str) -> fl
     return 2 * pi * result
 
 
-def gauss_calc(a_matrix: list[list[float]], b_vector: list[float], n: int) -> list[float]:
+def gauss_calc(
+        a_matrix: Sequence[Sequence[float]],
+        b_vector: Sequence[Sequence],
+        n: int
+) -> tuple[Sequence[float], Sequence[float], Sequence[Sequence[float]]] | None:
+    a_matrix = deepcopy(a_matrix)
+    b_vector = deepcopy(b_vector)
+
+    a_matrix_copy = deepcopy(a_matrix)
+    b_vector_copy = deepcopy(b_vector)
 
     for k in range(n - 1):
         if a_matrix[k][k] == 0:
@@ -433,7 +443,7 @@ def gauss_calc(a_matrix: list[list[float]], b_vector: list[float], n: int) -> li
             while m < n and a_matrix[m][k] == 0:
                 m += 1
             if m == n:
-                return []
+                return None  # Система не обусловлена, не удалось заменить строку
             else:
                 # Обмен строк
                 a_matrix[k], a_matrix[m] = a_matrix[m], a_matrix[k]
@@ -450,4 +460,11 @@ def gauss_calc(a_matrix: list[list[float]], b_vector: list[float], n: int) -> li
         s = sum(a_matrix[i][j] * x_vector[j] for j in range(i + 1, n))
         x_vector[i] = (b_vector[i] - s) / a_matrix[i][i]
 
-    return x_vector
+    delta_vector = []
+    for i in range(n):
+        s = 0
+        for j in range(n):
+            s += a_matrix_copy[i][j] * x_vector[j]
+        delta_vector.append(b_vector_copy[i] - s)
+
+    return x_vector, delta_vector, a_matrix
