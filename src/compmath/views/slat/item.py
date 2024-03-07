@@ -5,7 +5,7 @@ from PyQt6.QtWidgets import (
     QVBoxLayout,
     QHBoxLayout,
     QTableWidgetItem,
-    QHeaderView
+    QHeaderView, QScrollArea
 )
 
 from compmath.models.slat.base import BaseSLATModel
@@ -160,8 +160,7 @@ class SLATItemView(QWidget):
         self.x0.set_a([self.model.x0])
         self.x0.blockSignals(False)
 
-    def was_calculated(self):
-        if self.model.table:
+        if self.model.results:
             self.result_button.setDisabled(False)
 
     def model_loaded(self):
@@ -196,9 +195,6 @@ class SLATItemView(QWidget):
 
     def validation_error(self, message: str):
         self.error_label.setText(message)
-
-    def error_handler(self, error):
-        self.error_label.setText(error)
 
     def size_changed(self):
         value = self.size_input.value()
@@ -242,29 +238,88 @@ class SLATItemView(QWidget):
     def show_result(self):
         modal = self.widgets_factory.modal(self.parent)
         modal.setFixedWidth(800)
-        modal.setFixedHeight(450)
+        modal.setFixedHeight(600)
         modal.layout().setContentsMargins(5, 0, 5, 5)
-        table = self.widgets_factory.table()
-        table.setFixedHeight(400)
-        table.setRowCount(len(self.model.table))
-        table.add_style("""
-            QTableWidget {
-                border: none;
+
+        sheet = QWidget(modal)
+        sheet.setObjectName("sheet")
+        sheet.setStyleSheet("""
+            QWidget#sheet {
+                background-color: transparent;
             }
-            """)
-        table.setColumnCount(len(self.model.x0) + 2)
-        table.setHorizontalHeaderLabels([
-            "№",
-            "delta",
-            *[f"x{i}" for i in range(len(self.model.x0))]
-        ])
-        table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeMode.ResizeToContents)
-        for i, row in enumerate(self.model.table):
-            table.setItem(i, 0, QTableWidgetItem(str(row.iter_num)))
-            table.setItem(i, 1, QTableWidgetItem(str(row.delta)))
-            for j, x in enumerate(row.vector):
-                table.setItem(i, j + 2, QTableWidgetItem(str(x)))
-        modal.layout().addWidget(table)
+        """)
+        modal.layout().addWidget(sheet)
+
+        central_layout = QVBoxLayout(sheet)
+        central_layout.setContentsMargins(30, 20, 30, 20)
+        central_layout.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
+        central_layout.setSpacing(10)
+        sheet.setLayout(central_layout)
+
+        scroll_area = QScrollArea(modal)
+        scroll_area.setFixedHeight(550)
+        scroll_area.setObjectName("scroll_area")
+        scroll_area.setStyleSheet("""
+            QScrollArea#scroll_area {
+                border: none;
+                outline: none;
+                background-color: transparent;
+            }
+        """)
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setWidget(sheet)
+        modal.layout().addWidget(scroll_area)
+
+        for num, item in enumerate(self.model.results, 1):
+            log, table, title = item
+            item_widget = QWidget()
+            central_layout.addWidget(item_widget)
+            item_widget.setObjectName(f"item{num}_widget")
+            item_widget.setStyleSheet("""
+                QWidget#item$NUMBER_widget {
+                    background-color: transparent;
+                }
+            """.replace(
+                "$NUMBER", str(num)
+            ))
+
+            main_layout = QVBoxLayout(item_widget)
+            main_layout.setContentsMargins(15, 0, 15, 15)
+            main_layout.setSpacing(0)
+
+            if len(self.model.results) > 1:
+                header_layout = self.widgets_factory.heading3(f"№{num}. {title}")
+            else:
+                header_layout = self.widgets_factory.heading3(title)
+            main_layout.addWidget(header_layout)
+
+            content_layout = QHBoxLayout()
+            content_layout.setContentsMargins(5, 5, 5, 0)
+            content_layout.setSpacing(10)
+            main_layout.addLayout(content_layout)
+
+            if log:
+                log_area = self.widgets_factory.textarea()
+                log_area.setFixedHeight(400)
+                log_area.setReadOnly(True)
+                log_area.setPlainText("\n".join(log))
+                content_layout.addWidget(log_area)
+
+            if table:
+                table_widget = self.widgets_factory.table()
+                table_widget.setFixedHeight(400)
+                table_widget.setRowCount(len(table))
+                table_widget.add_style(""" QTableWidget { border: none; } """)
+                table_widget.setColumnCount(len(self.model.x0) + 2)
+                table_widget.setHorizontalHeaderLabels(["№", "delta", *[f"x{i}" for i in range(len(self.model.x0))]])
+                table_widget.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeMode.ResizeToContents)
+                for i, row in enumerate(table):
+                    table_widget.setItem(i, 0, QTableWidgetItem(str(row.iter_num)))
+                    table_widget.setItem(i, 1, QTableWidgetItem(str(row.delta)))
+                    for j, x in enumerate(row.vector):
+                        table_widget.setItem(i, j + 2, QTableWidgetItem(str(x)))
+                content_layout.addWidget(table_widget)
+
         modal.exec()
 
     def iters_limit_changed(self):
