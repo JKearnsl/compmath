@@ -8,6 +8,7 @@ from subprocess import Popen
 from PyQt6 import QtCore, QtGui
 from PyQt6.QtWidgets import QApplication, QStyleFactory
 
+from compmath.api.factory import APIFactory
 from compmath.config import InIConfig
 from compmath.controllers import ApplicationController
 from compmath.themes import BASE_THEME
@@ -74,9 +75,15 @@ class CompMathApp(QApplication):
             theme = BASE_THEME
 
         widgets_factory = WidgetsFactory(theme[0])
-
+        api_factory = APIFactory(
+            host=config.VAR.CALC_SERVER.HOST,
+            port=config.VAR.CALC_SERVER.PORT,
+            scheme="http",
+            path="/api"
+        )
         controller = ApplicationController(
             widgets_factory=widgets_factory,
+            api_factory=api_factory,
             config=config,
         )
         controller.main()
