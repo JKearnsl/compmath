@@ -9,7 +9,7 @@ class SNEController:
         self.model = model
         self.widgets_factory = widgets_factory
         self.api_factory = api_factory
-        self.view = SNEView(self, self.model, widgets_factory, parent)
+        self.view = SNEView(self, self.model, widgets_factory, api_factory, parent)
 
         self.view.show()
         self.view.model_loaded()
