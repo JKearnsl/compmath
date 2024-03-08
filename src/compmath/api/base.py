@@ -1,8 +1,17 @@
 import json
+from functools import reduce
 from typing import Callable, Any, Literal
 
 from PyQt6.QtCore import QObject, QUrl
 from PyQt6.QtNetwork import QNetworkReply, QNetworkRequest, QNetworkAccessManager
+
+
+def join_slash(a, b):
+    return a.rstrip('/') + '/' + b.lstrip('/')
+
+
+def urljoin(*args):
+    return reduce(join_slash, args) if args else ''
 
 
 class APIBase(QObject):
@@ -67,7 +76,7 @@ class APIBase(QObject):
 
         if reply.error() != QNetworkReply.NetworkError.NoError and error_callbacks is not None:
             message = "Неизвестная ошибка"
-            if response_json and (error:= response_json.get("error")):
+            if response_json and (error := response_json.get("error")):
                 error_type = error.get("type")
                 if error_type == 1:
                     message = error.get("content")

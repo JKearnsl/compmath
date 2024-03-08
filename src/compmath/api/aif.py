@@ -1,20 +1,11 @@
-from functools import reduce
 from typing import Any
 
 import numpy as np
 from PyQt6.QtCore import pyqtSignal
 
-from compmath.api.base import APIBase
+from compmath.api.base import APIBase, urljoin
 from compmath.models.graphic import Graphic, PolygonModel, RectModel, GraphModel, PointModel
 from compmath.utils.data import dicts_to_dataclasses
-
-
-def join_slash(a, b):
-    return a.rstrip('/') + '/' + b.lstrip('/')
-
-
-def urljoin(*args):
-    return reduce(join_slash, args) if args else ''
 
 
 class AIFClient(APIBase):
