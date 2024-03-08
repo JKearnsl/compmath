@@ -2,6 +2,7 @@ from typing import TypeVar
 
 from PyQt6.QtWidgets import QWidget
 
+from compmath.api.factory import APIFactory
 from compmath.models import MenuItem
 from compmath.models.sne.ntm import NTModel
 from compmath.models.sne.sim import SIModel
@@ -17,11 +18,12 @@ ViewWidget = TypeVar('ViewWidget', bound=QWidget)
 class SNEView(QWidget, DObserver, metaclass=TSMeta):
     id: MenuItem
 
-    def __init__(self, controller, model, widgets_factory, parent: ViewWidget):
+    def __init__(self, controller, model, widgets_factory, api_factory: APIFactory, parent: ViewWidget):
         super().__init__(parent)
         self.id = model.id
         self.controller = controller
         self.model = model
+        self.api_factory = api_factory
         self.widgets_factory = widgets_factory
 
         parent.ui.content_layout.addWidget(self)
@@ -39,13 +41,13 @@ class SNEView(QWidget, DObserver, metaclass=TSMeta):
         ...
 
     def model_loaded(self):
-        sim = SNEItemView(SIModel(), self.widgets_factory, self)
+        sim = SNEItemView(SIModel(self.api_factory.create_sne()), self.widgets_factory, self)
         self.ui.central_layout.addWidget(sim)
 
-        zm = SNEItemView(ZModel(), self.widgets_factory, self)
+        zm = SNEItemView(ZModel(self.api_factory.create_sne()), self.widgets_factory, self)
         self.ui.central_layout.addWidget(zm)
 
-        ntm = SNEItemView(NTModel(), self.widgets_factory, self)
+        ntm = SNEItemView(NTModel(self.api_factory.create_sne()), self.widgets_factory, self)
         self.ui.central_layout.addWidget(ntm)
 
         sim.model_loaded()
