@@ -93,8 +93,7 @@ class SNEItemView(QWidget):
         error_label.setWordWrap(True)
         error_label.setTextFormat(Qt.TextFormat.RichText)
         error_label.setFixedHeight(15)
-        error_label.setFixedWidth(200)
-        error_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        error_label.setFixedWidth(350)
         error_label.setStyleSheet("""
             QLabel {
                 color: red;
@@ -103,7 +102,7 @@ class SNEItemView(QWidget):
             }
         """)
         self.error_label = error_label
-        layout.addWidget(error_label, alignment=Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(error_label, alignment=Qt.AlignmentFlag.AlignLeft)
 
         bottom = QHBoxLayout()
         bottom.setContentsMargins(0, 0, 0, 0)
@@ -247,8 +246,14 @@ class SNEItemView(QWidget):
         self.initial_guess_input.blockSignals(True)
 
         self.header.setText(self.model.title)
-        self.description.setText(self.model.description)
-        self.eps_input.setText(str(self.model.eps))
+        if self.model.description:
+            self.description.setText(self.model.description)
+        else:
+            self.description.setVisible(False)
+        eps_str = format(self.model.eps, "f")
+        if '.' in eps_str:
+            eps_str = eps_str.rstrip('0').rstrip('.')
+        self.eps_input.setText(eps_str)
         self.iters_limit_input.setText(str(self.model.iters_limit))
         self.initial_guess_input.setText(f"{self.model.initial_guess[0]}, {self.model.initial_guess[1]}")
 
