@@ -4,6 +4,7 @@ from PyQt6.QtWidgets import QWidget
 
 from compmath.api.factory import APIFactory
 from compmath.models import MenuItem
+from compmath.models.ni.intermediate import InterModel
 from compmath.models.ni.lrm import LRModel
 from compmath.models.ni.mrm import MRModel
 from compmath.models.ni.rrm import RRModel
@@ -11,6 +12,7 @@ from compmath.models.ni.sm import SModel
 from compmath.models.ni.tm import TModel
 from compmath.utils.observer import DObserver
 from compmath.utils.ts_meta import TSMeta
+from compmath.views.ni.interm_item import NItermView
 from compmath.views.ni.item import NItemView
 from compmath.views.ni.static_ui import UiNIPage
 
@@ -40,6 +42,9 @@ class NIView(QWidget, DObserver, metaclass=TSMeta):
         # События
 
     def model_changed(self):
+        inter = NItermView(InterModel(self.api_factory.create_ni()), self.widgets_factory, self)
+        self.ui.central_layout.addWidget(inter)
+
         lrm = NItemView(LRModel(self.api_factory.create_ni()), self.widgets_factory, self)
         self.ui.central_layout.addWidget(lrm)
 
@@ -55,6 +60,7 @@ class NIView(QWidget, DObserver, metaclass=TSMeta):
         sm = NItemView(SModel(self.api_factory.create_ni()), self.widgets_factory, self)
         self.ui.central_layout.addWidget(sm)
 
+        inter.model_loaded()
         lrm.model_loaded()
         rrm.model_loaded()
         mrm.model_loaded()
