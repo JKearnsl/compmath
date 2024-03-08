@@ -2,6 +2,7 @@ from typing import TypeVar
 
 from PyQt6.QtWidgets import QWidget
 
+from compmath.api.factory import APIFactory
 from compmath.models import MenuItem
 from compmath.models.ni.lrm import LRModel
 from compmath.models.ni.mrm import MRModel
@@ -19,11 +20,12 @@ ViewWidget = TypeVar('ViewWidget', bound=QWidget)
 class NIView(QWidget, DObserver, metaclass=TSMeta):
     id: MenuItem
 
-    def __init__(self, controller, model, widgets_factory, parent: ViewWidget):
+    def __init__(self, controller, model, widgets_factory, api_factory: APIFactory, parent: ViewWidget):
         super().__init__(parent)
         self.id = model.id
         self.controller = controller
         self.model = model
+        self.api_factory = api_factory
         self.widgets_factory = widgets_factory
 
         parent.ui.content_layout.addWidget(self)
@@ -38,19 +40,19 @@ class NIView(QWidget, DObserver, metaclass=TSMeta):
         # События
 
     def model_changed(self):
-        lrm = NItemView(LRModel(), self.widgets_factory, self)
+        lrm = NItemView(LRModel(self.api_factory.create_ni()), self.widgets_factory, self)
         self.ui.central_layout.addWidget(lrm)
 
-        rrm = NItemView(RRModel(), self.widgets_factory, self)
+        rrm = NItemView(RRModel(self.api_factory.create_ni()), self.widgets_factory, self)
         self.ui.central_layout.addWidget(rrm)
 
-        mrm = NItemView(MRModel(), self.widgets_factory, self)
+        mrm = NItemView(MRModel(self.api_factory.create_ni()), self.widgets_factory, self)
         self.ui.central_layout.addWidget(mrm)
 
-        tm = NItemView(TModel(), self.widgets_factory, self)
+        tm = NItemView(TModel(self.api_factory.create_ni()), self.widgets_factory, self)
         self.ui.central_layout.addWidget(tm)
 
-        sm = NItemView(SModel(), self.widgets_factory, self)
+        sm = NItemView(SModel(self.api_factory.create_ni()), self.widgets_factory, self)
         self.ui.central_layout.addWidget(sm)
 
         lrm.model_loaded()
