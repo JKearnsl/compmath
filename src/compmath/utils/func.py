@@ -3,11 +3,8 @@ from math import pi
 from typing import Callable, Protocol, cast, Sequence
 
 import numpy as np
-from numpy.linalg import lstsq
 from scipy import LowLevelCallable
 from scipy.integrate import quad
-from scipy.interpolate import interp1d
-from scipy.optimize import curve_fit
 from sympy import sympify, lambdify, SympifyError, Basic, solve, symbols, integrate, diff, sqrt, parse_expr
 from sympy.core import Symbol
 
