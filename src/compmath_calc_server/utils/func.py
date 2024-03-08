@@ -502,3 +502,53 @@ def is_diagonal_dominance(matrix: Sequence[Sequence[float]]) -> bool:
 
     # Проверить диагональное преобладание
     return np.all(diagonal >= off_diagonal)
+
+
+def is_converges(
+        func1: str,
+        func2: str,
+        initial_guess: tuple[float, float],
+        log: bool = False
+) -> bool | tuple[bool, list[str]]:
+    solve_log = ["\nПроверка итерационной сходимости\n"]
+
+    fi_x_y = (
+        solve_rel_var(func1, "x")[0],
+        solve_rel_var(func2, "y")[0]
+    )
+
+    fi_1_x_y = (
+        diff(fi_x_y[0], "x"),
+        diff(fi_x_y[0], "y")
+    )
+
+    fi_2_x_y = (
+        diff(fi_x_y[1], "x"),
+        diff(fi_x_y[1], "y")
+    )
+
+    a, b = initial_guess
+
+    one = abs(make_callable(fi_1_x_y[0])(a, b)) + abs(make_callable(fi_1_x_y[1])(a, b))
+    two = abs(make_callable(fi_2_x_y[0])(a, b)) + abs(make_callable(fi_2_x_y[1])(a, b))
+
+    solve_log.append(f"fi(x, y) = {fi_x_y}")
+    solve_log.append(f"fi₁'(x, y) = {fi_1_x_y}")
+    solve_log.append(f"fi₂'(x, y) = {fi_2_x_y}")
+    solve_log.append(f"\na = {a}\nb = {b}\n")
+    solve_log.append(f"abs(fi₁.₁'(a, b)) + abs(fi₁.₂'(a, b)) = {one} {'<' if one < 1 else '>'} 1")
+    solve_log.append(f"abs(fi₂.₁'(a, b)) + abs(fi₂.₂'(a, b)) = {two} {'<' if two < 1 else '>'} 1")
+
+    if not (result := one < 1 and two < 1):
+        solve_log.append("\nУсловие сходимости не выполнено\n")
+    else:
+        solve_log.append("\nУсловие сходимости выполнено\n")
+    return result if not log else (result, solve_log)
+
+
+def evenly_spaced_elements[T: Sequence](lst: T, n: int = 30) -> T | list:
+    if len(lst) > n:
+        indices = np.linspace(0, len(lst) - 1, n, dtype=int)
+        return [lst[i] for i in indices]
+    else:
+        return lst
