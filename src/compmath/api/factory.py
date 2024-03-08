@@ -1,6 +1,7 @@
 import urllib.parse as urllib
 
 from compmath.api.aif import AIFClient
+from compmath.api.ni import NIClient
 from compmath.api.sne import SNEClient
 
 
@@ -13,3 +14,6 @@ class APIFactory:
 
     def create_sne(self) -> SNEClient:
         return SNEClient(self._base_url)
+
+    def create_ni(self) -> NIClient:
+        return NIClient(self._base_url)
