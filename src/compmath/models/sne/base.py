@@ -19,8 +19,8 @@ class BaseSNEModel(BaseGraphicModel):
 
     def __init__(self):
         super().__init__()
-        self._title = "None"
-        self._description = "None"
+        self._title = None
+        self._description = None
         self._eps = 0.00001
         self.equations: list[str] = [
             "x + cos(y) - 3",
@@ -29,22 +29,21 @@ class BaseSNEModel(BaseGraphicModel):
         self.initial_guess: tuple[int | float, int | float] = (0, 1)
         self.solve_log: list[str] = []
         self._iters_limit = 100
-        self.iters = None
         self.table: list[TableRow] = []
 
     @property
-    def title(self) -> str:
+    def title(self) -> str | None:
         return self._title
 
-    def set_title(self, title: str):
+    def set_title(self, title: str | None):
         self._title = title
         self.notify_observers()
 
     @property
-    def description(self) -> str:
+    def description(self) -> str | None:
         return self._description
 
-    def set_description(self, description: str):
+    def set_description(self, description: str | None):
         self._description = description
         self.notify_observers()
 
@@ -148,39 +147,3 @@ class BaseSNEModel(BaseGraphicModel):
             else:
                 graphic.add_graph(fy=make_callable(solutions[0]), color=var[1])
         return graphic
-
-    def is_converges(self, func1: str, func2: str) -> bool:
-        self.solve_log.append("\nПроверка итерационной сходимости\n")
-
-        fi_x_y = (
-            solve_rel_var(func1, "x")[0],
-            solve_rel_var(func2, "y")[0]
-        )
-
-        fi_1_x_y = (
-            diff(fi_x_y[0], "x"),
-            diff(fi_x_y[0], "y")
-        )
-
-        fi_2_x_y = (
-            diff(fi_x_y[1], "x"),
-            diff(fi_x_y[1], "y")
-        )
-
-        a, b = self.initial_guess
-
-        one = abs(make_callable(fi_1_x_y[0])(a, b)) + abs(make_callable(fi_1_x_y[1])(a, b))
-        two = abs(make_callable(fi_2_x_y[0])(a, b)) + abs(make_callable(fi_2_x_y[1])(a, b))
-
-        self.solve_log.append(f"fi(x, y) = {fi_x_y}")
-        self.solve_log.append(f"fi₁'(x, y) = {fi_1_x_y}")
-        self.solve_log.append(f"fi₂'(x, y) = {fi_2_x_y}")
-        self.solve_log.append(f"\na = {a}\nb = {b}\n")
-        self.solve_log.append(f"abs(fi₁.₁'(a, b)) + abs(fi₁.₂'(a, b)) = {one} {'<' if one < 1 else '>'} 1")
-        self.solve_log.append(f"abs(fi₂.₁'(a, b)) + abs(fi₂.₂'(a, b)) = {two} {'<' if two < 1 else '>'} 1")
-
-        if not (result := one < 1 and two < 1):
-            self.solve_log.append("\nУсловие сходимости не выполнено\n")
-        else:
-            self.solve_log.append("\nУсловие сходимости выполнено\n")
-        return result
