@@ -169,7 +169,7 @@ class BaseNIModel(BaseGraphicModel):
         self.notify_observers()
 
     @abstractmethod
-    def calc(self, in_thread: bool = False) -> None:
+    def calc(self) -> None:
         ...
 
     def validation_error(self, error):
