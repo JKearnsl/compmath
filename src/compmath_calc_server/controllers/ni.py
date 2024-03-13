@@ -5,7 +5,8 @@ from compmath_calc_server.models.ni import (
     lrm,
     mrm,
     rrm,
-    sm,
+    sm2,
+    sm1,
     tm,
     intermediate
 )
@@ -29,9 +30,14 @@ def calculate_rrm(data: InputNIModel):
     return NIResponse(content=rrm.calc(data))
 
 
-@router.post("/sm/calculate", response_model=NIResponse, status_code=200)
-def calculate_sm(data: InputNIModel):
-    return NIResponse(content=sm.calc(data))
+@router.post("/sm2/calculate", response_model=NIResponse, status_code=200)
+def calculate_sm2(data: InputNIModel):
+    return NIResponse(content=sm2.calc(data))
+
+
+@router.post("/sm1/calculate", response_model=NIResponse, status_code=200)
+def calculate_sm1(data: InputNIModel):
+    return NIResponse(content=sm1.calc(data))
 
 
 @router.post("/tm/calculate", response_model=NIResponse, status_code=200)

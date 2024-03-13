@@ -17,9 +17,6 @@ def calc(data: InputNIModel) -> OutputNIModel:
     if a > b:
         raise BadRequest("Левая граница интервала не может быть больше правой")
 
-    if n % 2 != 0:
-        raise BadRequest("Количество интервалов должно быть четным")
-
     graphic = GraphicBuilder(x_limits=x_limits, y_limits=y_limits)
     graphic.add_graph(function)
     graphic.add_graph(lambda x: 0, width=2, x_limits=(a, b))

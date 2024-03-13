@@ -8,7 +8,8 @@ from compmath.models.ni.intermediate import InterModel
 from compmath.models.ni.lrm import LRModel
 from compmath.models.ni.mrm import MRModel
 from compmath.models.ni.rrm import RRModel
-from compmath.models.ni.sm import SModel
+from compmath.models.ni.sm1 import S1Model
+from compmath.models.ni.sm2 import S2Model
 from compmath.models.ni.tm import TModel
 from compmath.utils.observer import DObserver
 from compmath.utils.ts_meta import TSMeta
@@ -57,15 +58,19 @@ class NIView(QWidget, DObserver, metaclass=TSMeta):
         tm = NItemView(TModel(self.api_factory.create_ni()), self.widgets_factory, self)
         self.ui.central_layout.addWidget(tm)
 
-        sm = NItemView(SModel(self.api_factory.create_ni()), self.widgets_factory, self)
-        self.ui.central_layout.addWidget(sm)
+        sm1 = NItemView(S1Model(self.api_factory.create_ni()), self.widgets_factory, self)
+        self.ui.central_layout.addWidget(sm1)
+
+        sm2 = NItemView(S2Model(self.api_factory.create_ni()), self.widgets_factory, self)
+        self.ui.central_layout.addWidget(sm2)
 
         inter.model_loaded()
         lrm.model_loaded()
         rrm.model_loaded()
         mrm.model_loaded()
         tm.model_loaded()
-        sm.model_loaded()
+        sm1.model_loaded()
+        sm2.model_loaded()
 
     def model_loaded(self):
         self.model_changed()

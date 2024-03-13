@@ -13,14 +13,16 @@ class NIClient(APIBase):
     lrmCalculated = pyqtSignal(object)
     mrmCalculated = pyqtSignal(object)
     rrmCalculated = pyqtSignal(object)
-    smCalculated = pyqtSignal(object)
+    sm1Calculated = pyqtSignal(object)
+    sm2Calculated = pyqtSignal(object)
     tmCalculated = pyqtSignal(object)
     intermediateCalculated = pyqtSignal(object)
 
     lrmError = pyqtSignal(str)
     mrmError = pyqtSignal(str)
     rrmError = pyqtSignal(str)
-    smError = pyqtSignal(str)
+    sm1Error = pyqtSignal(str)
+    sm2Error = pyqtSignal(str)
     tmError = pyqtSignal(str)
     intermediateError = pyqtSignal(str)
 
@@ -126,7 +128,7 @@ class NIClient(APIBase):
             [self.rrmError.emit]
         )
 
-    def calc_sm(
+    def calc_sm1(
             self,
             a: float,
             b: float,
@@ -136,7 +138,7 @@ class NIClient(APIBase):
             y_limits: tuple[float, float]
     ) -> None:
         """
-        Вычисление методом средних прямоугольников
+        Вычисление методом Симпсона 1
 
         :param a: левая граница интервала
         :param b: правая граница интервала
@@ -147,7 +149,7 @@ class NIClient(APIBase):
         :return: список графиков, логов, результатов и названий моделей
         """
         self.post(
-            urljoin(self._base_url, "/ni/sm/calculate"),
+            urljoin(self._base_url, "/ni/sm1/calculate"),
             {
                 "a": a,
                 "b": b,
@@ -156,8 +158,42 @@ class NIClient(APIBase):
                 "x_limits": x_limits,
                 "y_limits": y_limits
             },
-            [lambda content: self._calculated(self.smCalculated, content)],
-            [self.smError.emit]
+            [lambda content: self._calculated(self.sm1Calculated, content)],
+            [self.sm1Error.emit]
+        )
+
+    def calc_sm2(
+            self,
+            a: float,
+            b: float,
+            intervals: int,
+            fx: str,
+            x_limits: tuple[float, float],
+            y_limits: tuple[float, float]
+    ) -> None:
+        """
+        Вычисление методом Симпсона 2
+
+        :param a: левая граница интервала
+        :param b: правая граница интервала
+        :param intervals: количество интервалов
+        :param fx: функция
+        :param x_limits: пределы по оси x
+        :param y_limits: пределы по оси y
+        :return: список графиков, логов, результатов и названий моделей
+        """
+        self.post(
+            urljoin(self._base_url, "/ni/sm2/calculate"),
+            {
+                "a": a,
+                "b": b,
+                "intervals": intervals,
+                "fx": fx,
+                "x_limits": x_limits,
+                "y_limits": y_limits
+            },
+            [lambda content: self._calculated(self.sm2Calculated, content)],
+            [self.sm2Error.emit]
         )
 
     def calc_tm(
