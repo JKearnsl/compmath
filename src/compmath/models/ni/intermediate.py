@@ -1,3 +1,5 @@
+import numpy as np
+
 from compmath.api.ni import NIClient
 from compmath.models.base import BaseGraphicModel
 from compmath.models.graphic import Graphic
@@ -77,9 +79,37 @@ class InterModel(BaseGraphicModel):
         )
 
     def process_values(self, content: tuple[Graphic, float, float, float, float]) -> None:
-        self.graphics.append(content[0])
+        # self.graphics.append(content[0])
         self.reference_result = content[1]
         self.surface_area = content[2]
         self.volume = content[3]
         self.arc_length = content[4]
+
+        # Ox: x
+        # Oy: f(x) × sin(y)
+        # Oz: f(x) × sin(y)
+
+        x_data = np.arange(
+            self._x_limits[0],
+            self._x_limits[1],
+            0.1
+        )
+
+        y_data = np.array(
+            [np.sin(x) * np.sin(y) for x, y in zip(x_data, [
+                np.sin(x) for x in x_data
+            ])]
+        )
+
+
+        z_data = np.array([[np.sin(x) * np.cos(y) for x in x_data] for y in y_data])
+        print(len(x_data), len(y_data), len(z_data))
+
+
+
+        graphic = Graphic()
+        graphic.add_surface(
+            x_data, y_data, z_data
+        )
+        self.graphics.append(graphic)
         self.notify_observers()
