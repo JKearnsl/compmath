@@ -1,11 +1,8 @@
 from copy import deepcopy
-from math import pi
-from typing import Callable, Protocol, cast, Sequence
+from typing import Callable, Protocol, Sequence
 
 import numpy as np
-from scipy import LowLevelCallable
-from scipy.integrate import quad
-from sympy import sympify, lambdify, SympifyError, Basic, solve, symbols, integrate, diff, sqrt, parse_expr
+from sympy import sympify, lambdify, SympifyError, Basic, solve
 from sympy.core import Symbol
 
 
@@ -57,7 +54,10 @@ def make_callable(func: str | Basic) -> FuncReturn:
         expr = func
 
     # Список символов из выражения
-    symbols_str_list = [str(s) for s in expr.free_symbols if isinstance(s, Symbol)]
+    try:
+        symbols_str_list = [str(s) for s in expr.free_symbols if isinstance(s, Symbol)]
+    except AttributeError:
+        raise FunctionValidateError(f"Invalid literal: {func}")
 
     if len(symbols_str_list) > 1 and "x" in symbols_str_list:
         symbols_str_list.sort(key=lambda var: var != "x")
@@ -145,61 +145,6 @@ def line_between_points(
     m = (y2 - y1) / (x2 - x1)
     b = y1 - m * x1
     return lambda x: m * x + b
-
-
-def integral(fx: Callable[[float | int], float] | LowLevelCallable, a: float | int, b: float | int) -> float:
-    """
-    Вычисление определенного интеграла
-
-    :param fx: функция
-    :param a: нижний предел
-    :param b: верхний предел
-    :param symbol: символ
-    :return: значение определенного интеграла
-    """
-    integral_value, error = cast(tuple[float, float], quad(fx, a, b))
-    return integral_value
-
-
-def arc_length(fx_str: str, a: float | int, b: float | int, symbol: str) -> float:
-    """
-    Вычисление длины дуги
-
-    :param fx_str: функция
-    :param a: нижний предел
-    :param b: верхний предел
-    :param symbol: символ
-    :return: длина дуги
-    """
-    x = symbols('x')
-    fx = lambdify(x, fx_str, "numpy")
-
-    # вычислите производную
-    df_dx_str = str(diff(fx_str, 'x'))
-    df_dx = lambdify(x, df_dx_str, "numpy")
-
-    def integrand(x):
-        return sqrt(1 + df_dx(x) ** 2)
-
-    result, error = cast(tuple[float, float], quad(integrand, a, b))
-    return result
-
-
-def surface_area(fx_str: str, a: float | int, b: float | int, symbol: str) -> float:
-    """
-    Вычисление площади поверхности
-
-    :param fx_str: функция
-    :param a: нижний предел
-    :param b: верхний предел
-    :param symbol: символ
-    :return: площадь поверхности
-    """
-    func = parse_expr(fx_str)
-
-    df_dx = diff(func, symbol)
-    result = integrate(func * sqrt(1 + df_dx ** 2), (symbol, a, b))
-    return 2 * pi * result
 
 
 def gauss_calc(
