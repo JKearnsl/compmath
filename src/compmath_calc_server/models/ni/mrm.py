@@ -31,8 +31,8 @@ def calc(data: InputNIModel) -> OutputNIModel:
     h = (b - a) / n
     result = 0
     for i in range(n):
-        x = a + i * h + h / 2
-        y = function(x)
+        x = a + i * h
+        y = function(x + h / 2)
         s = y * h
         result += s
 
