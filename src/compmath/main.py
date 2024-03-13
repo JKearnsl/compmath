@@ -61,7 +61,7 @@ class CompMathApp(QApplication):
                 "--bind",
                 f"{config.VAR.CALC_SERVER.HOST}:{config.VAR.CALC_SERVER.PORT}",
                 "--workers",
-                "4",
+                "3",
                 "--worker-class",
                 "uvicorn.workers.UvicornWorker",
                 "compmath_calc_server.main:application"
