@@ -1,5 +1,7 @@
 from collections import deque
 
+from sympy import integrate, sympify
+
 from compmath_calc_server.models.ni.dto import TableRow
 from compmath_calc_server.utils.func import make_callable
 from compmath_calc_server.exceptions import BadRequest
@@ -47,10 +49,16 @@ def calc(data: InputNIModel) -> OutputNIModel:
         fill="red" if n > 100 else None
     )
 
+    reference_result = integrate(sympify(data.fx), ('x', a, b)).evalf()
+    abs_delta = abs(reference_result - result)
+    relative_delta = abs(abs_delta / reference_result) * 100
+
     return OutputNIModel(
         graphic_items=graphic.build(),
         table=list(rows),
-        result=result
+        result=result,
+        abs_delta=abs_delta,
+        relative_delta=relative_delta
     )
 
 

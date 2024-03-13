@@ -1,3 +1,5 @@
+from sympy import integrate, sympify
+
 from compmath_calc_server.utils.func import make_callable
 from compmath_calc_server.exceptions import BadRequest
 from compmath_calc_server.models import GraphicBuilder
@@ -35,8 +37,14 @@ def calc(data: InputNIModel) -> OutputNIModel:
 
     result = h / 3 * (function(a) + 4 * sum1 + 2 * sum2 + function(b))
 
+    reference_result = integrate(sympify(data.fx), ('x', a, b)).evalf()
+    abs_delta = abs(reference_result - result)
+    relative_delta = abs(abs_delta / reference_result) * 100
+
     return OutputNIModel(
         graphic_items=graphic.build(),
+        table=[],
         result=result,
-        table=[]
+        abs_delta=abs_delta,
+        relative_delta=relative_delta
     )

@@ -28,6 +28,8 @@ class TableRow(BaseModel):
 
 class OutputNIModel(BaseModel):
     graphic_items: list[GraphicItem]
+    abs_delta: float
+    relative_delta: float
     table: list[TableRow]
     result: float
 
