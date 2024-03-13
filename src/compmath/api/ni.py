@@ -273,6 +273,8 @@ class NIClient(APIBase):
             ]
         )
         result = content['result']
+        abs_delta = content['abs_delta']
+        relative_delta = content['relative_delta']
 
         for item in plot_items:
             if isinstance(item, GraphModel):
@@ -288,4 +290,4 @@ class NIClient(APIBase):
         graphic = Graphic()
         graphic.graphs.extend(plot_items)
 
-        signal.emit((graphic, table, result))
+        signal.emit((graphic, table, result, abs_delta, relative_delta))
