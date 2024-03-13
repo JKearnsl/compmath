@@ -10,6 +10,7 @@ from compmath.views.widgets.combo_box import ComboBox
 from compmath.views.widgets.dialog import Dialog
 from compmath.views.widgets.double_spin_box import DoubleSpinBox
 from compmath.views.widgets.graphic import Graphic
+from compmath.views.widgets.gl import GLWidget
 from compmath.views.widgets.heading import Heading1
 from compmath.views.widgets.heading import Heading2
 from compmath.views.widgets.heading import Heading3
@@ -235,6 +236,16 @@ class WidgetsFactory:
 
     def graphic(self, *, parent: QWidgetLike = None) -> Graphic:
         return Graphic(
+            self.theme.text_tertiary,
+            self.theme.hover,
+            self.theme.second_background,
+            self.theme.first_background,
+            self.theme.text_header,
+            parent
+        )
+
+    def gl_widget(self, *, parent: QWidgetLike = None) -> GLWidget:
+        return GLWidget(
             self.theme.text_tertiary,
             self.theme.hover,
             self.theme.second_background,
