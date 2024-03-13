@@ -188,9 +188,10 @@ def lclif(
     y = [point[1] for point in points]
 
     def f(t): return 1, t, t ** 3, t ** 5, t ** 7
+    log.append(f"Функция: f(t) = 1, t, t^3, t^5, t^7\n")
 
     k = linfit(x, y, f)
-    log.append(f"Коэффициенты линейной комбинации: K = \n{'\n'.join([str(_) for _ in k])}\n")
+    log.append(f"Коэффициенты линейной комбинации (linfit): K = \n{'\n'.join([str(_) for _ in k])}\n")
 
     def k1(t): return np.dot(k, f(t))
 
