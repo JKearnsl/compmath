@@ -1,5 +1,5 @@
 from PyQt6 import sip
-from PyQt6.QtCore import Qt, QThread, QLocale
+from PyQt6.QtCore import Qt, QLocale
 from PyQt6.QtGui import QDoubleValidator, QIntValidator
 from PyQt6.QtWidgets import (
     QWidget,
@@ -62,12 +62,12 @@ class NItemView(QWidget):
         error_label.setFixedWidth(200)
         error_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         error_label.setStyleSheet("""
-                    QLabel {
-                        color: red;
-                        padding: 0px;
-                        margin: 0px;
-                    }
-                """)
+            QLabel {
+                color: red;
+                padding: 0px;
+                margin: 0px;
+            }
+        """)
         self.error_label = error_label
         error_layout.addWidget(error_label, alignment=Qt.AlignmentFlag.AlignLeft)
 
@@ -123,6 +123,18 @@ class NItemView(QWidget):
         self.result_input = result_input
         form.addRow(result_label, result_input)
 
+        abs_delta_label = widgets_factory.label("Абсолютная Δ: ")
+        abs_delta_input = widgets_factory.line_edit()
+        abs_delta_input.setReadOnly(True)
+        self.abs_delta_input = abs_delta_input
+        form.addRow(abs_delta_label, abs_delta_input)
+
+        relative_delta_label = widgets_factory.label("Относительная Δ: ")
+        relative_delta_input = widgets_factory.line_edit()
+        relative_delta_input.setReadOnly(True)
+        self.relative_delta_input = relative_delta_input
+        form.addRow(relative_delta_label, relative_delta_input)
+
         buttons_layout = QVBoxLayout()
         buttons_layout.setContentsMargins(0, 0, 0, 0)
         buttons_layout.setAlignment(Qt.AlignmentFlag.AlignRight)
@@ -170,6 +182,14 @@ class NItemView(QWidget):
             self.result_input.setText(str(self.model.result))
             self.in_calc_state()
             self.result_input.setCursorPosition(0)
+
+        if self.model.abs_delta is not None:
+            self.abs_delta_input.setText(str(self.model.abs_delta))
+            self.abs_delta_input.setCursorPosition(0)
+
+        if self.model.relative_delta is not None:
+            self.relative_delta_input.setText(str(self.model.relative_delta))
+            self.relative_delta_input.setCursorPosition(0)
 
         if self.model.table:
             self.table_button.setDisabled(False)
