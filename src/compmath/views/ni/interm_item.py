@@ -126,10 +126,9 @@ class NItermView(QWidget):
         left.addWidget(calc_button)
         self.calc_button = calc_button
 
-        graphic = widgets_factory.graphic()
+        graphic = widgets_factory.gl_widget()
         graphic.setFixedWidth(350)
         graphic.setFixedHeight(350)
-        graphic.setSliderEnabled(False)
         self.graphic = graphic
         bottom.addWidget(graphic)
 
@@ -139,7 +138,6 @@ class NItermView(QWidget):
         fx_input.textChanged.connect(lambda text: self.model.set_fx(text))
         interval_a_input.textChanged.connect(self.interval_input_changed)
         interval_b_input.textChanged.connect(self.interval_input_changed)
-        graphic.limitChanged.connect(self.limit_changed)
         calc_button.clicked.connect(self.calc_button_clicked)
 
     def model_changed(self):
@@ -150,7 +148,7 @@ class NItermView(QWidget):
 
         if self.model.reference_result:
             self.reference_result_input.setText(str(self.model.reference_result))
-            self.in_calc_state()
+            self.in_normal_state()
             self.reference_result_input.setCursorPosition(0)
 
         if self.model.surface_area:
@@ -166,9 +164,8 @@ class NItermView(QWidget):
             self.arc_length_input.setCursorPosition(0)
 
         if self.model.graphics:
-            self.graphic.clear_plots()
-            for plot in self.model.graphics:
-                self.graphic.add_plot(plot.plot_items())
+            items = self.model.graphics[0].plot_items()
+            self.graphic.set_element(items)
 
     def model_loaded(self):
         self.header.blockSignals(True)
@@ -182,8 +179,6 @@ class NItermView(QWidget):
         self.fx_input.setText(self.model.fx)
         self.interval_a_input.setText(str(self.model.interval[0]))
         self.interval_b_input.setText(str(self.model.interval[1]))
-        self.graphic.set_x_limits(self.model.x_limits)
-        self.graphic.set_y_limits(self.model.y_limits)
 
         self.header.blockSignals(False)
         self.fx_input.blockSignals(False)
@@ -197,6 +192,7 @@ class NItermView(QWidget):
 
     def validation_error(self, message: str):
         self.error_label.setText(message)
+        self.in_normal_state()
 
     def interval_input_changed(self):
         value_a = self.interval_a_input.text()
@@ -231,7 +227,7 @@ class NItermView(QWidget):
         self.interval_a_input.setDisabled(True)
         self.interval_b_input.setDisabled(True)
 
-    def in_calc_state(self):
+    def in_normal_state(self):
         self.calc_button.setDisabled(False)
         self.fx_input.setDisabled(False)
         self.interval_a_input.setDisabled(False)
