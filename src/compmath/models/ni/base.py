@@ -24,6 +24,8 @@ class BaseNIModel(BaseGraphicModel):
         self._interval = (0, 1)
         self._intervals = 1
         self.result = None
+        self.abs_delta = None
+        self.relative_delta = None
         self.table: list[TableRow] = []
 
     @property
@@ -111,3 +113,11 @@ class BaseNIModel(BaseGraphicModel):
     @abstractmethod
     def calc(self) -> None:
         ...
+
+    def process_values(self, content: tuple[Graphic, list[TableRow], float, float, float]) -> None:
+        self.graphics.append(content[0])
+        self.table = content[1]
+        self.result = content[2]
+        self.abs_delta = content[3]
+        self.relative_delta = content[4]
+        self.notify_observers()

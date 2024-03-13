@@ -36,9 +36,3 @@ class TModel(BaseNIModel):
             self._x_limits,
             self._y_limits
         )
-
-    def process_values(self, content: tuple[Graphic, list[TableRow], float]) -> None:
-        self.graphics.append(content[0])
-        self.table = content[1]
-        self.result = content[2]
-        self.notify_observers()
