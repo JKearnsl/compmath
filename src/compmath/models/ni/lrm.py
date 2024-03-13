@@ -1,6 +1,5 @@
 from compmath.api.ni import NIClient
-from compmath.models.graphic import Graphic
-from compmath.models.ni.base import BaseNIModel, TableRow
+from compmath.models.ni.base import BaseNIModel
 
 
 class LRModel(BaseNIModel):

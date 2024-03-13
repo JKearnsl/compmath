@@ -1,9 +1,5 @@
-from collections import deque
-
 from compmath.api.ni import NIClient
-from compmath.models.ni.base import BaseNIModel, TableRow
-from compmath.models.graphic import Graphic
-from compmath.utils.func import make_callable
+from compmath.models.ni.base import BaseNIModel
 
 
 class TModel(BaseNIModel):
