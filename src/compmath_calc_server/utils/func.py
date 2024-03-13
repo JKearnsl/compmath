@@ -4,11 +4,10 @@ from typing import Callable, Protocol, cast, Sequence
 
 import numpy as np
 from numpy.linalg import lstsq
-from scipy import LowLevelCallable
 from scipy.integrate import quad
 from scipy.interpolate import interp1d
 from scipy.optimize import curve_fit
-from sympy import sympify, lambdify, SympifyError, Basic, solve, symbols, integrate, diff, sqrt, parse_expr
+from sympy import sympify, lambdify, SympifyError, Basic, solve, symbols, diff, sqrt
 from sympy.core import Symbol
 
 
@@ -375,20 +374,6 @@ def lspline(x: list[float], y: list[float]):
     return interp1d(x_data, y_data, kind='linear', fill_value="extrapolate")
 
 
-def integral(fx: Callable[[float | int], float] | LowLevelCallable, a: float | int, b: float | int) -> float:
-    """
-    Вычисление определенного интеграла
-
-    :param fx: функция
-    :param a: нижний предел
-    :param b: верхний предел
-    :param symbol: символ
-    :return: значение определенного интеграла
-    """
-    integral_value, error = cast(tuple[float, float], quad(fx, a, b))
-    return integral_value
-
-
 def arc_length(fx_str: str, a: float | int, b: float | int, symbol: str) -> float:
     """
     Вычисление длины дуги
@@ -400,9 +385,8 @@ def arc_length(fx_str: str, a: float | int, b: float | int, symbol: str) -> floa
     :return: длина дуги
     """
     x = symbols('x')
-    fx = lambdify(x, fx_str, "numpy")
 
-    # вычислите производную
+    # Производная функции
     df_dx_str = str(diff(fx_str, 'x'))
     df_dx = lambdify(x, df_dx_str, "numpy")
 
@@ -423,11 +407,17 @@ def surface_area(fx_str: str, a: float | int, b: float | int, symbol: str) -> fl
     :param symbol: символ
     :return: площадь поверхности
     """
-    func = parse_expr(fx_str)
+    x = symbols('x')
+    fx_lambda = lambdify(symbol, fx_str, 'numpy')
+    df_dx_str = str(diff(fx_str, 'x'))
+    df_dx = lambdify(x, df_dx_str, "numpy")
 
-    df_dx = diff(func, symbol)
-    result = integrate(func * sqrt(1 + df_dx ** 2), (symbol, a, b))
-    return 2 * pi * result
+    def integrand(x):
+        return fx_lambda(x) * sqrt(1 + df_dx(x) ** 2)
+
+    surface_area, error = cast(tuple[float, float], quad(integrand, a, b))
+    surface_area *= 2 * pi
+    return surface_area
 
 
 def gauss_calc(
