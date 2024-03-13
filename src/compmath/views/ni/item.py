@@ -184,11 +184,17 @@ class NItemView(QWidget):
             self.result_input.setCursorPosition(0)
 
         if self.model.abs_delta is not None:
-            self.abs_delta_input.setText(str(self.model.abs_delta))
+            abs_delta = format(self.model.abs_delta, ".17f")
+            if '.' in abs_delta:
+                abs_delta = abs_delta.rstrip('0').rstrip('.')
+            self.abs_delta_input.setText(abs_delta)
             self.abs_delta_input.setCursorPosition(0)
 
         if self.model.relative_delta is not None:
-            self.relative_delta_input.setText(str(self.model.relative_delta))
+            relative_delta = format(self.model.relative_delta, ".17f")
+            if '.' in relative_delta:
+                relative_delta = relative_delta.rstrip('0').rstrip('.')
+            self.relative_delta_input.setText(relative_delta)
             self.relative_delta_input.setCursorPosition(0)
 
         if self.model.table:
