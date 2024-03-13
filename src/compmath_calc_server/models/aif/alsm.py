@@ -15,8 +15,6 @@ def calc(data: InputAIFModel) -> list[ResultAIFItem]:
 
     points = sorted(data.points, key=lambda _: _[0])
 
-    results.append(linear_regression(points, data.x_limits, data.y_limits))
-
     x_vector, y_vector = zip(*points)
     matrix_a = cast(list[list], [[None for _ in range(4)] for _ in range(4)])
     for i, row in enumerate(matrix_a):
@@ -27,9 +25,9 @@ def calc(data: InputAIFModel) -> list[ResultAIFItem]:
     for i in range(len(b_vector)):
         b_vector[i] = sum(y * x ** i for x, y in zip(x_vector, y_vector))
 
+    results.append(linear_regression(points, matrix_a, b_vector, data.x_limits, data.y_limits))
     results.append(polynomial_regression(points, 2, matrix_a, b_vector, data.x_limits, data.y_limits))
     results.append(polynomial_regression(points, 3, matrix_a, b_vector, data.x_limits, data.y_limits))
-    results.append(polynomial_regression(points, 4, matrix_a, b_vector, data.x_limits, data.y_limits))
     results.append(lclif(points, data.x_limits, data.y_limits))
 
     results.append(ndp(points, expfit, data.x_limits, data.y_limits))
@@ -50,6 +48,8 @@ def calc(data: InputAIFModel) -> list[ResultAIFItem]:
 
 def linear_regression(
         points: list[tuple[float, float]],
+        a_matrix: list[list],
+        b_vector: list,
         x_limits: tuple[float | int, float | int],
         y_limits: tuple[float | int, float | int]
 ) -> RegressReturn:
@@ -58,6 +58,8 @@ def linear_regression(
 
     :param points: отсортированный двумерный массив точек (x, y)
     :param x_limits:
+    :param a_matrix
+    :param b_vector
     :param y_limits:
     :return: график, лог
     """
@@ -91,6 +93,28 @@ def linear_regression(
     for point in points:
         graphic.add_point(point[0], point[1])
     graphic.add_graph(func)
+
+    # Gauss
+    gauss_vector = gauss_calc(deepcopy(a_matrix), deepcopy(b_vector), 2)
+    log.append(
+        f"\nМатрица A: \n{'\n'.join(['\t'.join([str(round(_, 4)) for _ in row[:2]]) for row in a_matrix[:2]])}"
+    )
+    log.append(
+        f"\nВектор B: \n{'\n'.join([str(round(_, 5)) for _ in b_vector[:2]])}"
+    )
+    log.append(
+        f"\nКоэффициенты полинома (метод Гаусса): "
+        f"\n{'\n'.join([str(coefficient) for coefficient in gauss_vector[0]])}"
+    )
+    log.append(
+        f"\nВектор невязок: "
+        f"\n{'\n'.join([str(round(_, 5)) for _ in gauss_vector[1]])}"
+    )
+
+    log.append("\nТреугольная матрица\n")
+    t_matrix = cast(Sequence[Sequence[float]], gauss_vector[2])
+    for row in t_matrix:
+        log.append("\t".join(str(round(cell, 2)) for cell in row))
 
     return graphic.build(), log, (sum_diff, r), "Линейная регрессия"
 
@@ -144,12 +168,12 @@ def polynomial_regression(
     graphic.add_graph(cast(Callable[[float], float], polynomial))
 
     # Gauss
-    gauss_vector = gauss_calc(deepcopy(a_matrix), deepcopy(b_vector), degree)
+    gauss_vector = gauss_calc(deepcopy(a_matrix), deepcopy(b_vector), degree + 1)
     log.append(
-        f"\nМатрица A: \n{'\n'.join(['\t'.join([str(round(_, 4)) for _ in row]) for row in a_matrix])}"
+        f"\nМатрица A: \n{'\n'.join(['\t'.join([str(round(_, 4)) for _ in row[:degree + 1]]) for row in a_matrix[:degree + 1]])}"
     )
     log.append(
-        f"\nВектор B: \n{'\n'.join([str(round(_, 5)) for _ in b_vector])}"
+        f"\nВектор B: \n{'\n'.join([str(round(_, 5)) for _ in b_vector[:degree + 1]])}"
     )
     log.append(
         f"\nКоэффициенты полинома (метод Гаусса): "
