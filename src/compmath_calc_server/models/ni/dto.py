@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from compmath_calc_server.models.graphic import GraphicItem
+from compmath_calc_server.models.graphic import GraphicItem, MeshModel
 
 
 class InputNIModel(BaseModel):
@@ -15,8 +15,6 @@ class InputNInterModel(BaseModel):
     a: float
     b: float
     fx: str
-    x_limits: tuple[float, float]
-    y_limits: tuple[float, float]
 
 
 class TableRow(BaseModel):
@@ -35,7 +33,7 @@ class OutputNIModel(BaseModel):
 
 
 class OutputNInterModel(BaseModel):
-    graphic_items: list[GraphicItem]
+    graphic_items: list[MeshModel]
     reference_result: float
     surface_area: float
     volume: float
