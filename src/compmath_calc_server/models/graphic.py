@@ -36,7 +36,13 @@ class PolygonModel(BaseModel):
     fill: str | None
 
 
-type GraphicItem = PointModel | GraphModel | RectModel | PolygonModel
+class MeshModel(BaseModel):
+    vertexes: list[list[float]]
+    faces: list[list[int]]
+    shader: str
+
+
+type GraphicItem = PointModel | GraphModel | RectModel | PolygonModel | MeshModel
 
 
 class GraphicBuilder:
@@ -159,6 +165,20 @@ class GraphicBuilder:
                 color=color,
                 width=width,
                 fill=fill
+            )
+        )
+
+    def add_mesh(
+            self,
+            vertexes: list[list[float]],
+            faces: list[list[int]],
+            shader: str = "normalColor"
+    ) -> None:
+        self.graphs.append(
+            MeshModel(
+                vertexes=vertexes,
+                faces=faces,
+                shader=shader
             )
         )
 
