@@ -1,5 +1,5 @@
 from dataclasses import fields
-from typing import Type, List
+from typing import Type, List, Any
 
 
 def dict_to_dataclass(d: dict, cls: Type) -> object:
@@ -10,7 +10,7 @@ def dict_to_dataclass(d: dict, cls: Type) -> object:
         raise ValueError(f"The dictionary keys {d.keys()} do not match the fields of {cls}")
 
 
-def dicts_to_dataclasses(dict_list: List[dict], classes: list) -> List[object]:
+def dicts_to_dataclasses(dict_list: List[dict], classes: list) -> List[Any]:
     result = []
     for d in dict_list:
         for cls in classes:
