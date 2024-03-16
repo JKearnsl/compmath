@@ -7,7 +7,7 @@ import pyqtgraph as pg
 from PyQt6.QtCore import QRectF, QPointF
 from PyQt6.QtGui import QPicture, QPainter, QPolygonF
 from pyqtgraph import PlotDataItem
-from pyqtgraph.opengl import GLSurfacePlotItem
+from pyqtgraph.opengl import GLMeshItem, MeshData
 
 
 @dataclass
@@ -38,12 +38,10 @@ class RectModel:
 
 
 @dataclass
-class SurfaceModel:
-    x: Sequence[float | int]
-    y: Sequence[float | int]
-    z: Sequence[float | int]
+class MeshModel:
+    vertexes: list[list[float]]
+    faces: list[list[int]]
     shader: str
-    color: tuple[float, float, float, float]
 
 
 @dataclass
@@ -245,16 +243,14 @@ class Graphic:
                     ),
                     brush=pg.mkBrush(graph.fill) if graph.fill else None
                 )
-            elif isinstance(graph, SurfaceModel):
-                plot_item = GLSurfacePlotItem(
-                    x=graph.x,
-                    y=graph.y,
-                    z=graph.z,
-                    shader=graph.shader,
-                    color=graph.color
+            elif isinstance(graph, MeshModel):
+                plot_item = GLMeshItem(
+                    meshdata=MeshData(
+                        vertexes=np.array(graph.vertexes),
+                        faces=np.array(graph.faces),
+                    ),
+                    shader=graph.shader
                 )
-                plot_item.scale(16. / 49., 16. / 49., 1.0)
-                plot_item.translate(-3, -3, 0)
             else:
                 raise ValueError(f"Неизвестный тип графика {type(graph)}")
             plot_items.append(plot_item)
@@ -311,20 +307,16 @@ class Graphic:
             )
         )
 
-    def add_surface(
+    def add_mesh(
             self,
-            x: Sequence[float | int],
-            y: Sequence[float | int],
-            z: Sequence[float | int],
-            shader: str = 'shaded',
-            color: tuple[float, float, float, float] = (0.5, 0.5, 0.5, 1)
+            vertexes: list[list[float]],
+            faces: list[list[int]],
+            shader: str = "normalColor"
     ) -> None:
         self.graphs.append(
-            SurfaceModel(
-                x=x,
-                y=y,
-                z=z,
-                shader=shader,
-                color=color
+            MeshModel(
+                vertexes=vertexes,
+                faces=faces,
+                shader=shader
             )
         )
