@@ -4,7 +4,7 @@ import numpy as np
 from PyQt6.QtCore import pyqtSignal
 
 from compmath.api.base import APIBase, urljoin
-from compmath.models.graphic import Graphic, PolygonModel, RectModel, GraphModel, PointModel
+from compmath.models.graphic import Graphic, PolygonModel, RectModel, GraphModel, PointModel, MeshModel
 from compmath.models.ni.base import TableRow
 from compmath.utils.data import dicts_to_dataclasses
 
@@ -234,9 +234,7 @@ class NIClient(APIBase):
             self,
             a: float,
             b: float,
-            fx: str,
-            x_limits: tuple[float, float],
-            y_limits: tuple[float, float]
+            fx: str
     ) -> None:
         """
         Вычисление промежуточных значений
@@ -244,8 +242,6 @@ class NIClient(APIBase):
         :param a: левая граница интервала
         :param b: правая граница интервала
         :param fx: функция
-        :param x_limits: пределы по оси x
-        :param y_limits: пределы по оси y
         :return: список графиков, логов, результатов и названий моделей
         """
         self.post(
@@ -253,9 +249,7 @@ class NIClient(APIBase):
             {
                 "a": a,
                 "b": b,
-                "fx": fx,
-                "x_limits": x_limits,
-                "y_limits": y_limits
+                "fx": fx
             },
             [lambda content: self._calculated_interm(self.intermediateCalculated, content)],
             [self.intermediateError.emit]
@@ -265,10 +259,7 @@ class NIClient(APIBase):
         plot_items = dicts_to_dataclasses(
             content['graphic_items'],
             [
-                PolygonModel,
-                RectModel,
-                GraphModel,
-                PointModel
+                MeshModel
             ]
         )
         reference_result = content['reference_result']
@@ -276,19 +267,14 @@ class NIClient(APIBase):
         volume = content['volume']
         arc_length = content['arc_length']
 
-        # for item in plot_items:
-        #     if isinstance(item, GraphModel):
-        #         if None in item.x_data:
-        #             for i, coord in enumerate(item.x_data):
-        #                 if coord is None:
-        #                     item.x_data[i] = np.nan
-        #         if None in item.y_data:
-        #             for i, coord in enumerate(item.y_data):
-        #                 if coord is None:
-        #                     item.y_data[i] = np.nan
-
         graphic = Graphic()
-        graphic.graphs.extend(plot_items)
+        if plot_items:
+            item = plot_items[0]
+            graphic.add_mesh(
+                vertexes=item.vertexes,
+                faces=item.faces,
+                shader=item.shader
+            )
 
         signal.emit((graphic, reference_result, surface_area, volume, arc_length))
 
