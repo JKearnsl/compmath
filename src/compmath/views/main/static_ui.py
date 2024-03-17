@@ -1,5 +1,4 @@
-from PyQt6 import QtCore, QtGui
-from PyQt6.QtCore import QUrl
+from PyQt6 import QtCore
 from PyQt6.QtWidgets import (
     QSpacerItem,
     QSizePolicy,
@@ -135,14 +134,14 @@ class UiMainWindow:
         menu_list_model = menu_list_widget.model()
         self.menu_select_model = menu_list_widget.selectionModel()
 
-        self.menu_item_research = ListItemWidget("Menu item 1", MenuItem.RESEARCH, "icons:research.svg")
+        # self.menu_item_research = ListItemWidget("Menu item 1", MenuItem.RESEARCH, "icons:research.svg")
         self.menu_item_nonlinear = ListItemWidget("Menu item 2", MenuItem.NONLINEAR, "icons:nonlinear.svg")
         self.menu_item_slat = ListItemWidget("Menu item 3", MenuItem.SLAT, "icons:slat.svg")
         self.menu_item_ni = ListItemWidget("Menu item 4", MenuItem.NI, "icons:ni.svg")
         self.menu_item_sne = ListItemWidget("Menu item 5", MenuItem.SNE, "icons:sne.svg")
         self.menu_item_aif = ListItemWidget("Menu item 6", MenuItem.AIF, "icons:aif.svg")
 
-        menu_list_model.appendRow(self.menu_item_research)
+        # menu_list_model.appendRow(self.menu_item_research)
         menu_list_model.appendRow(self.menu_item_nonlinear)
         menu_list_model.appendRow(self.menu_item_slat)
         menu_list_model.appendRow(self.menu_item_ni)
@@ -269,7 +268,7 @@ class UiMainWindow:
 
     def translate_ui(self, main_window):
         _translate = QtCore.QCoreApplication.translate
-        self.menu_item_research.setText(_translate("main_window", "Методы исследования"))
+        # self.menu_item_research.setText(_translate("main_window", "Методы исследования"))
         self.menu_item_nonlinear.setText(_translate("main_window", "Нелинейные уравнения"))
         self.menu_item_slat.setText(_translate("main_window", "СЛАУ"))
         self.menu_item_ni.setText(_translate("main_window", "Численные интегрирования"))
