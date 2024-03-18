@@ -1,18 +1,15 @@
 import logging
 
 from PyQt6 import sip
-from PyQt6.QtCore import QPointF, Qt, pyqtSignal
-from PyQt6.QtGui import QColor
+from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtWidgets import (
     QWidget,
     QGridLayout,
-    QGraphicsDropShadowEffect,
     QHBoxLayout,
     QToolButton,
     QVBoxLayout,
     QSlider
 )
-
 from pyqtgraph import PlotDataItem, AxisItem
 from pyqtgraph import PlotWidget, InfiniteLine
 
@@ -114,11 +111,6 @@ class Graphic(QWidget):
             }
         """.replace(
             "$HOVER", hover_color,
-        ))
-        sheet.setGraphicsEffect(QGraphicsDropShadowEffect(
-            blurRadius=10,
-            color=QColor(0, 0, 0, 50),
-            offset=QPointF(0, 0)
         ))
 
         layout = QGridLayout()
