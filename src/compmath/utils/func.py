@@ -64,7 +64,10 @@ def make_callable(func: str | Basic) -> FuncReturn:
 
     symbols_list = [Symbol(s) for s in symbols_str_list]
 
-    lambda_func = lambdify(symbols_list, expr, 'numpy')
+    try:
+        lambda_func = lambdify(symbols_list, expr, 'numpy')
+    except TypeError:
+        raise FunctionValidateError(f"Invalid literal: {func}")
 
     def wrapped_func(a0: float | int | None = None, a1: float | int | None = None):
         if 'x' in symbols_str_list and 'y' in symbols_str_list:
