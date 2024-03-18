@@ -146,9 +146,11 @@ class NItermView(QWidget):
 
         self.error_label.setText("")
 
+    def was_calculated(self):
+        self.in_normal_state()
+
         if self.model.reference_result:
             self.reference_result_input.setText(str(self.model.reference_result))
-            self.in_normal_state()
             self.reference_result_input.setCursorPosition(0)
 
         if self.model.surface_area:
@@ -164,7 +166,7 @@ class NItermView(QWidget):
             self.arc_length_input.setCursorPosition(0)
 
         if self.model.graphics:
-            items = self.model.graphics[0].plot_items()
+            items = self.model.graphics[-1].plot_items()
             self.graphic.set_element(items)
 
     def model_loaded(self):

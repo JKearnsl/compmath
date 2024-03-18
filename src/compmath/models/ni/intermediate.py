@@ -83,4 +83,8 @@ class InterModel(BaseGraphicModel):
         self.volume = content[3]
         self.arc_length = content[4]
 
-        self.notify_observers()
+        self.was_calculated()
+
+    def was_calculated(self):
+        for observer in self._mObservers:
+            observer.was_calculated()
