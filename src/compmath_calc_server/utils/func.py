@@ -409,15 +409,13 @@ def surface_area(fx_str: str, a: float | int, b: float | int, symbol: str) -> fl
     """
     x = symbols('x')
     fx_lambda = lambdify(symbol, fx_str, 'numpy')
-    df_dx_str = str(diff(fx_str, 'x'))
-    df_dx = lambdify(x, df_dx_str, "numpy")
+    df_dx = lambdify(x, diff(fx_str, x), "numpy")
 
     def integrand(x):
-        return fx_lambda(x) * sqrt(1 + df_dx(x) ** 2)
+        return abs(fx_lambda(x)) * sqrt(1 + df_dx(x) ** 2)
 
-    surface_area, error = cast(tuple[float, float], quad(integrand, a, b))
-    surface_area *= 2 * pi
-    return surface_area
+    result, error = cast(tuple[float, float], quad(integrand, a, b))
+    return 2 * pi * result
 
 
 def gauss_calc(
