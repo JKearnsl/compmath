@@ -1,6 +1,8 @@
 import atexit
+import logging
 import os
 import shutil
+import socket
 import sys
 import tempfile
 from subprocess import Popen
@@ -14,6 +16,21 @@ from compmath.controllers import ApplicationController
 from compmath.themes import BASE_THEME
 from compmath.utils.theme import get_themes
 from compmath.views.widgets import WidgetsFactory
+
+import psutil
+
+
+def kill_procs(host: str, port: int):
+    ip = socket.gethostbyname(host)
+    for proc in psutil.process_iter(['pid', 'name', 'connections']):
+        try:
+            conns = proc.connections("inet4")
+        except psutil.AccessDenied:
+            continue
+
+        for conn in conns:
+            if conn.laddr.port == port and conn.laddr.ip == ip:
+                proc.kill()
 
 
 class CompMathApp(QApplication):
@@ -54,7 +71,17 @@ class CompMathApp(QApplication):
         app_icon.addFile("icons:logo-256.png", QtCore.QSize(256, 256))
         self.setWindowIcon(app_icon)
 
-        # Compmath Calc Server
+        # CompMath Calc Server
+
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            is_port_in_use = s.connect_ex((config.VAR.CALC_SERVER.HOST, config.VAR.CALC_SERVER.PORT)) == 0
+
+        if is_port_in_use:
+            logging.warning(f"Port {config.VAR.CALC_SERVER.PORT} is already in use")
+            logging.warning("Trying to terminate the process")
+            kill_procs(config.VAR.CALC_SERVER.HOST, config.VAR.CALC_SERVER.PORT)
+            logging.warning("Process terminated")
+
         subprocess = Popen(
             [
                 "gunicorn",
