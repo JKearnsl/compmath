@@ -8,19 +8,17 @@ from PyQt6.QtWidgets import (
     QToolButton,
     QVBoxLayout
 )
-from pyqtgraph import PlotDataItem
 from pyqtgraph.opengl import GLViewWidget, GLGraphicsItem, GLAxisItem
-
+from OpenGL import error as opengl_error
 from compmath.utils.icon import svg_ico
+from compmath.views.widgets import Dialog
 
 
 class GLCanvas(GLViewWidget):
     def __init__(self, background_color: str = "white", parent=None):
         super().__init__(parent)
-        self._items = []
 
-        self.opts['distance'] = 200
-        self.setWindowTitle('pyqtgraph example: GLLinePlotItem')
+        self.opts['distance'] = 10
         self.setBackgroundColor(background_color)
 
         self.axis = GLAxisItem(
@@ -28,36 +26,30 @@ class GLCanvas(GLViewWidget):
         )
         self.addItem(self.axis)
 
-    def add_temp_item(self, item):
+    def addItem(self, item: GLGraphicsItem):
         if self and not sip.isdeleted(self):
-            self._items.append(item)
-            self.addItem(item)
+            super().addItem(item)
         else:
             logging.warning("[GLCanvas] self is deleted")
 
-    def clear_temp_items(self):
+    def clearItems(self):
         if self and not sip.isdeleted(self):
-            for item in self._temp_items:
-                self.removeItem(item)
-            self._items.clear()
+            self.clear()
+            self.addItem(self.axis)
         else:
             logging.warning("[GLCanvas] self is deleted")
 
-    def temp_items(self) -> list[PlotDataItem]:
-        return self._items
+    def paintGL(self, region=None, viewport=None, useItemNames=False):
+        try:
+            super().paintGL(region, viewport, useItemNames)
+        except opengl_error.Error as error:
+            logging.error(f"[GLCanvas] OpenGL Error in paintGL: {error}")
 
 
-# def copy_plot_data_item(item: PlotDataItem) -> PlotDataItem:
-#     x, y, z = item.getData()
-#
-#     copied_item =
-#
-#     copied_item.setPen(item.opts['pen'])
-#     copied_item.setSymbol(item.opts['symbol'])
-#     copied_item.setSymbolBrush(item.opts['symbolBrush'])
-#     copied_item.setSymbolPen(item.opts['symbolPen'])
-#
-#     return copied_item
+def copy_item(item: GLGraphicsItem) -> GLGraphicsItem:
+    if isinstance(item, GLAxisItem):
+        return GLAxisItem(size=item.size())
+    return item
 
 
 class GLWidget(QWidget):
@@ -73,7 +65,6 @@ class GLWidget(QWidget):
     ):
         super().__init__(parent)
 
-        self._plots: list[PlotDataItem] = []
         self._current_plot = None
         self._slider_enabled = True
 
@@ -140,6 +131,7 @@ class GLWidget(QWidget):
 
         fullscreen_btn.setIconSize(fullscreen_btn.size())
         fullscreen_btn.setIcon(svg_ico("icons:fullscreen.svg"))
+        fullscreen_btn.clicked.connect(self.show_full_screen)
         toolbar_layout.addWidget(fullscreen_btn)
         self.toolbar = toolbar
 
@@ -147,27 +139,27 @@ class GLWidget(QWidget):
         layout.addWidget(toolbar)
 
     def set_element(self, element_items: list[GLGraphicsItem]):
-        self._plots = element_items
+        self._gl_widget.clearItems()
         for item in element_items:
             self._gl_widget.addItem(item)
 
-    # def show_full_screen(self):
-    #     dialog = Dialog(
-    #         background_window=self._dialog_background_color,
-    #         background_close_btn=self._background_color,
-    #         hover_close_btn=self._hover_color,
-    #         text_color_close_btn=self._text_header_color,
-    #         parent=self
-    #     )
-    #     dialog.setModal(True)
-    #     dialog.setFixedSize(800, 450)
-    #
-    #     graphic = GraphicCanvas(self._dialog_background_color, self._text_color)
-    #     for item in self._gl_widget.temp_items():
-    #         graphic.addItem(copy_plot_data_item(item))
-    #     dialog.layout().addWidget(graphic)
-    #
-    #     dialog.show()
+    def show_full_screen(self):
+        dialog = Dialog(
+            background_window=self._dialog_background_color,
+            background_close_btn=self._background_color,
+            hover_close_btn=self._hover_color,
+            text_color_close_btn=self._text_header_color,
+            parent=self
+        )
+        dialog.setModal(True)
+        dialog.setFixedSize(800, 450)
+
+        # graphic = GLCanvas(self._dialog_background_color, self)
+        # for item in self._gl_widget.items:
+        #     graphic.addItem(copy_item(item))
+        # dialog.layout().addWidget(graphic)
+
+        dialog.show()
 
     def setFixedHeight(self, a0: int) -> None:
         self._gl_widget.setFixedHeight(a0 - 50)
