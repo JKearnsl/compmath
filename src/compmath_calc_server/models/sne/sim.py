@@ -67,7 +67,6 @@ def calc(data: InputSNEModel) -> OutputSNEModel:
         graphics.append(graphic.build())
 
     solve_log.append(f"\nРешение: {x_vector}")
-
     return OutputSNEModel(
         solve_log=solve_log,
         table=table,

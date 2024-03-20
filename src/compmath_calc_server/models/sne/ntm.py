@@ -77,7 +77,7 @@ def calc(data: InputSNEModel) -> OutputSNEModel:
         x_vector = delta_x + x_vector
 
         # Расчет оценки достаточной точности
-        delta = np.max(np.abs(delta_x))
+        delta = np.mean(np.abs(delta_x))
 
         table.append(TableRow(iter_num=k, vector=x_vector, delta=delta))
         graphic = GraphicBuilder(x_limits=x_limits, y_limits=y_limits)
