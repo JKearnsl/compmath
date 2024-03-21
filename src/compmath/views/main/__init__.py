@@ -151,7 +151,6 @@ class MainView(QWidget, DObserver, metaclass=TSMeta):
 
     def closeEvent(self, event):
         self.scheduler.pause()
-        self.controller.close()
         event.accept()
 
     def error_handler(self, error):

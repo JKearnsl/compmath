@@ -32,6 +32,5 @@ class ApplicationController:
             ),
             self.widgets_factory,
             self.api_factory,
-            self.config,
-            self
+            self.config
         )

@@ -4,7 +4,7 @@ from compmath.views.widgets import WidgetsFactory
 from compmath.views.main import MainView
 
 from compmath.controllers.research import ResearchController
-from compmath.models import ResearchModel, MenuItem
+from compmath.models import ResearchModel, MenuItem, MainModel
 from compmath.controllers.nonlinear import NoNLinearController
 from compmath.models import NoNLinearModel
 from compmath.controllers.slat import SLATController
@@ -24,17 +24,15 @@ class MainController:
 
     def __init__(
             self,
-            model: 'MainModel',
-            widgets_factory: 'WidgetsFactory',
+            model: MainModel,
+            widgets_factory: WidgetsFactory,
             api_factory: APIFactory,
-            config: 'InIConfig',
-            app_controller
+            config: InIConfig,
     ):
         self.model = model
         self.api_factory = api_factory
         self.config = config
         self.widgets_factory = widgets_factory
-        self.app_controller = app_controller
         self.view = MainView(self, model, widgets_factory)
 
         self.view.show()
@@ -73,6 +71,3 @@ class MainController:
                 )
             case _:
                 raise ValueError(f'Unknown page_id: {page_id}')
-
-    def close(self):
-        ...
