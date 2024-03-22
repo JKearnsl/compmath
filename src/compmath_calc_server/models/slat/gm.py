@@ -74,9 +74,9 @@ def calc_transform(a_matrix: list[list[float]], b_vector: list[float]) -> tuple[
         log.append("Необходимо преобразовать исходную матрицу")
 
         log.append("\nПреобразованная матрица\n")
-        transformed_a_matrix, transformed_b_vector, log = transform_matrix(a_matrix, b_vector)
+        transformed_a_matrix, transformed_b_vector, transform_log = transform_matrix(a_matrix, b_vector)
         log.append("Шаги:")
-        log.extend(log)
+        log.extend(transform_log)
         log.append("")
         for i, row in enumerate(transformed_a_matrix):
             log.append(
