@@ -2,8 +2,7 @@ import logging
 from fastapi import FastAPI, APIRouter
 from fastapi.exceptions import RequestValidationError
 
-from compmath_calc_server.controllers import sne, ni
-from compmath_calc_server.controllers import aif
+from compmath_calc_server.controllers import sne, ni,  aif, slat
 from compmath_calc_server.config import load_config
 from compmath_calc_server.exceptions import APIError, handle_api_error, handle_404_error, handle_pydantic_error
 from compmath_calc_server.utils.openapi import custom_openapi
@@ -28,6 +27,7 @@ def create_app():
     api_router.include_router(aif.router, prefix="/aif", tags=["AIF"])
     api_router.include_router(sne.router, prefix="/sne", tags=["SNE"])
     api_router.include_router(ni.router, prefix="/ni", tags=["NI"])
+    api_router.include_router(slat.router, prefix="/slat", tags=["SLAT"])
     app.include_router(api_router)
 
     logging.debug("Регистрация обработчиков исключений")
