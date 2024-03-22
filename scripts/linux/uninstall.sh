@@ -2,23 +2,42 @@
 
 set -e
 
+# Variables
 PROGRAM_NAME='CompMath'
 PROGRAM_NAME_LOWER=$(echo "$PROGRAM_NAME" | tr '[:upper:]' '[:lower:]')
 
 INSTALL_PATH=/opt/$PROGRAM_NAME_LOWER
-ICON_PATH="$ICON_PATH"
+ICON_PATH="/usr/share/icons/hicolor"
 
-echo 'Удаление программы '$PROGRAM_NAME
+
+# Color map
+RED=$(tput setaf 1)
+GREEN=$(tput setaf 2)
+YELLOW=$(tput setaf 3)
+BOLD=$(tput bold)
+ENDCOLOR=$(tput sgr0)
+
+log() {
+  if [ "$1" = "info" ]; then
+    echo "$BOLD$GREEN$2$ENDCOLOR"
+  elif [ "$1" = "error" ]; then
+    echo "${BOLD}${RED}Ошибка: $2${ENDCOLOR}" >&2
+  elif [ "$1" = "warning" ]; then
+    echo "$BOLD$YELLOW$2$ENDCOLOR"
+  fi
+}
+
+trap 'echo "$RED$BOLDВозникла ошибка при удалении программы $PROGRAM_NAME$ENDCOLOR"' EXIT
+
+log info "Удаление программы $PROGRAM_NAME"
 
 if [ "$(id -u)" -ne 0 ]; then
-  echo "Ошибка: этот скрипт должен быть запущен с правами суперпользователя." >&2
+  log error "Этот скрипт должен быть запущен с правами суперпользователя."
   exit 1
 fi
 
 # Remove app
-echo 'Удаление приложения...'
-
-rm -rf ${INSTALL_PATH:?}/
+rm -rf "${INSTALL_PATH:?}/"
 
 # Remove files
 getent passwd | while IFS=: read -r _ _ uid _ _ home _; do
@@ -42,34 +61,36 @@ rm -f "$ICON_PATH"/256x256/apps/"$PROGRAM_NAME_LOWER".png
 # Update icon cache
 # GNOME
 if [ -x "$(command -v gtk-update-icon-cache)" ]; then
-    echo "Обновление кэша иконок GNOME..."
+    log info "Обновление кэша иконок GNOME..."
     gtk-update-icon-cache -f -t "$ICON_PATH"/
 fi
 
 # KDE
 if [ -x "$(command -v kbuildsycoca5)" ]; then
-    echo "Обновление кэша иконок KDE..."
+    log info "Обновление кэша иконок KDE..."
     kbuildsycoca5 --noincremental
 fi
 
 # XFCE
 if [ -x "$(command -v xfce4-panel)" ]; then
-    echo "Обновление кэша иконок XFCE..."
+    log info "Обновление кэша иконок XFCE..."
     xfce4-panel --restart
 fi
 
 # LXDE
 if [ -x "$(command -v lxpanelctl)" ]; then
-    echo "Обновление кэша иконок LXDE..."
+    log info "Обновление кэша иконок LXDE..."
     lxpanelctl restart
 fi
 
 # MATE
 if [ -x "$(command -v mate-panel)" ]; then
-    echo "Обновление кэша иконок MATE..."
+    log info "Обновление кэша иконок MATE..."
     mate-panel --replace &
 fi
 
-echo "Обновление кэша иконок завершено."
+log info "Обновление кэша иконок завершено."
 
-echo 'Удаление успешно завершено.'
+log info 'Удаление успешно завершено.'
+
+trap - EXIT
