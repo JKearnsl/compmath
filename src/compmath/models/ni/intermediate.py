@@ -1,5 +1,3 @@
-import numpy as np
-
 from compmath.api.ni import NIClient
 from compmath.models.base import BaseGraphicModel
 from compmath.models.graphic import Graphic
@@ -18,7 +16,6 @@ class InterModel(BaseGraphicModel):
         self._fx = "sin(2*x**2 + 1)"
         self._interval = (0, 1)
         self._x_limits = (-2, 2)
-        self._y_limits = (-2, 2)
 
         self.reference_result = None
         self.surface_area = None

@@ -14,6 +14,12 @@ class GModel(BaseSLATModel):
         self._title = "Метод Гаусса"
         self._description = "Метод Гаусса - метод решения системы линейных уравнений..."
 
+        self.matrix: list[list[int | float]] = [
+            [56.43, -8.54, 6.36, 9.76],
+            [4.34, 48.87, 9.18, 43.48],
+            [6.75, -8.93, 48.88, 56.92]
+        ]
+
     def calc(self):
         self._api_client.calc_gm(
             self.a(),

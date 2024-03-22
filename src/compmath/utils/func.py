@@ -1,7 +1,5 @@
-from copy import deepcopy
-from typing import Callable, Protocol, Sequence
+from typing import Callable, Protocol
 
-import numpy as np
 from sympy import sympify, lambdify, SympifyError, Basic, solve
 from sympy.core import Symbol
 
@@ -148,77 +146,3 @@ def line_between_points(
     m = (y2 - y1) / (x2 - x1)
     b = y1 - m * x1
     return lambda x: m * x + b
-
-
-def gauss_calc(
-        a_matrix: Sequence[Sequence[float]],
-        b_vector: Sequence[float],
-        n: int
-) -> tuple[Sequence[float], Sequence[float], Sequence[Sequence[float]]] | None:
-    """
-    Метод Гаусса
-
-
-    :param a_matrix:
-    :param b_vector:
-    :param n:
-    :return: Вектор решений, вектор невязок, преобразованная матрица
-    """
-    a_matrix = deepcopy(a_matrix)
-    b_vector = deepcopy(b_vector)
-
-    a_matrix_copy = deepcopy(a_matrix)
-    b_vector_copy = deepcopy(b_vector)
-
-    for k in range(n - 1):
-        if a_matrix[k][k] == 0:
-            m = k + 1
-            while m < n and a_matrix[m][k] == 0:
-                m += 1
-            if m == n:
-                return None  # Система не обусловлена, не удалось заменить строку
-            else:
-                # Обмен строк
-                a_matrix[k], a_matrix[m] = a_matrix[m], a_matrix[k]
-                b_vector[k], b_vector[m] = b_vector[m], b_vector[k]
-
-        # Прямой ход
-        for i in range(k + 1, n):
-            q = a_matrix[i][k] / a_matrix[k][k]
-            for j in range(k, n):
-                a_matrix[i][j] -= q * a_matrix[k][j]
-            b_vector[i] -= q * b_vector[k]
-
-    x_vector = [b_vector[c] / a_matrix[c][c] for c in range(n)]
-
-    # Обратный ход
-    for i in range(n - 1, -1, -1):
-        s = sum(a_matrix[i][j] * x_vector[j] for j in range(i + 1, n))
-        x_vector[i] = (b_vector[i] - s) / a_matrix[i][i]
-
-    # Невязки
-    delta_vector = []
-    for i in range(n):
-        s = 0
-        for j in range(n):
-            s += a_matrix_copy[i][j] * x_vector[j]
-        delta_vector.append(b_vector_copy[i] - s)
-
-    result_matrix = []
-    for i in range(n):
-        result_matrix.append([a_matrix_copy[i][j] for j in range(n)])
-        result_matrix[i].append(b_vector_copy[i])
-
-    return x_vector, delta_vector, result_matrix
-
-
-def is_diagonal_dominance(matrix: Sequence[Sequence[float]]) -> bool:
-    matrix = np.array(matrix)
-
-    diagonal = np.abs(matrix.diagonal())
-
-    # Сумма абсолютных значений элементов вне диагонали
-    off_diagonal = np.sum(np.abs(matrix), axis=1) - diagonal
-
-    # Проверить диагональное преобладание
-    return np.all(diagonal >= off_diagonal)

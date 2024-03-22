@@ -1,8 +1,6 @@
 from abc import abstractmethod
 from dataclasses import dataclass
 
-from sympy import diff
-
 from compmath.models.base import BaseGraphicModel
 from compmath.models.graphic import Graphic
 from compmath.utils.func import make_callable, solve_rel_var, is_valid_func

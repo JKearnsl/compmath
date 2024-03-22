@@ -22,7 +22,6 @@ class LRModel(BaseNIModel):
         self._interval = (0, 1)
         self._intervals = 10
         self._x_limits = (-2, 2)
-        self._y_limits = (-2, 2)
 
     def calc(self):
         self.api_client.calc_lrm(
