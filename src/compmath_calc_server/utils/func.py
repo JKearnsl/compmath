@@ -480,18 +480,6 @@ def gauss_calc(
     return x_vector, delta_vector, result_matrix
 
 
-def is_diagonal_dominance(matrix: Sequence[Sequence[float]]) -> bool:
-    matrix = np.array(matrix)
-
-    diagonal = np.abs(matrix.diagonal())
-
-    # Сумма абсолютных значений элементов вне диагонали
-    off_diagonal = np.sum(np.abs(matrix), axis=1) - diagonal
-
-    # Проверить диагональное преобладание
-    return np.all(diagonal >= off_diagonal)
-
-
 def is_converges(
         func1: str,
         func2: str,
