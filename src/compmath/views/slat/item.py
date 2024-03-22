@@ -292,7 +292,7 @@ class SLATItemView(QWidget):
                 header_layout = self.widgets_factory.heading3(title)
             main_layout.addWidget(header_layout)
 
-            content_layout = QHBoxLayout()
+            content_layout = QVBoxLayout()
             content_layout.setContentsMargins(5, 5, 5, 0)
             content_layout.setSpacing(10)
             main_layout.addLayout(content_layout)
@@ -314,9 +314,15 @@ class SLATItemView(QWidget):
                 table_widget.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeMode.ResizeToContents)
                 for i, row in enumerate(table):
                     table_widget.setItem(i, 0, QTableWidgetItem(str(row.iter_num)))
-                    table_widget.setItem(i, 1, QTableWidgetItem(str(row.delta)))
+                    delta = format(row.delta, ".17f")
+                    if '.' in delta:
+                        delta = delta.rstrip('0').rstrip('.')
+                    table_widget.setItem(i, 1, QTableWidgetItem(delta))
                     for j, x in enumerate(row.vector):
-                        table_widget.setItem(i, j + 2, QTableWidgetItem(str(x)))
+                        val = format(x, ".17f")
+                        if '.' in val:
+                            val = val.rstrip('0').rstrip('.')
+                        table_widget.setItem(i, j + 2, QTableWidgetItem(val))
                 content_layout.addWidget(table_widget)
 
         modal.exec()

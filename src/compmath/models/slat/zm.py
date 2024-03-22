@@ -1,45 +1,34 @@
+from compmath.api.slat import SLATClient
 from compmath.models.slat.base import BaseSLATModel, TableRow
 
 
 class ZModel(BaseSLATModel):
 
-    def __init__(self):
+    def __init__(self, api_client: SLATClient):
         super().__init__()
+
+        self._api_client = api_client
+        self._api_client.zmCalculated.connect(self.process_values)
+        self._api_client.zmError.connect(self.validation_error)
 
         self._title = "Метод Зейделя"
         self._description = "Метод Зейделя - модификация метода простых итераций"
 
+        self.matrix: list[list[int | float]] = [
+            [56.43, -8.54, 6.36, 9.76],
+            [4.34, 48.87, 9.18, 43.48],
+            [6.75, -8.93, 48.88, 56.92]
+        ]
+
     def calc(self):
-        self.results.clear()
-        table = []
+        self._api_client.calc_zm(
+            self.a(),
+            self.b(),
+            self.eps,
+            self.iters_limit,
+            self.x0
+        )
 
-        k = 0
-        n = len(self.a())
-        a_matrix = self.a()
-        b_vector = self.b()
-        x = self.x0.copy()
-
-        while True:
-            k += 1
-            x_prev = x.copy()
-            for i in range(n):
-                s1 = sum(a_matrix[i][j] * x[j] for j in range(i))
-                s2 = sum(a_matrix[i][j] * x_prev[j] for j in range(i + 1, n))
-                x[i] = (b_vector[i] - s1 - s2) / a_matrix[i][i]
-
-            # Оценка точности
-            delta = max(abs(x[i] - x_prev[i]) for i in range(n))
-
-            table.append(
-                TableRow(
-                    iter_num=k,
-                    vector=x.copy(),
-                    delta=delta
-                )
-            )
-
-            if delta <= self.eps or k > self.iters_limit:
-                break
-
-        self.results.append(([], table, "Результаты"))
+    def process_values(self, content: list[tuple[list[str], list[TableRow], str]]):
+        self.results = content
         self.notify_observers()
