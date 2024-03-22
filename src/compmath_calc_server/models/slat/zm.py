@@ -39,7 +39,7 @@ def calc_zm(
         k += 1
         x_prev = x.copy()
         for i in range(n):
-            s = sum(a_matrix[i][j] * x_prev[j] for j in range(n) if j != i)
+            s = sum(a_matrix[i][j] * x[j] for j in range(n) if j != i)
             x[i] = (b_vector[i] - s) / a_matrix[i][i]
 
         # Оценка точности
