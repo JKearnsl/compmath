@@ -113,18 +113,18 @@ def calc_normalized(a_matrix: list[list[float]], b_vector: list[float]) -> tuple
         )
 
     log.append("\nРешение методом Гаусса\n")
-    normal_gauss_vector = gauss_calc(normal_a_matrix, normal_b_vector, n)
-    if normal_gauss_vector is None:
+    gauss_vector = gauss_calc(normal_a_matrix, normal_b_vector, n)
+    if gauss_vector is None:
         log.append("Система не обусловлена")
         return log, [], "Нормализованная матрица"
 
-    log.append("\n".join(str(cell) for cell in normal_gauss_vector[0]))
+    log.append("\n".join(str(cell) for cell in gauss_vector[0]))
 
     log.append("\nВектор невязок\n")
-    log.append("\n".join(str(round(cell, 2)) for cell in normal_gauss_vector[1]))
+    log.append("\n".join(str(round(cell, 2)) for cell in gauss_vector[1]))
 
     log.append("\nТреугольная матрица\n")
-    for row in normal_gauss_vector[2]:
+    for row in gauss_vector[2]:
         log.append("\t".join(str(round(cell, 2)) for cell in row))
 
     return log, [], "Нормализованная матрица"
