@@ -1,6 +1,7 @@
 import atexit
 import logging
 import os
+import platform
 import shutil
 import socket
 import sys
@@ -82,18 +83,32 @@ class CompMathApp(QApplication):
             kill_procs(config.VAR.CALC_SERVER.HOST, config.VAR.CALC_SERVER.PORT)
             logging.warning("Process terminated")
 
-        subprocess = Popen(
-            [
-                "gunicorn",
-                "--bind",
-                f"{config.VAR.CALC_SERVER.HOST}:{config.VAR.CALC_SERVER.PORT}",
-                "--workers",
-                "3",
-                "--worker-class",
-                "uvicorn.workers.UvicornWorker",
-                "compmath_calc_server.main:application"
-            ]
-        )
+        if platform.system() == "Windows":
+            subprocess = Popen(
+                [
+                    "uvicorn",
+                    "compmath_calc_server.main:application",
+                    "--host",
+                    config.VAR.CALC_SERVER.HOST,
+                    "--port",
+                    str(config.VAR.CALC_SERVER.PORT),
+                    "--workers",
+                    "3",
+                ]
+            )
+        else:
+            subprocess = Popen(
+                [
+                    "gunicorn",
+                    "--bind",
+                    f"{config.VAR.CALC_SERVER.HOST}:{config.VAR.CALC_SERVER.PORT}",
+                    "--workers",
+                    "3",
+                    "--worker-class",
+                    "uvicorn.workers.UvicornWorker",
+                    "compmath_calc_server.main:application"
+                ]
+            )
         atexit.register(subprocess.terminate)
 
         # Theme
