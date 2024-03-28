@@ -2,7 +2,7 @@ from math import sqrt
 from typing import Sequence
 
 from compmath_calc_server.models.slat.dto import InputSLATModel, TableRow
-from compmath_calc_server.models.slat.utils import is_diagonal_dominance, transform_matrix, normalize_matrix
+from compmath_calc_server.models.slat.utils import is_diagonal_dominance, normalize_matrix
 
 
 def calc(data: InputSLATModel) -> list[tuple[list[str], list[TableRow], str]]:
@@ -17,7 +17,6 @@ def calc(data: InputSLATModel) -> list[tuple[list[str], list[TableRow], str]]:
         x0 = [0] * len(a_matrix)
 
     results.append(calc_original(a_matrix, b_vector, x0, eps, iters_limit))
-    results.append(calc_transformed(a_matrix, b_vector, x0, eps, iters_limit))
     results.append(calc_normalized(a_matrix, b_vector, x0, eps, iters_limit))
 
     return results
@@ -74,31 +73,7 @@ def calc_original(
             "\t".join(str(cell) for cell in row) + "\t|   " + str(b_vector[i])
         )
 
-    log.append("\nРешение МПИ\n")
-    result = calc_sim(a_matrix, b_vector, x0, eps, iters_limit)
-    log.append("\n".join(str(cell) for cell in result[0]))
-
-    log.append("\nКол-во итераций\n")
-    log.append(str(len(result[1])))
-
-    return log, result[1], "Исходная матрица"
-
-
-def calc_transformed(
-        a_matrix: list[list[float]],
-        b_vector: list[float],
-        x0: list[float],
-        eps: float,
-        iters_limit: int
-) -> tuple[list[str], list[TableRow], str]:
-    # Преобразованная матрица
-    log = ["\nИсходная матрица\n"]
-    for i, row in enumerate(a_matrix):
-        log.append(
-            "\t".join(str(cell) for cell in row) + "\t|   " + str(b_vector[i])
-        )
-    log.append("")
-
+    log.append("\nПроверка диагонального преобладания")
     for i, row in enumerate(a_matrix):
         sum_row = sum(abs(cell) for j, cell in enumerate(row) if j != i)
         log.append(
@@ -108,7 +83,6 @@ def calc_transformed(
         )
     log.append("")
 
-    table = []
     if is_diagonal_dominance(a_matrix):
         log.append("Матрица обладает диагональным преобладанием")
         log.append("Необходимости в элементарных преобразованиях исходной матрицы нет")
@@ -116,21 +90,14 @@ def calc_transformed(
         log.append("Матрица не обладает диагональным преобладанием")
         log.append("Необходимо преобразовать исходную матрицу")
 
-        log.append("\nПреобразованная матрица\n")
-        transformed_a_matrix, transformed_b_vector, transform_log = transform_matrix(a_matrix, b_vector)
-        log.append("Шаги:")
-        log.extend(transform_log)
-        log.append("")
+    log.append("\nРешение МПИ\n")
+    result = calc_sim(a_matrix, b_vector, x0, eps, iters_limit)
+    log.append("\n".join(str(cell) for cell in result[0]))
 
-        log.append("\nРешение МПИ\n")
-        result = calc_sim(a_matrix, b_vector, x0, eps, iters_limit)
-        log.append("\n".join(str(cell) for cell in result[0]))
+    log.append("\nКол-во итераций\n")
+    log.append(str(len(result[1])))
 
-        log.append("\nКол-во итераций\n")
-        log.append(str(len(result[1])))
-        table.extend(result[1])
-
-    return log, table, "Преобразованная матрица"
+    return log, result[1], "Исходная матрица"
 
 
 def calc_normalized(
