@@ -102,11 +102,12 @@ def calc_transformed(
         sum_row = sum(abs(cell) for j, cell in enumerate(row) if j != i)
         log.append(
             f"sum({', '.join(f'|{cell}|' for j, cell in enumerate(row) if j != i)}) = "
-            f"{sum_row}   {'>' if sum_row > abs(row[i]) else '<='}   |{row[i]}|"
-            f"\t[{'-' if sum_row > abs(row[i]) else '+'}]"
+            f"{sum_row:.2f}   {'>=' if sum_row >= abs(row[i]) else '<'}   |{row[i]}|"
+            f"\t[{'-' if sum_row >= abs(row[i]) else '+'}]"
         )
     log.append("")
 
+    table = []
     if is_diagonal_dominance(a_matrix):
         log.append("Матрица обладает диагональным преобладанием")
         log.append("Необходимости в элементарных преобразованиях исходной матрицы нет")
@@ -120,14 +121,15 @@ def calc_transformed(
         log.extend(transform_log)
         log.append("")
 
-    log.append("\nРешение Зейдель\n")
-    result = calc_zm(a_matrix, b_vector, x0, eps, iters_limit)
-    log.append("\n".join(str(cell) for cell in result[0]))
+        log.append("\nРешение Зейдель\n")
+        result = calc_zm(a_matrix, b_vector, x0, eps, iters_limit)
+        log.append("\n".join(str(cell) for cell in result[0]))
 
-    log.append("\nКол-во итераций\n")
-    log.append(str(len(result[1])))
+        log.append("\nКол-во итераций\n")
+        log.append(str(len(result[1])))
+        table.extend(result[1])
 
-    return log, result[1], "Преобразованная матрица"
+    return log, table, "Преобразованная матрица"
 
 
 def calc_normalized(

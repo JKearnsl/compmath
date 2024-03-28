@@ -60,4 +60,4 @@ def is_diagonal_dominance(matrix: Sequence[Sequence[float]]) -> bool:
     off_diagonal = np.sum(np.abs(matrix), axis=1) - diagonal
 
     # Проверить диагональное преобладание
-    return np.all(diagonal >= off_diagonal)
+    return np.all(diagonal > off_diagonal)
