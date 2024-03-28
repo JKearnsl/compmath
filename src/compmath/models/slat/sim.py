@@ -12,11 +12,12 @@ class SIModel(BaseSLATModel):
 
         self._title = "Метод простых итераций"
         self._description = ""
+
         self.matrix: list[list[int | float]] = [
-            [56.43, -8.54, 6.36, 9.76],
-            [4.34, 48.87, 9.18, 43.48],
-            [6.75, -8.93, 48.88, 56.92]
-        ]
+            [2.39, -0.48, 1.08, 4.13],
+            [0.54, 1.82, 0.73, 2.42],
+            [0.32, -0.65, 1.11, -0.47]
+        ] # S1 + S2 ; S2 - S3
 
     def calc(self):
         self._api_client.calc_sim(
