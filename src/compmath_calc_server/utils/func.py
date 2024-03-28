@@ -450,7 +450,6 @@ def gauss_calc(
                 a_matrix[k], a_matrix[m] = a_matrix[m], a_matrix[k]
                 b_vector[k], b_vector[m] = b_vector[m], b_vector[k]
 
-        # Прямой ход
         for i in range(k + 1, n):
             q = a_matrix[i][k] / a_matrix[k][k]
             for j in range(k, n):

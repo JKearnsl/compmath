@@ -22,7 +22,7 @@ def calc_original(a_matrix: list[list[float]], b_vector: list[float]) -> tuple[l
             "\t".join(str(cell) for cell in row) + "\t|   " + str(b_vector[i])
         )
 
-    log.append("\nПрямой ход метода Гаусса\n")
+    log.append("\nМетод Гаусса\n")
     original_gauss_vector = gauss_calc(a_matrix, b_vector, n)
     if original_gauss_vector is None:
         log.append("Система не обусловлена")
