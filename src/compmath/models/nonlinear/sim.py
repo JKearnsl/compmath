@@ -1,5 +1,7 @@
-from compmath.models.nonlinear.base import BaseNoNLinearModel, TableRow
+from sympy import symbols
+
 from compmath.models.graphic import Graphic
+from compmath.models.nonlinear.base import BaseNoNLinearModel, TableRow
 from compmath.utils.func import make_callable
 
 
@@ -29,10 +31,20 @@ class SIModel(BaseNoNLinearModel):
         self.table.clear()
 
         function = make_callable(self.fx)
+
+        x = symbols('x')
+
+        # Определение функции f(x)
+        # f_x = 0.5 ** x + 1 - (x - 2) ** 2
+        #
+        # phi_x = solve(f_x, x)
+        # phi = lambdify(x, phi_x[0])
+        phi = function
+
         a, b = self.interval
 
         # Проверка сходимости
-        if abs(function(a)) > 1 or abs(function(b)) > 1:
+        if function(a) * function(b) > 0:
             self.validation_error("Метод не сходится")
             return
 
@@ -40,7 +52,7 @@ class SIModel(BaseNoNLinearModel):
         x = a
         while True:
             x0 = x
-            x = function(x0)
+            x = phi(x0)
             n += 1
 
             graphic = Graphic(x_limits=self.x_limits, y_limits=self.y_limits)
