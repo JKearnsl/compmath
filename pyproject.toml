@@ -18,7 +18,7 @@ sympy= "^1.12"
 
 # Calc Server
 fastapi = "^0.110.0"
-gunicorn = "^21.2.0"
+gunicorn = "^22.0.0"
 uvicorn = "^0.29.0"
 
 # Plot
